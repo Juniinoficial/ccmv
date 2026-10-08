@@ -1,32 +1,32 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="theme-auto">
+<html lang="pt-BR" class="theme-dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>CCMV | Calculadora de Consumo Médio Veicular</title>
   
-  <!-- Fontes de Alta Precisão -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   
-  <!-- Tailwind CSS & Chart.js -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
-    /* CSS Variables Dinâmicas para Dark / Light / Ceramic */
     :root {
       --bg-canvas: #07090E;
       --card-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
       --card-border: rgba(255, 255, 255, 0.09);
       --card-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.8);
       --card-specular: rgba(255, 255, 255, 0.12);
-      --input-bg: rgba(0, 0, 0, 0.45);
-      --input-border: rgba(255, 255, 255, 0.12);
+      
+      /* Ajuste refinado para os inputs baseados na imagem */
+      --input-bg: rgba(255, 255, 255, 0.03); 
+      --input-border: rgba(255, 255, 255, 0.08);
+      
       --text-primary: #FFFFFF;
       --text-secondary: #94A3B8;
-      --header-bg: rgba(7, 9, 14, 0.75);
+      --header-bg: rgba(7, 9, 14, 0.65);
       --header-border: rgba(255, 255, 255, 0.08);
       --kpi-border: rgba(255, 255, 255, 0.06);
     }
@@ -41,7 +41,7 @@
       --input-border: rgba(0, 0, 0, 0.15);
       --text-primary: #0F172A;
       --text-secondary: #64748B;
-      --header-bg: rgba(248, 250, 252, 0.85);
+      --header-bg: rgba(248, 250, 252, 0.75);
       --header-border: rgba(0, 0, 0, 0.08);
       --kpi-border: rgba(0, 0, 0, 0.06);
     }
@@ -61,11 +61,11 @@
 
     .titanium-glass {
       background: var(--card-bg);
-      backdrop-filter: blur(28px) saturate(180%);
-      -webkit-backdrop-filter: blur(28px) saturate(180%);
+      backdrop-filter: blur(24px) saturate(160%);
+      -webkit-backdrop-filter: blur(24px) saturate(160%);
       border: 1px solid var(--card-border);
       box-shadow: inset 0 1px 1px 0 var(--card-specular), var(--card-shadow);
-      border-radius: 20px;
+      border-radius: 16px;
       transition: all 0.3s ease;
     }
 
@@ -73,20 +73,22 @@
       background: var(--input-bg);
       border: 1px solid var(--input-border);
       color: var(--text-primary);
-      transition: all 0.25s ease;
+      transition: all 0.2s ease;
     }
     .titanium-input:focus {
       outline: none;
-      border-color: var(--text-primary);
-      box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.25);
+      background: rgba(255, 255, 255, 0.06);
+      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.05);
     }
 
+    /* O z-index foi ajustado para -1 para não bloquear cliques na barra superior */
     .orb-glow {
       position: fixed;
       border-radius: 50%;
-      filter: blur(140px);
+      filter: blur(120px);
       pointer-events: none;
-      z-index: 0;
+      z-index: -1; 
       transition: opacity 0.5s ease;
     }
   </style>
@@ -94,17 +96,16 @@
 <body class="min-h-screen relative overflow-x-hidden selection:bg-slate-500/20">
 
   <!-- Luzes de Ambiente -->
-  <div id="orb1" class="orb-glow w-[500px] h-[500px] bg-slate-400/5 -top-40 -left-40"></div>
-  <div id="orb2" class="orb-glow w-[600px] h-[600px] bg-slate-600/5 top-1/2 -right-60"></div>
+  <div id="orb1" class="orb-glow w-[500px] h-[500px] bg-slate-500/10 -top-40 -left-40"></div>
+  <div id="orb2" class="orb-glow w-[600px] h-[600px] bg-slate-700/10 top-1/2 -right-60"></div>
 
-  <!-- Header Fixo com Desfoque Fluido -->
-  <header style="background: var(--header-bg); border-bottom: 1px solid var(--header-border);" class="sticky top-0 z-40 backdrop-blur-2xl transition-colors duration-300">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
+  <!-- Header Fixo -->
+  <header style="background: var(--header-bg); border-bottom: 1px solid var(--header-border);" class="sticky top-0 z-40 backdrop-blur-xl transition-colors duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
       
-      <!-- Logo com Ícone Vetorial de Carro -->
-      <div class="flex items-center space-x-4">
-        <div class="w-12 h-12 rounded-2xl titanium-glass flex items-center justify-center border-white/20 shadow-inner">
-          <svg class="w-7 h-7 text-current" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl titanium-glass flex items-center justify-center border-white/20 shadow-inner">
+          <svg class="w-6 h-6 text-current" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
             <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9C2.1 11.1 2 11.5 2 12v4c0 .6.4 1 1 1h2"/>
             <circle cx="7" cy="17" r="2"/>
             <path d="M9 17h6"/>
@@ -112,347 +113,305 @@
           </svg>
         </div>
         <div>
-          <h1 class="text-xl font-extrabold tracking-tight leading-tight" style="color: var(--text-primary)">
-            CCMV
-          </h1>
-          <p class="text-xs font-medium" style="color: var(--text-secondary)">
-            Calculadora de Consumo Médio Veicular
+          <h1 class="text-lg font-extrabold tracking-tight leading-none" style="color: var(--text-primary)">CCMV</h1>
+          <p class="text-[10px] font-medium uppercase tracking-wider mt-0.5" style="color: var(--text-secondary)">
+            Calculadora de Consumo
           </p>
         </div>
       </div>
 
-      <!-- Controles de Cabeçalho: Tema & Conexão -->
-      <div class="flex items-center space-x-3">
-        
-        <!-- Theme Switcher (Auto / Light / Dark) -->
-        <div class="titanium-glass p-1 rounded-xl flex items-center space-x-1 text-xs">
-          <button onclick="setTheme('auto')" id="btnThemeAuto" title="Automático (Segue o Sistema)" class="px-2.5 py-1.5 rounded-lg font-bold transition-all">Auto</button>
-          <button onclick="setTheme('light')" id="btnThemeLight" title="Modo Claro" class="px-2.5 py-1.5 rounded-lg font-bold transition-all">☀️</button>
-          <button onclick="setTheme('dark')" id="btnThemeDark" title="Modo Escuro" class="px-2.5 py-1.5 rounded-lg font-bold transition-all">🌙</button>
+      <div class="flex items-center space-x-3 relative z-50">
+        <!-- Theme Switcher -->
+        <div class="titanium-glass p-1 rounded-lg flex items-center space-x-1 text-xs">
+          <button onclick="setTheme('auto')" id="btnThemeAuto" title="Auto" class="px-2 py-1 rounded font-bold">Auto</button>
+          <button onclick="setTheme('light')" id="btnThemeLight" title="Claro" class="px-2 py-1 rounded font-bold">☀️</button>
+          <button onclick="setTheme('dark')" id="btnThemeDark" title="Escuro" class="px-2 py-1 rounded font-bold">🌙</button>
         </div>
 
-        <button onclick="toggleModalConfig()" class="h-10 px-3.5 rounded-xl titanium-glass hover:opacity-80 text-xs font-semibold transition-all flex items-center space-x-2">
-          <span>⚙️</span>
-          <span class="hidden sm:inline">Conexão Planilha</span>
+        <button onclick="toggleModalConfig()" class="h-8 px-3 rounded-lg titanium-glass hover:opacity-80 text-xs font-semibold transition-all">
+          ⚙️ <span class="hidden sm:inline ml-1">API</span>
         </button>
 
-        <div id="syncBadge" class="h-10 px-3.5 rounded-xl titanium-glass flex items-center space-x-2 text-xs font-num">
-          <span class="w-2 h-2 rounded-full bg-slate-400 animate-pulse" id="syncDot"></span>
-          <span id="syncText" class="font-medium">Conectando</span>
+        <div id="syncBadge" class="h-8 px-3 rounded-lg titanium-glass flex items-center space-x-2 text-[11px] font-num">
+          <span class="w-1.5 h-1.5 rounded-full bg-slate-400 animate-pulse" id="syncDot"></span>
+          <span id="syncText" class="font-medium">Sync</span>
         </div>
       </div>
-
     </div>
   </header>
 
-  <main class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8">
+  <main class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6">
 
-    <!-- KPI HUD: Métricas Centrais -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-      
-      <!-- KPI 1: Eficiência Média -->
-      <div class="titanium-glass p-6 relative overflow-hidden">
+    <!-- KPI HUD -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="titanium-glass p-5 relative overflow-hidden">
         <div class="flex justify-between items-start">
-          <span class="text-[11px] font-bold tracking-[0.2em] uppercase" style="color: var(--text-secondary)">Eficiência Média</span>
-          <span class="text-[10px] font-num px-2 py-0.5 rounded bg-white/10 font-bold border border-white/10">50L REF</span>
+          <span class="text-[10px] font-bold tracking-[0.2em] uppercase" style="color: var(--text-secondary)">Eficiência Média</span>
+          <span class="text-[9px] font-num px-1.5 py-0.5 rounded bg-black/20 dark:bg-white/10 font-bold border border-white/5">50L</span>
         </div>
-        <div class="mt-4 flex items-baseline space-x-2">
-          <h2 id="kpiKmL" class="text-4xl font-extrabold tracking-tight font-num">0.0</h2>
-          <span class="text-sm font-semibold" style="color: var(--text-secondary)">km/l</span>
+        <div class="mt-3 flex items-baseline space-x-1.5">
+          <h2 id="kpiKmL" class="text-3xl font-extrabold tracking-tight font-num">0.0</h2>
+          <span class="text-xs font-semibold" style="color: var(--text-secondary)">km/l</span>
         </div>
-        <div class="mt-3 pt-3 flex items-center justify-between text-xs font-num" style="border-top: 1px solid var(--kpi-border)">
+        <div class="mt-2.5 pt-2.5 flex justify-between text-[11px] font-num" style="border-top: 1px solid var(--kpi-border)">
           <span style="color: var(--text-secondary)">Taxa 100km:</span>
-          <span id="kpiL100" class="font-bold">0.0 L/100km</span>
+          <span id="kpiL100" class="font-bold">0.0 L</span>
         </div>
       </div>
 
-      <!-- KPI 2: Odômetro & KM Desde Último Abastecimento -->
-      <div class="titanium-glass p-6 relative overflow-hidden">
+      <div class="titanium-glass p-5 relative overflow-hidden">
         <div class="flex justify-between items-start">
-          <span class="text-[11px] font-bold tracking-[0.2em] uppercase" style="color: var(--text-secondary)">Odômetro Atual</span>
-          <span class="text-[10px] font-num px-2 py-0.5 rounded bg-white/10 font-bold border border-white/10">FROTA</span>
+          <span class="text-[10px] font-bold tracking-[0.2em] uppercase" style="color: var(--text-secondary)">Odômetro Atual</span>
         </div>
-        <div class="mt-4 flex items-baseline space-x-2">
-          <h2 id="kpiOdometroTotal" class="text-4xl font-extrabold tracking-tight font-num">0</h2>
-          <span class="text-sm font-semibold" style="color: var(--text-secondary)">km</span>
+        <div class="mt-3 flex items-baseline space-x-1.5">
+          <h2 id="kpiOdometroTotal" class="text-3xl font-extrabold tracking-tight font-num">0</h2>
+          <span class="text-xs font-semibold" style="color: var(--text-secondary)">km</span>
         </div>
-        <div class="mt-3 pt-3 flex items-center justify-between text-xs font-num" style="border-top: 1px solid var(--kpi-border)">
-          <span style="color: var(--text-secondary)">Desde último tanque:</span>
+        <div class="mt-2.5 pt-2.5 flex justify-between text-[11px] font-num" style="border-top: 1px solid var(--kpi-border)">
+          <span style="color: var(--text-secondary)">Trecho rodado:</span>
           <span id="kpiKmDesdeAbastecimento" class="font-bold text-emerald-500">0 km</span>
         </div>
       </div>
 
-      <!-- KPI 3: Desembolso Financeiro -->
-      <div class="titanium-glass p-6 relative overflow-hidden">
+      <div class="titanium-glass p-5 relative overflow-hidden">
         <div class="flex justify-between items-start">
-          <span class="text-[11px] font-bold tracking-[0.2em] uppercase" style="color: var(--text-secondary)">Gasto no Mês</span>
-          <span class="text-[10px] font-num px-2 py-0.5 rounded bg-white/10 font-bold border border-white/10">TOTAL</span>
+          <span class="text-[10px] font-bold tracking-[0.2em] uppercase" style="color: var(--text-secondary)">Gasto no Mês</span>
         </div>
-        <div class="mt-4 flex items-baseline space-x-2">
-          <span class="text-lg font-light" style="color: var(--text-secondary)">R$</span>
-          <h2 id="kpiGastoMes" class="text-4xl font-extrabold tracking-tight font-num">0,00</h2>
+        <div class="mt-3 flex items-baseline space-x-1.5">
+          <span class="text-sm font-light" style="color: var(--text-secondary)">R$</span>
+          <h2 id="kpiGastoMes" class="text-3xl font-extrabold tracking-tight font-num">0,00</h2>
         </div>
-        <div class="mt-3 pt-3 flex items-center justify-between text-xs font-num" style="border-top: 1px solid var(--kpi-border)">
-          <span style="color: var(--text-secondary)">Esta Semana:</span>
+        <div class="mt-2.5 pt-2.5 flex justify-between text-[11px] font-num" style="border-top: 1px solid var(--kpi-border)">
+          <span style="color: var(--text-secondary)">Semana:</span>
           <span id="kpiGastoSemana" class="font-bold">R$ 0,00</span>
         </div>
       </div>
 
-      <!-- KPI 4: Custo Operacional por KM -->
-      <div class="titanium-glass p-6 relative overflow-hidden">
+      <div class="titanium-glass p-5 relative overflow-hidden">
         <div class="flex justify-between items-start">
-          <span class="text-[11px] font-bold tracking-[0.2em] uppercase" style="color: var(--text-secondary)">Custo por KM</span>
-          <span class="text-[10px] font-num px-2 py-0.5 rounded bg-white/10 font-bold border border-white/10">DINÂMICO</span>
+          <span class="text-[10px] font-bold tracking-[0.2em] uppercase" style="color: var(--text-secondary)">Custo por KM</span>
         </div>
-        <div class="mt-4 flex items-baseline space-x-2">
-          <span class="text-lg font-light" style="color: var(--text-secondary)">R$</span>
-          <h2 id="kpiCustoKm" class="text-4xl font-extrabold tracking-tight font-num">0,00</h2>
+        <div class="mt-3 flex items-baseline space-x-1.5">
+          <span class="text-sm font-light" style="color: var(--text-secondary)">R$</span>
+          <h2 id="kpiCustoKm" class="text-3xl font-extrabold tracking-tight font-num">0,00</h2>
         </div>
-        <div class="mt-3 pt-3 flex items-center justify-between text-xs font-num" style="border-top: 1px solid var(--kpi-border)">
-          <span style="color: var(--text-secondary)">Autonomia Est. (50L):</span>
+        <div class="mt-2.5 pt-2.5 flex justify-between text-[11px] font-num" style="border-top: 1px solid var(--kpi-border)">
+          <span style="color: var(--text-secondary)">Autonomia (50L):</span>
           <span id="kpiAutonomia" class="font-bold">~0 km</span>
         </div>
       </div>
-
     </div>
 
-    <!-- Seção de Ações: Formulário de Ingestão e Calculadora Flex -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+    <!-- Seção de Ações -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
       
-      <!-- Formulário com Dupla Modalidade (Abastecimento vs Check-in KM Diário) -->
-      <div class="lg:col-span-7 titanium-glass p-7">
+      <!-- Formulário -->
+      <div class="lg:col-span-7 titanium-glass p-6">
         
-        <!-- Seletor de Modo -->
-        <div class="flex items-center justify-between pb-5" style="border-bottom: 1px solid var(--header-border)">
-          <div class="flex p-1 rounded-xl bg-black/10 dark:bg-black/40 border border-white/10 text-xs font-bold">
-            <button type="button" id="tabAbastecer" onclick="setFormMode('abastecer')" class="px-4 py-2 rounded-lg transition-all bg-white text-black shadow-sm">
+        <div class="flex items-center justify-between pb-4" style="border-bottom: 1px solid var(--header-border)">
+          <div class="flex p-1 rounded-lg bg-black/10 dark:bg-white/5 border border-white/5 text-xs font-bold">
+            <button type="button" id="tabAbastecer" onclick="setFormMode('abastecer')" class="px-3 py-1.5 rounded transition-all bg-white text-slate-900 shadow-sm">
               ⛽ Abastecimento
             </button>
-            <button type="button" id="tabCheckin" onclick="setFormMode('checkin')" class="px-4 py-2 rounded-lg transition-all text-slate-400 hover:text-white">
-              📍 Registro de KM Diário
+            <button type="button" id="tabCheckin" onclick="setFormMode('checkin')" class="px-3 py-1.5 rounded transition-all text-slate-500 hover:text-slate-900 dark:hover:text-white">
+              📍 KM Diário
             </button>
           </div>
-          <span id="lastOdoBadge" class="text-xs font-num px-3 py-1 rounded-lg bg-white/5 border border-white/10">
+          <span id="lastOdoBadge" class="text-[10px] font-num px-2 py-1 rounded bg-black/5 dark:bg-white/5 border border-white/10" style="color: var(--text-secondary)">
             Último KM: --
           </span>
         </div>
 
-        <form id="registroForm" class="mt-6 space-y-5" onsubmit="handleSalvarRegistro(event)">
+        <form id="registroForm" class="mt-5 space-y-4" onsubmit="handleSalvarRegistro(event)">
           
-          <!-- Campo 1: Odômetro (Presente em Ambos) -->
           <div>
-            <label class="block text-[11px] font-bold uppercase tracking-wider mb-1.5" style="color: var(--text-secondary)">
-              Odômetro Atual (KM Total do Carro)
+            <label class="block text-[10px] font-bold uppercase tracking-wider mb-1" style="color: var(--text-secondary)">
+              Odômetro Atual (KM Total)
             </label>
-            <input type="number" id="inOdo" required step="1" placeholder="Ex: 52140" class="titanium-input w-full px-4 py-3 rounded-xl text-base font-num font-bold">
+            <input type="number" id="inOdo" required step="1" placeholder="Ex: 52140" class="titanium-input w-full px-3.5 py-2.5 rounded-lg text-sm font-num font-bold">
           </div>
 
-          <!-- Campos Exclusivos de Abastecimento -->
           <div id="secaoAbastecimento" class="space-y-4">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label class="block text-[11px] font-bold uppercase tracking-wider mb-1.5" style="color: var(--text-secondary)">Combustível</label>
-                <select id="inCombustivel" class="titanium-input w-full px-4 py-3 rounded-xl text-sm font-semibold">
+                <label class="block text-[10px] font-bold uppercase tracking-wider mb-1" style="color: var(--text-secondary)">Combustível</label>
+                <select id="inCombustivel" class="titanium-input w-full px-3.5 py-2.5 rounded-lg text-xs font-semibold">
                   <option value="Gasolina">Gasolina</option>
-                  <option value="Etanol">Etanol (Álcool)</option>
+                  <option value="Etanol">Etanol</option>
                 </select>
               </div>
 
               <div>
-                <label class="block text-[11px] font-bold uppercase tracking-wider mb-1.5" style="color: var(--text-secondary)">Preço do Litro (R$)</label>
-                <input type="number" id="inPrecoLitro" step="0.001" placeholder="Ex: 5.89" class="titanium-input w-full px-4 py-3 rounded-xl text-base font-num font-bold">
+                <label class="block text-[10px] font-bold uppercase tracking-wider mb-1" style="color: var(--text-secondary)">Preço do Litro (R$)</label>
+                <input type="number" id="inPrecoLitro" step="0.001" placeholder="Ex: 5.89" class="titanium-input w-full px-3.5 py-2.5 rounded-lg text-sm font-num font-bold">
               </div>
 
               <div>
-                <label class="block text-[11px] font-bold uppercase tracking-wider mb-1.5" style="color: var(--text-secondary)">Litros Colocados</label>
-                <input type="number" id="inLitros" step="0.01" placeholder="Ex: 28.00" class="titanium-input w-full px-4 py-3 rounded-xl text-base font-num font-bold">
+                <label class="block text-[10px] font-bold uppercase tracking-wider mb-1" style="color: var(--text-secondary)">Litros Colocados</label>
+                <input type="number" id="inLitros" step="0.01" placeholder="Ex: 28.00" class="titanium-input w-full px-3.5 py-2.5 rounded-lg text-sm font-num font-bold">
               </div>
 
               <div>
-                <div class="flex justify-between items-center mb-1.5">
-                  <label class="text-[11px] font-bold uppercase tracking-wider" style="color: var(--text-secondary)">Valor Total Pago (R$)</label>
-                  <span class="text-[9px] uppercase font-bold text-emerald-500 font-num">Auto ou Editável</span>
+                <div class="flex justify-between items-center mb-1">
+                  <label class="text-[10px] font-bold uppercase tracking-wider" style="color: var(--text-secondary)">Valor Total Pago (R$)</label>
+                  <span class="text-[8px] uppercase font-bold text-emerald-500 font-num">Auto / Edit</span>
                 </div>
-                <input type="number" id="inValor" step="0.01" placeholder="Ex: 140.00" class="titanium-input w-full px-4 py-3 rounded-xl text-base font-num font-bold">
+                <input type="number" id="inValor" step="0.01" placeholder="Ex: 140.00" class="titanium-input w-full px-3.5 py-2.5 rounded-lg text-sm font-num font-bold">
               </div>
             </div>
 
-            <!-- Live HUD Feedback -->
-            <div class="grid grid-cols-3 gap-3 p-4 rounded-xl bg-black/10 dark:bg-black/50 border border-white/10 font-num text-center">
+            <!-- Dashboard de Preview do Form -->
+            <div class="grid grid-cols-3 gap-2 p-3 rounded-lg border text-center" style="background: var(--input-bg); border-color: var(--input-border)">
               <div>
-                <span class="text-[9px] uppercase tracking-wider block font-semibold" style="color: var(--text-secondary)">Distância no Tanque</span>
-                <span id="prevDeltaKm" class="text-sm font-bold mt-0.5 block">0 km</span>
+                <span class="text-[8px] uppercase tracking-wider block font-bold" style="color: var(--text-secondary)">Trecho Atual</span>
+                <span id="prevDeltaKm" class="text-xs font-bold mt-0.5 block font-num">0 km</span>
               </div>
               <div>
-                <span class="text-[9px] uppercase tracking-wider block font-semibold" style="color: var(--text-secondary)">Preço Real/Litro</span>
-                <span id="prevPrecoReal" class="text-sm font-bold mt-0.5 block">R$ 0,00</span>
+                <span class="text-[8px] uppercase tracking-wider block font-bold" style="color: var(--text-secondary)">Custo/Litro</span>
+                <span id="prevPrecoReal" class="text-xs font-bold mt-0.5 block font-num">R$ 0,00</span>
               </div>
               <div>
-                <span class="text-[9px] uppercase tracking-wider block font-semibold" style="color: var(--text-secondary)">Média Parcial</span>
-                <span id="prevKmL" class="text-sm font-bold text-emerald-500 mt-0.5 block">0.0 km/l</span>
+                <span class="text-[8px] uppercase tracking-wider block font-bold" style="color: var(--text-secondary)">Rendimento</span>
+                <span id="prevKmL" class="text-xs font-bold text-emerald-500 mt-0.5 block font-num">0.0 km/l</span>
               </div>
             </div>
           </div>
 
-          <!-- Live Feedback para Check-in Diário -->
-          <div id="secaoCheckinInfo" class="hidden p-4 rounded-xl bg-black/10 dark:bg-black/50 border border-white/10 font-num text-center">
-            <span class="text-[10px] uppercase tracking-wider block font-semibold" style="color: var(--text-secondary)">Quilômetros Rodados Hoje</span>
-            <span id="prevDeltaKmCheckin" class="text-2xl font-black text-emerald-500 mt-1 block">0 km</span>
-            <p class="text-[11px] mt-1" style="color: var(--text-secondary)">Este registro atualizará o total de KM rodados sem alterar as médias de consumo da bomba.</p>
+          <div id="secaoCheckinInfo" class="hidden p-3 rounded-lg border text-center" style="background: var(--input-bg); border-color: var(--input-border)">
+            <span class="text-[9px] uppercase tracking-wider block font-bold" style="color: var(--text-secondary)">Distância Percorrida (Delta)</span>
+            <span id="prevDeltaKmCheckin" class="text-xl font-black text-emerald-500 mt-1 block font-num">0 km</span>
           </div>
 
-          <button type="submit" id="btnSalvar" class="w-full py-4 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-black font-extrabold text-sm tracking-wide transition-all shadow-lg flex items-center justify-center space-x-2 hover:opacity-90">
+          <!-- Botão Salvar estilizado sutilmente para caber no Titanium -->
+          <button type="submit" id="btnSalvar" class="w-full py-3.5 rounded-lg font-extrabold text-xs tracking-wide transition-all shadow-md flex items-center justify-center space-x-2" style="background: var(--text-primary); color: var(--bg-canvas);">
             <span id="btnSalvarTexto">Salvar Abastecimento</span>
           </button>
         </form>
       </div>
 
-      <!-- Calculadora Flex Turbo -->
-      <div class="lg:col-span-5 titanium-glass p-7 flex flex-col justify-between">
+      <!-- Calculadora Flex -->
+      <div class="lg:col-span-5 titanium-glass p-6 flex flex-col justify-between">
         <div>
-          <div class="flex items-center justify-between pb-5" style="border-bottom: 1px solid var(--header-border)">
-            <h2 class="text-lg font-bold tracking-tight">Decisor Flex (Bomba)</h2>
-            <span class="text-[10px] font-num font-bold px-2 py-0.5 rounded bg-white/10 border border-white/10">70% RATIO</span>
+          <div class="flex items-center justify-between pb-4" style="border-bottom: 1px solid var(--header-border)">
+            <h2 class="text-base font-bold tracking-tight">Decisor Flex</h2>
+            <span class="text-[9px] font-num font-bold px-1.5 py-0.5 rounded bg-white/10 border border-white/5">70% RATIO</span>
           </div>
 
-          <p class="text-xs mt-4 leading-relaxed" style="color: var(--text-secondary)">
-            Digite o valor na bomba para saber o combustível mais vantajoso financeiramente.
-          </p>
-
-          <div class="grid grid-cols-2 gap-4 mt-6">
+          <div class="grid grid-cols-2 gap-3 mt-5">
             <div>
-              <label class="block text-[10px] font-bold uppercase tracking-wider mb-1.5" style="color: var(--text-secondary)">Gasolina (R$)</label>
-              <input type="number" id="calcGas" step="0.01" placeholder="5.99" oninput="runFlexEngine()" class="titanium-input w-full px-3.5 py-2.5 rounded-xl text-base font-num font-bold">
+              <label class="block text-[9px] font-bold uppercase tracking-wider mb-1" style="color: var(--text-secondary)">Gasolina (R$)</label>
+              <input type="number" id="calcGas" step="0.01" placeholder="5.99" oninput="runFlexEngine()" class="titanium-input w-full px-3 py-2 rounded-lg text-sm font-num font-bold">
             </div>
             <div>
-              <label class="block text-[10px] font-bold uppercase tracking-wider mb-1.5" style="color: var(--text-secondary)">Etanol (R$)</label>
-              <input type="number" id="calcEta" step="0.01" placeholder="3.89" oninput="runFlexEngine()" class="titanium-input w-full px-3.5 py-2.5 rounded-xl text-base font-num font-bold">
+              <label class="block text-[9px] font-bold uppercase tracking-wider mb-1" style="color: var(--text-secondary)">Etanol (R$)</label>
+              <input type="number" id="calcEta" step="0.01" placeholder="3.89" oninput="runFlexEngine()" class="titanium-input w-full px-3 py-2 rounded-lg text-sm font-num font-bold">
             </div>
           </div>
 
-          <div id="flexVerdictBox" class="mt-6 p-6 rounded-2xl bg-black/10 dark:bg-black/40 border border-white/10 text-center transition-all">
-            <span class="text-[10px] uppercase tracking-[0.2em] font-semibold block mb-2" style="color: var(--text-secondary)">Recomendação</span>
-            <h3 id="flexVerdict" class="text-2xl font-extrabold font-num tracking-tight" style="color: var(--text-secondary)">Aguardando Preços</h3>
-            <p id="flexRatio" class="text-xs font-num mt-2" style="color: var(--text-secondary)">Paridade: --</p>
+          <!-- Card interno de veredito, similar ao Titanium Glass base -->
+          <div id="flexVerdictBox" class="mt-5 p-5 rounded-xl border text-center transition-all" style="background: var(--input-bg); border-color: var(--input-border)">
+            <span class="text-[9px] uppercase tracking-[0.2em] font-semibold block mb-1.5" style="color: var(--text-secondary)">Recomendação</span>
+            <h3 id="flexVerdict" class="text-xl font-extrabold font-num tracking-tight" style="color: var(--text-secondary)">--</h3>
+            <p id="flexRatio" class="text-[10px] font-num mt-1.5" style="color: var(--text-secondary)">Paridade: --</p>
           </div>
-        </div>
-
-        <div class="text-[10px] font-num mt-6 pt-4 text-center" style="border-top: 1px solid var(--kpi-border); color: var(--text-secondary)">
-          *Relação estequiométrica de paridade em 0.70x.
         </div>
       </div>
 
     </div>
 
-    <!-- Telemetria Gráfica: 3 Instrumentos Visuais -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-      
-      <!-- Gráfico 1: Evolução Financeira & Km Rodados (8 colunas) -->
-      <div class="lg:col-span-8 titanium-glass p-7">
-        <div class="flex items-center justify-between mb-6">
-          <div>
-            <h3 class="text-base font-bold tracking-tight">Evolução Financeira & Distância</h3>
-            <p class="text-xs" style="color: var(--text-secondary)">Histórico de desembolso (R$) e quilômetros percorridos.</p>
-          </div>
-        </div>
-        <div class="h-72">
-          <canvas id="chartEvolucao"></canvas>
-        </div>
+    <!-- Telemetria Gráfica -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div class="lg:col-span-8 titanium-glass p-6">
+        <h3 class="text-sm font-bold tracking-tight mb-4">Desembolso Financeiro & KM</h3>
+        <div class="h-60"><canvas id="chartEvolucao"></canvas></div>
       </div>
-
-      <!-- Gráfico 2: Matriz de Combustível (4 colunas) -->
-      <div class="lg:col-span-4 titanium-glass p-7">
-        <h3 class="text-base font-bold tracking-tight mb-1">Gasto por Combustível</h3>
-        <p class="text-xs mb-6" style="color: var(--text-secondary)">Proporção financeira acumulada.</p>
-        <div class="h-72 flex items-center justify-center">
-          <canvas id="chartMix"></canvas>
-        </div>
+      <div class="lg:col-span-4 titanium-glass p-6">
+        <h3 class="text-sm font-bold tracking-tight mb-4">Gasto por Combustível</h3>
+        <div class="h-60 flex items-center justify-center"><canvas id="chartMix"></canvas></div>
       </div>
-
     </div>
-
-    <!-- Gráfico 3: Rendimento KM/L vs L/100km -->
-    <div class="titanium-glass p-7">
-      <div class="flex items-center justify-between mb-6">
-        <div>
-          <h3 class="text-base font-bold tracking-tight">Rendimento de Combustível (KM/L & L/100km)</h3>
-          <p class="text-xs" style="color: var(--text-secondary)">Aferição contínua da eficiência nos ciclos de abastecimento.</p>
-        </div>
-      </div>
-      <div class="h-64">
-        <canvas id="chartEficiencia"></canvas>
-      </div>
+    
+    <div class="titanium-glass p-6">
+      <h3 class="text-sm font-bold tracking-tight mb-4">Rendimento Energético (KM/L & L/100km)</h3>
+      <div class="h-56"><canvas id="chartEficiencia"></canvas></div>
     </div>
 
     <!-- Tabela de Registros -->
     <div class="titanium-glass overflow-hidden">
-      <div class="p-6 flex items-center justify-between" style="border-bottom: 1px solid var(--header-border)">
-        <div>
-          <h3 class="text-base font-bold tracking-tight">Histórico de Telemetria</h3>
-          <p class="text-xs" style="color: var(--text-secondary)">Registros de abastecimentos e medições diárias.</p>
-        </div>
-        <button onclick="carregarDadosDaNuvem()" class="px-4 py-2 rounded-xl titanium-glass hover:opacity-80 text-xs font-semibold font-num">
+      <div class="p-5 flex items-center justify-between" style="border-bottom: 1px solid var(--header-border)">
+        <h3 class="text-sm font-bold tracking-tight">Histórico de Telemetria</h3>
+        <button onclick="carregarDadosDaNuvem()" class="px-3 py-1.5 rounded-lg border text-[10px] font-bold font-num" style="border-color: var(--input-border); background: var(--input-bg)">
           Atualizar Tabela
         </button>
       </div>
-
       <div class="overflow-x-auto">
-        <table class="w-full text-left text-xs font-num">
+        <table class="w-full text-left text-[11px] font-num">
           <thead>
-            <tr class="bg-black/10 dark:bg-black/40 uppercase tracking-wider text-[10px]" style="border-bottom: 1px solid var(--header-border); color: var(--text-secondary)">
-              <th class="py-3.5 px-5">Data</th>
-              <th class="py-3.5 px-5">Odômetro</th>
-              <th class="py-3.5 px-5">Delta KM</th>
-              <th class="py-3.5 px-5">Tipo</th>
-              <th class="py-3.5 px-5">Litros</th>
-              <th class="py-3.5 px-5">Total Pago</th>
-              <th class="py-3.5 px-5">R$/Litro</th>
-              <th class="py-3.5 px-5">KM/L</th>
-              <th class="py-3.5 px-5">L/100km</th>
-              <th class="py-3.5 px-5">Custo/KM</th>
+            <tr class="uppercase tracking-wider text-[9px]" style="border-bottom: 1px solid var(--header-border); background: var(--input-bg); color: var(--text-secondary)">
+              <th class="py-3 px-4">Data</th>
+              <th class="py-3 px-4">Odômetro</th>
+              <th class="py-3 px-4">Delta KM</th>
+              <th class="py-3 px-4">Tipo</th>
+              <th class="py-3 px-4">Litros</th>
+              <th class="py-3 px-4">Total</th>
+              <th class="py-3 px-4">R$/Litro</th>
+              <th class="py-3 px-4">KM/L</th>
+              <th class="py-3 px-4">L/100km</th>
             </tr>
           </thead>
-          <tbody id="tabelaLogs" class="divide-y divide-white/5 font-medium">
-            <tr>
-              <td colspan="10" class="text-center py-10" style="color: var(--text-secondary)">Carregando dados da planilha...</td>
-            </tr>
+          <tbody id="tabelaLogs" class="divide-y font-medium" style="border-color: var(--kpi-border)">
+            <tr><td colspan="9" class="text-center py-8" style="color: var(--text-secondary)">Conectando...</td></tr>
           </tbody>
         </table>
       </div>
     </div>
-
   </main>
 
-  <!-- Modal de Conexão com Google Sheets -->
+  <!-- Modal Config API -->
   <div id="modalConfig" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-    <div class="titanium-glass max-w-lg w-full p-8 space-y-6 border border-white/20">
+    <div class="titanium-glass max-w-lg w-full p-6 space-y-5">
       <div>
-        <h3 class="text-lg font-bold tracking-tight">Conexão Google Apps Script</h3>
-        <p class="text-xs mt-1" style="color: var(--text-secondary)">Insira a URL gerada na implantação do Apps Script.</p>
+        <h3 class="text-base font-bold tracking-tight">Google Apps Script API</h3>
       </div>
-      <input type="text" id="apiEndpointInput" placeholder="https://script.google.com/macros/s/.../exec" class="titanium-input w-full px-4 py-3 rounded-xl text-xs font-num">
-      <div class="flex justify-end space-x-3 pt-2">
-        <button onclick="toggleModalConfig()" class="px-5 py-2.5 rounded-xl titanium-glass text-xs font-semibold hover:opacity-80">Fechar</button>
-        <button onclick="salvarApiEndpoint()" class="px-5 py-2.5 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-black font-extrabold text-xs">Salvar Conexão</button>
+      <input type="text" id="apiEndpointInput" class="titanium-input w-full px-3 py-2.5 rounded-lg text-[10px] font-num">
+      <div class="flex justify-end space-x-2">
+        <button onclick="toggleModalConfig()" class="px-4 py-2 rounded-lg text-xs font-semibold hover:opacity-80">Fechar</button>
+        <button onclick="salvarApiEndpoint()" class="px-4 py-2 rounded-lg font-bold text-xs" style="background: var(--text-primary); color: var(--bg-canvas);">Salvar</button>
       </div>
     </div>
   </div>
 
-  <!-- Script Lógico Integrado -->
-  <script>
-    let API_ENDPOINT = localStorage.getItem("CCMV_SHEETS_ENDPOINT") || "COLE_AQUI_SEU_APPS_SCRIPT_URL";
-    let telemetria = [];
-    let formModoAtual = 'abastecer'; // 'abastecer' ou 'checkin'
-    let chart1Instance, chart2Instance, chart3Instance;
+  <!-- Modal KM Inicial do Veículo -->
+  <div id="modalKmBase" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="titanium-glass max-w-sm w-full p-6 space-y-5 text-center">
+      <div class="mx-auto w-12 h-12 rounded-full flex items-center justify-center mb-2" style="background: var(--input-bg); border: 1px solid var(--input-border);">📍</div>
+      <h3 class="text-base font-bold tracking-tight">KM Inicial do Veículo</h3>
+      <p class="text-xs" style="color: var(--text-secondary)">Para começarmos os cálculos corretamente, informe o odômetro atual do carro.</p>
+      
+      <input type="number" id="inKmBase" required step="1" placeholder="Ex: 52140" class="titanium-input w-full px-3 py-3 rounded-lg text-lg font-num font-bold text-center">
+      
+      <button onclick="salvarKmBase()" id="btnKmBase" class="w-full px-4 py-3 rounded-lg font-bold text-sm transition-all" style="background: var(--text-primary); color: var(--bg-canvas);">
+        Iniciar Telemetria
+      </button>
+    </div>
+  </div>
 
-    // --- GERENCIADOR DE TEMAS (Auto / Light / Dark) ---
+  <script>
+    // --- INTEGRAÇÃO DIRETA COM SUA PLANILHA ---
+    const DEFAULT_ENDPOINT = "https://script.google.com/macros/s/AKfycbzWEzQWjxqSFOx2bgCWlHGw1EkTm8qRSr7B7zLcgjpHppBLW-p7vhAF5AkeGIWHXLRDfA/exec";
+    let API_ENDPOINT = localStorage.getItem("CCMV_SHEETS_ENDPOINT") || DEFAULT_ENDPOINT;
+    
+    let telemetria = [];
+    let formModoAtual = 'abastecer';
+    let chart1Instance, chart2Instance, chart3Instance;
+    let valorEditadoManualmente = false;
+
+    // --- TEMAS ---
     function initTheme() {
       const savedTheme = localStorage.getItem("CCMV_THEME") || "auto";
       setTheme(savedTheme, false);
       window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-        if (localStorage.getItem("CCMV_THEME") === "auto") {
-          applyThemeStyles('auto');
-        }
+        if (localStorage.getItem("CCMV_THEME") === "auto") applyThemeStyles('auto');
       });
     }
 
@@ -467,16 +426,11 @@
 
       ['btnThemeAuto', 'btnThemeLight', 'btnThemeDark'].forEach(id => {
         const btn = document.getElementById(id);
-        if(btn) btn.className = "px-2.5 py-1.5 rounded-lg font-bold transition-all text-slate-400";
+        if(btn) btn.className = "px-2 py-1 rounded font-bold text-slate-500 opacity-60";
       });
 
-      if (mode === 'auto') {
-        document.getElementById('btnThemeAuto').className = "px-2.5 py-1.5 rounded-lg font-bold transition-all bg-white/20 text-current";
-      } else if (mode === 'light') {
-        document.getElementById('btnThemeLight').className = "px-2.5 py-1.5 rounded-lg font-bold transition-all bg-white/20 text-current";
-      } else {
-        document.getElementById('btnThemeDark').className = "px-2.5 py-1.5 rounded-lg font-bold transition-all bg-white/20 text-current";
-      }
+      const activeId = mode === 'auto' ? 'btnThemeAuto' : (mode === 'light' ? 'btnThemeLight' : 'btnThemeDark');
+      document.getElementById(activeId).className = "px-2 py-1 rounded font-bold text-current opacity-100 bg-black/10 dark:bg-white/10";
 
       if (isDark) {
         html.classList.remove('theme-light');
@@ -485,70 +439,58 @@
         html.classList.remove('theme-dark');
         html.classList.add('theme-light');
       }
-
       if (chart1Instance) atualizarCoresGraficosParaTema(isDark);
     }
 
-    // --- CONTROLE DE MODALIDADE DO FORMULÁRIO ---
+    // --- FORM MODES ---
     function setFormMode(mode) {
       formModoAtual = mode;
-      const tabAb = document.getElementById('tabAbastecer');
-      const tabCk = document.getElementById('tabCheckin');
-      const secAb = document.getElementById('secaoAbastecimento');
-      const secCk = document.getElementById('secaoCheckinInfo');
-      const btnTexto = document.getElementById('btnSalvarTexto');
+      const tAb = document.getElementById('tabAbastecer');
+      const tCk = document.getElementById('tabCheckin');
+      const sAb = document.getElementById('secaoAbastecimento');
+      const sCk = document.getElementById('secaoCheckinInfo');
+      const bTxt = document.getElementById('btnSalvarTexto');
 
       if (mode === 'abastecer') {
-        tabAb.className = "px-4 py-2 rounded-lg transition-all bg-white text-black shadow-sm font-bold";
-        tabCk.className = "px-4 py-2 rounded-lg transition-all text-slate-400 hover:text-white font-bold";
-        secAb.classList.remove('hidden');
-        secCk.classList.add('hidden');
-        btnTexto.innerText = "Salvar Abastecimento";
+        tAb.className = "px-3 py-1.5 rounded transition-all bg-white text-slate-900 shadow-sm font-bold dark:bg-white dark:text-black bg-slate-800 text-white";
+        tCk.className = "px-3 py-1.5 rounded transition-all text-slate-500 hover:text-current font-bold";
+        sAb.classList.remove('hidden');
+        sCk.classList.add('hidden');
+        bTxt.innerText = "Salvar Abastecimento";
         document.getElementById('inLitros').required = true;
         document.getElementById('inValor').required = true;
       } else {
-        tabCk.className = "px-4 py-2 rounded-lg transition-all bg-white text-black shadow-sm font-bold";
-        tabAb.className = "px-4 py-2 rounded-lg transition-all text-slate-400 hover:text-white font-bold";
-        secAb.classList.add('hidden');
-        secCk.classList.remove('hidden');
-        btnTexto.innerText = "Salvar KM Diário";
+        tCk.className = "px-3 py-1.5 rounded transition-all bg-white text-slate-900 shadow-sm font-bold dark:bg-white dark:text-black bg-slate-800 text-white";
+        tAb.className = "px-3 py-1.5 rounded transition-all text-slate-500 hover:text-current font-bold";
+        sAb.classList.add('hidden');
+        sCk.classList.remove('hidden');
+        bTxt.innerText = "Salvar KM Diário";
         document.getElementById('inLitros').required = false;
         document.getElementById('inValor').required = false;
       }
       calcularPreviaInputs();
     }
 
-    // --- CÁLCULO INTELIGENTE DO VALOR TOTAL E FEEDBACK ---
-    let valorEditadoManualmente = false;
-
+    // --- CÁLCULO LIVE DO FORM ---
     function initFormEvents() {
-      const inLitros = document.getElementById('inLitros');
-      const inPreco = document.getElementById('inPrecoLitro');
-      const inValor = document.getElementById('inValor');
-      const inOdo = document.getElementById('inOdo');
+      const inL = document.getElementById('inLitros');
+      const inP = document.getElementById('inPrecoLitro');
+      const inV = document.getElementById('inValor');
+      const inO = document.getElementById('inOdo');
 
-      // Se mexer em Litros ou Preço, calcula automaticamente SE o usuário não tiver travado o valor manual
-      const recalcularValorAutomatico = () => {
+      const recalcV = () => {
         if (!valorEditadoManualmente) {
-          const l = Number(inLitros.value) || 0;
-          const p = Number(inPreco.value) || 0;
-          if (l > 0 && p > 0) {
-            inValor.value = (l * p).toFixed(2);
-          }
+          const l = Number(inL.value) || 0;
+          const p = Number(inP.value) || 0;
+          if (l > 0 && p > 0) inV.value = (l * p).toFixed(2);
         }
         calcularPreviaInputs();
       };
 
-      inLitros.addEventListener('input', recalcularValorAutomatico);
-      inPreco.addEventListener('input', recalcularValorAutomatico);
-
-      // Se o usuário editar diretamente o campo Valor Total (ex: ganhou 8L e pagou menos)
-      inValor.addEventListener('input', () => {
-        valorEditadoManualmente = true;
-        calcularPreviaInputs();
-      });
-
-      inOdo.addEventListener('input', calcularPreviaInputs);
+      inL.addEventListener('input', recalcV);
+      inP.addEventListener('input', recalcV);
+      inV.addEventListener('input', () => { valorEditadoManualmente = true; calcularPreviaInputs(); });
+      inO.addEventListener('input', calcularPreviaInputs);
     }
 
     function calcularPreviaInputs() {
@@ -556,13 +498,230 @@
       const lit = Number(document.getElementById('inLitros').value) || 0;
       const val = Number(document.getElementById('inValor').value) || 0;
 
-      const ultimoOdo = telemetria.length > 0 ? Number(telemetria[0].Odometro) : odo;
-      const delta = odo > ultimoOdo ? odo - ultimoOdo : 0;
+      const uOdo = telemetria.length > 0 ? Number(telemetria[0].Odometro) : odo;
+      const delta = odo > uOdo ? odo - uOdo : 0;
 
-      // Feedback modo Check-in
       document.getElementById('prevDeltaKmCheckin').innerText = delta > 0 ? `+${delta} km` : '0 km';
-
-      // Feedback modo Abastecimento
       document.getElementById('prevDeltaKm').innerText = delta > 0 ? `+${delta} km` : '0 km';
-      const precoRealPorLitro = (lit > 0 && val > 0) ? (val / lit) : 0;
-      document.getElementById('prevPrecoReal').innerText = `R$ ${preco
+      
+      const pReal = (lit > 0 && val > 0) ? (val / lit) : 0;
+      document.getElementById('prevPrecoReal').innerText = `R$ ${pReal.toFixed(2)}`;
+      document.getElementById('prevKmL').innerText = (delta > 0 && lit > 0) ? `${(delta / lit).toFixed(2)} km/l` : '0.0 km/l';
+    }
+
+    // --- NUVEM E DADOS ---
+    async function carregarDadosDaNuvem() {
+      if(!API_ENDPOINT) return;
+      const dot = document.getElementById('syncDot');
+      const text = document.getElementById('syncText');
+      dot.className = "w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping";
+      text.innerText = "Sync";
+
+      try {
+        const res = await fetch(`${API_ENDPOINT}?action=read`);
+        const json = await res.json();
+        telemetria = json.reverse();
+        
+        if (telemetria.length === 0) {
+          // Solicita o KM inicial se banco estiver zerado
+          document.getElementById('modalKmBase').classList.remove('hidden');
+        } else {
+          renderDashboard();
+        }
+        
+        dot.className = "w-1.5 h-1.5 rounded-full bg-emerald-400";
+        text.innerText = "Online";
+      } catch (err) {
+        console.error(err);
+        dot.className = "w-1.5 h-1.5 rounded-full bg-red-400";
+        text.innerText = "Erro";
+      }
+    }
+
+    // Função para registrar KM Base
+    async function salvarKmBase() {
+      const inputKm = Number(document.getElementById('inKmBase').value);
+      if(!inputKm || inputKm <= 0) return alert('Informe um KM válido.');
+      
+      const btn = document.getElementById('btnKmBase');
+      btn.innerText = "Iniciando...";
+      btn.disabled = true;
+
+      const params = new URLSearchParams({
+        action: "create",
+        data: new Date().toISOString(),
+        odometro: inputKm,
+        kmRodado: 0, litros: 0, valor: 0, combustivel: "Check-in Inicial",
+        kmPorLitro: 0, litros100km: 0, custoPorKm: 0, precoLitro: 0
+      });
+
+      try {
+        await fetch(`${API_ENDPOINT}?${params.toString()}`);
+        document.getElementById('modalKmBase').classList.add('hidden');
+        await carregarDadosDaNuvem();
+      } catch(e) {
+        alert('Erro ao gravar KM base');
+      }
+    }
+
+    function renderDashboard() {
+      const tbody = document.getElementById('tabelaLogs');
+      tbody.innerHTML = '';
+
+      if (telemetria.length === 0) return;
+
+      const ultOdo = Number(telemetria[0].Odometro);
+      document.getElementById('lastOdoBadge').innerText = `Último KM: ${ultOdo.toLocaleString('pt-BR')}`;
+      document.getElementById('kpiOdometroTotal').innerText = ultOdo.toLocaleString('pt-BR');
+
+      let tGasto = 0, tLitros = 0, tKmAbast = 0, gGas = 0, gEta = 0, gMes = 0, gSem = 0;
+      const hoje = new Date();
+
+      let kmUltAbast = ultOdo;
+      for (let i of telemetria) {
+        if (Number(i.Litros) > 0) { kmUltAbast = Number(i.Odometro); break; }
+      }
+      document.getElementById('kpiKmDesdeAbastecimento').innerText = `${ultOdo >= kmUltAbast ? ultOdo - kmUltAbast : 0} km`;
+
+      telemetria.forEach(item => {
+        const v = Number(item.Valor) || 0, l = Number(item.Litros) || 0, k = Number(item.KmRodado) || 0;
+        const d = new Date(item.Data);
+
+        tGasto += v; tLitros += l;
+        if (l > 0) {
+          tKmAbast += k;
+          if (item.Combustivel === 'Etanol') gEta += v; else gGas += v;
+        }
+
+        if (d.getMonth() === hoje.getMonth() && d.getFullYear() === hoje.getFullYear()) gMes += v;
+        if ((hoje - d)/(1000*60*60*24) <= 7) gSem += v;
+
+        const isCheck = l === 0;
+        const colorClass = isCheck ? 'bg-slate-500/10 text-slate-400' : (item.Combustivel==='Etanol'?'bg-amber-500/10 text-amber-500':'bg-blue-500/10 text-blue-500');
+        
+        tbody.innerHTML += `
+          <tr style="border-bottom: 1px solid var(--kpi-border)">
+            <td class="py-3 px-4" style="color:var(--text-secondary)">${d.toLocaleDateString('pt-BR')}</td>
+            <td class="py-3 px-4">${Number(item.Odometro).toLocaleString('pt-BR')}</td>
+            <td class="py-3 px-4 text-emerald-500">+${k}</td>
+            <td class="py-3 px-4"><span class="px-2 py-0.5 rounded text-[8px] font-bold ${colorClass}">${isCheck ? 'KM Dia' : item.Combustivel}</span></td>
+            <td class="py-3 px-4">${isCheck ? '--' : l.toFixed(2)}</td>
+            <td class="py-3 px-4">${isCheck ? '--' : 'R$ '+v.toFixed(2)}</td>
+            <td class="py-3 px-4" style="color:var(--text-secondary)">${isCheck ? '--' : 'R$ '+Number(item.PrecoLitro).toFixed(2)}</td>
+            <td class="py-3 px-4 text-emerald-500">${isCheck ? '--' : Number(item.KmPorLitro).toFixed(2)}</td>
+            <td class="py-3 px-4" style="color:var(--text-secondary)">${isCheck ? '--' : Number(item.Litros100km).toFixed(2)}</td>
+          </tr>
+        `;
+      });
+
+      const mKmL = tLitros > 0 ? (tKmAbast / tLitros) : 0;
+      document.getElementById('kpiKmL').innerText = mKmL.toFixed(2);
+      document.getElementById('kpiL100').innerText = mKmL>0 ? `${(100/mKmL).toFixed(2)} L` : '0.0 L';
+      document.getElementById('kpiCustoKm').innerText = tKmAbast>0 ? (tGasto/tKmAbast).toFixed(2) : '0.00';
+      document.getElementById('kpiAutonomia').innerText = `~${(mKmL*50).toFixed(0)} km`;
+      document.getElementById('kpiGastoMes').innerText = gMes.toFixed(2);
+      document.getElementById('kpiGastoSemana').innerText = `R$ ${gSem.toFixed(2)}`;
+
+      atualizarDadosGraficos(telemetria.slice().reverse(), gGas, gEta);
+    }
+
+    async function handleSalvarRegistro(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnSalvar');
+      const bTxt = document.getElementById('btnSalvarTexto');
+      bTxt.innerText = "Gravando..."; btn.disabled = true;
+
+      const odo = Number(document.getElementById('inOdo').value);
+      const ultOdo = telemetria.length > 0 ? Number(telemetria[0].Odometro) : odo;
+      const kR = odo > ultOdo ? odo - ultOdo : 0;
+
+      let lit = 0, val = 0, comb = "Check-in Diário", pL = 0, kL = 0, l100 = 0, cK = 0;
+
+      if (formModoAtual === 'abastecer') {
+        lit = Number(document.getElementById('inLitros').value) || 0;
+        val = Number(document.getElementById('inValor').value) || 0;
+        comb = document.getElementById('inCombustivel').value;
+        pL = lit>0?val/lit:0; kL = (kR>0&&lit>0)?kR/lit:0; l100 = kL>0?100/kL:0; cK = kR>0?val/kR:0;
+      }
+
+      const params = new URLSearchParams({
+        action: "create", data: new Date().toISOString(), odometro: odo, kmRodado: kR,
+        litros: lit, valor: val, combustivel: comb, kmPorLitro: kL.toFixed(2),
+        litros100km: l100.toFixed(2), custoPorKm: cK.toFixed(2), precoLitro: pL.toFixed(2)
+      });
+
+      try {
+        await fetch(`${API_ENDPOINT}?${params.toString()}`);
+        document.getElementById('registroForm').reset();
+        valorEditadoManualmente = false;
+        await carregarDadosDaNuvem();
+      } catch (err) { alert("Erro de Gravação"); }
+      finally { bTxt.innerText = formModoAtual === 'abastecer' ? "Salvar Abastecimento" : "Salvar KM Diário"; btn.disabled = false; }
+    }
+
+    // --- FLEX ---
+    function runFlexEngine() {
+      const g = Number(document.getElementById('calcGas').value), e = Number(document.getElementById('calcEta').value);
+      const bx = document.getElementById('flexVerdictBox'), vd = document.getElementById('flexVerdict'), rt = document.getElementById('flexRatio');
+      if (!g || !e) return;
+      const p = (e / g) * 100;
+      rt.innerText = `Paridade: ${p.toFixed(1)}%`;
+      if (p <= 70) {
+        bx.style.borderColor = 'rgba(16, 185, 129, 0.4)'; bx.style.background = 'rgba(16, 185, 129, 0.05)';
+        vd.className = "text-xl font-extrabold font-num tracking-tight text-emerald-500"; vd.innerText = "ETANOL";
+      } else {
+        bx.style.borderColor = 'rgba(59, 130, 246, 0.4)'; bx.style.background = 'rgba(59, 130, 246, 0.05)';
+        vd.className = "text-xl font-extrabold font-num tracking-tight text-blue-500"; vd.innerText = "GASOLINA";
+      }
+    }
+
+    // --- GRÁFICOS ---
+    function initCharts() {
+      Chart.defaults.font.family = 'JetBrains Mono'; Chart.defaults.font.size = 9;
+      const c1 = document.getElementById('chartEvolucao').getContext('2d');
+      chart1Instance = new Chart(c1, { type: 'line', data: {labels:[],datasets:[]}, options: { responsive:true, maintainAspectRatio:false, scales: { x:{grid:{display:false}}, y:{grid:{borderDash:[4,4]}} } } });
+      const c2 = document.getElementById('chartMix').getContext('2d');
+      chart2Instance = new Chart(c2, { type: 'doughnut', data: {labels:['Gasolina','Etanol'],datasets:[]}, options: { responsive:true, maintainAspectRatio:false, cutout:'75%' } });
+      const c3 = document.getElementById('chartEficiencia').getContext('2d');
+      chart3Instance = new Chart(c3, { type: 'bar', data: {labels:[],datasets:[]}, options: { responsive:true, maintainAspectRatio:false, scales: { x:{grid:{display:false}}, y:{grid:{borderDash:[4,4]}} } } });
+      atualizarCoresGraficosParaTema(document.documentElement.classList.contains('theme-dark'));
+    }
+
+    function atualizarCoresGraficosParaTema(isDark) {
+      const tc = isDark ? '#94A3B8' : '#64748B', gc = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+      [chart1Instance, chart2Instance, chart3Instance].forEach(c => {
+        if (!c) return; c.options.plugins.legend.labels.color = tc;
+        if (c.options.scales?.x) { c.options.scales.x.ticks.color = tc; c.options.scales.y.ticks.color = tc; c.options.scales.y.grid.color = gc; }
+        c.update();
+      });
+    }
+
+    function atualizarDadosGraficos(dados, gGas, gEta) {
+      const lbls = dados.map(i => new Date(i.Data).toLocaleDateString('pt-BR'));
+      chart1Instance.data = { labels: lbls, datasets: [
+        { label: 'R$', data: dados.map(i=>Number(i.Valor)), borderColor: '#10B981', backgroundColor: 'rgba(16, 185, 129, 0.1)', fill: true, tension: 0.3 },
+        { label: 'KM', data: dados.map(i=>Number(i.KmRodado)), borderColor: '#64748B', borderDash: [4,4], tension: 0.3 }
+      ]}; chart1Instance.update();
+      chart2Instance.data = { labels: ['Gas','Eta'], datasets: [{ data: [gGas, gEta], backgroundColor: ['#3B82F6', '#F59E0B'], borderWidth: 0 }]}; chart2Instance.update();
+      const abast = dados.filter(i => Number(i.Litros) > 0);
+      chart3Instance.data = { labels: abast.map(i=>new Date(i.Data).toLocaleDateString('pt-BR')), datasets: [
+        { label: 'KM/L', data: abast.map(i=>Number(i.KmPorLitro)), backgroundColor: '#10B981', borderRadius: 4 },
+        { label: 'L/100km', data: abast.map(i=>Number(i.Litros100km)), backgroundColor: 'rgba(16, 185, 129, 0.3)', borderRadius: 4 }
+      ]}; chart3Instance.update();
+    }
+
+    // --- MODAL API ---
+    function toggleModalConfig() {
+      const m = document.getElementById('modalConfig');
+      document.getElementById('apiEndpointInput').value = API_ENDPOINT;
+      m.classList.toggle('hidden');
+    }
+    function salvarApiEndpoint() {
+      const v = document.getElementById('apiEndpointInput').value.trim();
+      if(v) { localStorage.setItem("CCMV_SHEETS_ENDPOINT", v); API_ENDPOINT = v; toggleModalConfig(); carregarDadosDaNuvem(); }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => { initTheme(); initCharts(); initFormEvents(); carregarDadosDaNuvem(); });
+  </script>
+</body>
+</html>
