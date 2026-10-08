@@ -5,10 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>CCMV | Calculadora de Consumo Médio Veicular</title>
   
+  <!-- Favicon: Posto de Gasolina Vetorial (Minimalista / Esmeralda) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2310B981' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 22h12'/%3E%3Cpath d='M4 9h10v13H4z'/%3E%3Cpath d='M6 5h6v4H6z'/%3E%3Cpath d='M14 12h2a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2'/%3E%3Cpath d='M18 10c0-2.5 1-4 3-4'/%3E%3Cpath d='M21 6v3'/%3E%3C/svg%3E">
+  
+  <!-- Fontes de Alta Precisão -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   
+  <!-- Tailwind CSS & Chart.js -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -82,7 +87,6 @@
       box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.05);
     }
 
-    /* O z-index foi ajustado para -1 para não bloquear cliques na barra superior */
     .orb-glow {
       position: fixed;
       border-radius: 50%;
@@ -282,7 +286,6 @@
             <span id="prevDeltaKmCheckin" class="text-xl font-black text-emerald-500 mt-1 block font-num">0 km</span>
           </div>
 
-          <!-- Botão Salvar estilizado sutilmente para caber no Titanium -->
           <button type="submit" id="btnSalvar" class="w-full py-3.5 rounded-lg font-extrabold text-xs tracking-wide transition-all shadow-md flex items-center justify-center space-x-2" style="background: var(--text-primary); color: var(--bg-canvas);">
             <span id="btnSalvarTexto">Salvar Abastecimento</span>
           </button>
@@ -308,7 +311,6 @@
             </div>
           </div>
 
-          <!-- Card interno de veredito, similar ao Titanium Glass base -->
           <div id="flexVerdictBox" class="mt-5 p-5 rounded-xl border text-center transition-all" style="background: var(--input-bg); border-color: var(--input-border)">
             <span class="text-[9px] uppercase tracking-[0.2em] font-semibold block mb-1.5" style="color: var(--text-secondary)">Recomendação</span>
             <h3 id="flexVerdict" class="text-xl font-extrabold font-num tracking-tight" style="color: var(--text-secondary)">--</h3>
@@ -523,7 +525,6 @@
         telemetria = json.reverse();
         
         if (telemetria.length === 0) {
-          // Solicita o KM inicial se banco estiver zerado
           document.getElementById('modalKmBase').classList.remove('hidden');
         } else {
           renderDashboard();
@@ -538,7 +539,6 @@
       }
     }
 
-    // Função para registrar KM Base
     async function salvarKmBase() {
       const inputKm = Number(document.getElementById('inKmBase').value);
       if(!inputKm || inputKm <= 0) return alert('Informe um KM válido.');
