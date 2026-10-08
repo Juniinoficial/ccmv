@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>CCMV | Cockpit de Telemetria Veicular</title>
+  
+  <!-- Fontes de Alta Precisão (Inter & JetBrains Mono para telemetria numérica) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS & Chart.js -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    :root {
+      --bg-void: #06080D;
+      --titanium-100: #F8FAFC;
+      --titanium-300: #CBD5E1;
+      --titanium-500: #64748B;
+      --titanium-800: #1E293B;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background-color: var(--bg-void);
+      color: var(--titanium-100);
+      letter-spacing: -0.015em;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .font-mono-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-feature-settings: "tnum" 1, "zero" 1;
+    }
+
+    /* Efeito de Vidro Titânio Líquido Lapidado */
+    .titanium-glass {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
+      backdrop-filter: blur(28px) saturate(180%);
+      -webkit-backdrop-filter: blur(28px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.12),
+                  0 20px 40px -15px rgba(0, 0, 0, 0.7);
+      border-radius: 20px;
+    }
+
+    .titanium-input {
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+      color: #FFFFFF;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .titanium-input:focus {
+      outline: none;
+      border-color: rgba(255, 255, 255, 0.45);
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5), 0 0 16px rgba(255, 255, 255, 0.1);
+    }
+
+    /* Glows sutis de profundidade cósmica */
+    .orb-glow {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(140px);
+      pointer-events: none;
+      z-index: 0;
+    }
+  </style>
+</head>
+<body class="min-h-screen relative overflow-x-hidden selection:bg-white/20">
+
+  <!-- Ambient Lighting de Cockpit -->
+  <div class="orb-glow w-[500px] h-[500px] bg-slate-400/5 -top-40 -left-40"></div>
+  <div class="orb-glow w-[600px] h-[600px] bg-slate-700/5 top-1/2 -right-60"></div>
+
+  <!-- Barra de Telemetria Superior -->
+  <header class="relative z-10 border-b border-white/[0.06] bg-black/40 backdrop-blur-xl sticky top-0">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
+      
+      <!-- Logo & Branding -->
+      <div class="flex items-center space-x-4">
+        <div class="w-11 h-11 rounded-xl titanium-glass flex items-center justify-center border-white/20 shadow-inner">
+          <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <span class="text-xs uppercase tracking-[0.25em] font-semibold text-slate-400">Telemetry Cockpit</span>
+            <span class="text-[9px] font-mono-num font-bold bg-white/10 text-white px-2 py-0.5 rounded-full border border-white/10">v3.0.4</span>
+          </div>
+          <h1 class="text-xl font-extrabold tracking-tight text-white flex items-center gap-1.5">
+            CCMV <span class="font-normal text-slate-400 text-sm">| Consumo Médio</span>
+          </h1>
+        </div>
+      </div>
+
+      <!-- Indicadores de Status e Configuração -->
+      <div class="flex items-center space-x-3">
+        <button onclick="toggleModalConfig()" class="h-10 px-4 rounded-xl titanium-glass hover:bg-white/[0.08] text-xs font-semibold text-slate-300 transition-all flex items-center space-x-2">
+          <svg class="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+          </svg>
+          <span class="hidden sm:inline">Google API</span>
+        </button>
+
+        <div id="syncBadge" class="h-10 px-3.5 rounded-xl titanium-glass flex items-center space-x-2 text-xs font-mono-num border-white/10">
+          <span class="w-2 h-2 rounded-full bg-slate-400 animate-pulse" id="syncDot"></span>
+          <span id="syncText" class="text-slate-300 font-medium">Standby</span>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <main class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8">
+
+    <!-- KPI HUD: Painel de Indicadores de Alta Precisão -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      
+      <!-- KPI 1: Eficiência Dinâmica -->
+      <div class="titanium-glass p-6 relative overflow-hidden group">
+        <div class="flex justify-between items-start">
+          <span class="text-[11px] font-bold tracking-[0.2em] uppercase text-slate-400">Eficiência Média</span>
+          <span class="text-[10px] font-mono-num px-2 py-0.5 rounded bg-white/[0.06] text-slate-300 border border-white/10">50L REF</span>
+        </div>
+        <div class="mt-4 flex items-baseline space-x-2">
+          <h2 id="kpiKmL" class="text-4xl font-extrabold text-white tracking-tight font-mono-num">0.0</h2>
+          <span class="text-slate-400 text-sm font-semibold">km/l</span>
+        </div>
+        <div class="mt-3 pt-3 border-t border-white/[0.06] flex items-center justify-between text-xs font-mono-num">
+          <span class="text-slate-400">Taxa 100km:</span>
+          <span id="kpiL100" class="text-white font-bold">0.0 L/100km</span>
+        </div>
+      </div>
+
+      <!-- KPI 2: Custo Operacional -->
+      <div class="titanium-glass p-6 relative overflow-hidden">
+        <div class="flex justify-between items-start">
+          <span class="text-[11px] font-bold tracking-[0.2em] uppercase text-slate-400">Custo por Km</span>
+          <span class="text-[10px] font-mono-num px-2 py-0.5 rounded bg-white/[0.06] text-slate-300 border border-white/10">TELEMETRIA</span>
+        </div>
+        <div class="mt-4 flex items-baseline space-x-2">
+          <span class="text-slate-400 text-lg font-light">R$</span>
+          <h2 id="kpiCustoKm" class="text-4xl font-extrabold text-white tracking-tight font-mono-num">0,00</h2>
+        </div>
+        <div class="mt-3 pt-3 border-t border-white/[0.06] flex items-center justify-between text-xs font-mono-num">
+          <span class="text-slate-400">Autonomia Est.:</span>
+          <span id="kpiAutonomia" class="text-white font-bold">~0 km</span>
+        </div>
+      </div>
+
+      <!-- KPI 3: Desembolso Financeiro -->
+      <div class="titanium-glass p-6 relative overflow-hidden">
+        <div class="flex justify-between items-start">
+          <span class="text-[11px] font-bold tracking-[0.2em] uppercase text-slate-400">Investimento Mensal</span>
+          <span class="text-[10px] font-mono-num px-2 py-0.5 rounded bg-white/[0.06] text-slate-300 border border-white/10">CONSOLIDADO</span>
+        </div>
+        <div class="mt-4 flex items-baseline space-x-2">
+          <span class="text-slate-400 text-lg font-light">R$</span>
+          <h2 id="kpiGastoMes" class="text-4xl font-extrabold text-white tracking-tight font-mono-num">0,00</h2>
+        </div>
+        <div class="mt-3 pt-3 border-t border-white/[0.06] flex items-center justify-between text-xs font-mono-num">
+          <span class="text-slate-400">Esta Semana:</span>
+          <span id="kpiGastoSemana" class="text-white font-bold">R$ 0,00</span>
+        </div>
+      </div>
+
+      <!-- KPI 4: Odometria Acumulada -->
+      <div class="titanium-glass p-6 relative overflow-hidden">
+        <div class="flex justify-between items-start">
+          <span class="text-[11px] font-bold tracking-[0.2em] uppercase text-slate-400">Odômetro Geral</span>
+          <span class="text-[10px] font-mono-num px-2 py-0.5 rounded bg-white/[0.06] text-slate-300 border border-white/10">FROTA</span>
+        </div>
+        <div class="mt-4 flex items-baseline space-x-2">
+          <h2 id="kpiOdometroTotal" class="text-4xl font-extrabold text-white tracking-tight font-mono-num">0</h2>
+          <span class="text-slate-400 text-sm font-semibold">km</span>
+        </div>
+        <div class="mt-3 pt-3 border-t border-white/[0.06] flex items-center justify-between text-xs font-mono-num">
+          <span class="text-slate-400">Rodados no Mês:</span>
+          <span id="kpiKmRodadoMes" class="text-white font-bold">0 km</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Seção de Ação: Formulário de Ingestão de Dados & Calculadora Flex -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      
+      <!-- Formulário de Registro (7 colunas) -->
+      <div class="lg:col-span-7 titanium-glass p-7 relative">
+        <div class="flex items-center justify-between pb-5 border-b border-white/[0.08]">
+          <div>
+            <h2 class="text-lg font-bold text-white tracking-tight">Registro de Abastecimento</h2>
+            <p class="text-xs text-slate-400 mt-0.5">Entrada de dados brutos na bomba do posto.</p>
+          </div>
+          <span id="lastOdoBadge" class="text-xs font-mono-num text-slate-300 px-3 py-1 rounded-lg bg-white/[0.05] border border-white/10">
+            Último KM: --
+          </span>
+        </div>
+
+        <form id="refuelForm" class="mt-6 space-y-5" onsubmit="handleSubmitAbastecimento(event)">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            
+            <!-- Odômetro -->
+            <div>
+              <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Odômetro Atual (KM)</label>
+              <input type="number" id="inOdo" required step="1" placeholder="Ex: 52140" class="titanium-input w-full px-4 py-3 rounded-xl text-base font-mono-num font-bold">
+            </div>
+
+            <!-- Combustível -->
+            <div>
+              <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Combustível</label>
+              <select id="inCombustivel" class="titanium-input w-full px-4 py-3 rounded-xl text-sm font-semibold">
+                <option value="Gasolina">Gasolina Comum / Aditivada</option>
+                <option value="Etanol">Etanol (Álcool)</option>
+              </select>
+            </div>
+
+            <!-- Litros -->
+            <div>
+              <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Litros Abastecidos</label>
+              <input type="number" id="inLitros" required step="0.01" placeholder="Ex: 45.20" class="titanium-input w-full px-4 py-3 rounded-xl text-base font-mono-num font-bold">
+            </div>
+
+            <!-- Valor Total -->
+            <div>
+              <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Total Pago (R$)</label>
+              <input type="number" id="inValor" required step="0.01" placeholder="Ex: 260.00" class="titanium-input w-full px-4 py-3 rounded-xl text-base font-mono-num font-bold">
+            </div>
+
+          </div>
+
+          <!-- Live Cockpit Feedback HUD -->
+          <div class="grid grid-cols-3 gap-3 p-4 rounded-xl bg-black/50 border border-white/[0.06] font-mono-num text-center">
+            <div>
+              <span class="text-[9px] uppercase tracking-wider text-slate-400 block font-semibold">Delta Rodado</span>
+              <span id="prevDeltaKm" class="text-sm font-bold text-white mt-0.5 block">0 km</span>
+            </div>
+            <div>
+              <span class="text-[9px] uppercase tracking-wider text-slate-400 block font-semibold">Preço/Litro</span>
+              <span id="prevPrecoLitro" class="text-sm font-bold text-white mt-0.5 block">R$ 0,00</span>
+            </div>
+            <div>
+              <span class="text-[9px] uppercase tracking-wider text-slate-400 block font-semibold">Rendimento Médio</span>
+              <span id="prevKmL" class="text-sm font-bold text-emerald-400 mt-0.5 block">0.0 km/l</span>
+            </div>
+          </div>
+
+          <!-- Botão Primário Titanium -->
+          <button type="submit" id="btnSalvar" class="w-full py-4 rounded-xl bg-white hover:bg-slate-200 text-black font-extrabold text-sm tracking-wide transition-all shadow-[0_0_30px_rgba(255,255,255,0.15)] flex items-center justify-center space-x-2">
+            <span>Transmitir Dados para a Nuvem</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- Calculadora Flex de Alta Precisão (5 colunas) -->
+      <div class="lg:col-span-5 titanium-glass p-7 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between pb-5 border-b border-white/[0.08]">
+            <h2 class="text-lg font-bold text-white tracking-tight">Algoritmo Flex (Bomba)</h2>
+            <span class="text-[10px] font-mono-num font-bold px-2 py-0.5 rounded bg-white/10 text-white border border-white/10">PARIDADE 70%</span>
+          </div>
+
+          <p class="text-xs text-slate-400 mt-4 leading-relaxed">
+            Insira os valores exibidos na bomba para obter o veredito instantâneo de eficiência financeira.
+          </p>
+
+          <div class="grid grid-cols-2 gap-4 mt-6">
+            <div>
+              <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Gasolina (R$/L)</label>
+              <input type="number" id="calcGas" step="0.01" placeholder="5.99" oninput="runFlexEngine()" class="titanium-input w-full px-3.5 py-2.5 rounded-xl text-base font-mono-num font-bold">
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Etanol (R$/L)</label>
+              <input type="number" id="calcEta" step="0.01" placeholder="3.89" oninput="runFlexEngine()" class="titanium-input w-full px-3.5 py-2.5 rounded-xl text-base font-mono-num font-bold">
+            </div>
+          </div>
+
+          <!-- Placa de Decisão Computada -->
+          <div id="flexCockpitBox" class="mt-6 p-6 rounded-2xl bg-black/40 border border-white/[0.08] text-center transition-all">
+            <span class="text-[10px] uppercase tracking-[0.2em] font-semibold text-slate-400 block mb-2">Recomendação Estratégica</span>
+            <h3 id="flexVerdict" class="text-2xl font-extrabold text-slate-400 font-mono-num tracking-tight">Aguardando Valores</h3>
+            <p id="flexRatio" class="text-xs text-slate-400 font-mono-num mt-2">Paridade calculada: --</p>
+          </div>
+        </div>
+
+        <div class="text-[10px] text-slate-400 font-mono-num mt-6 pt-4 border-t border-white/[0.06] text-center">
+          *Ponto de equilíbrio dinâmico baseado em relação térmica de 0.70x.
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Telemetria Gráfica: 3 Instrumentos Visuais -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      
+      <!-- Gráfico 1: Evolução Financeira & Km Rodados (8 colunas) -->
+      <div class="lg:col-span-8 titanium-glass p-7">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h3 class="text-base font-bold text-white tracking-tight">Evolução Histórica de Desembolso e KM</h3>
+            <p class="text-xs text-slate-400">Correlação temporal entre custos totais e distância percorrida.</p>
+          </div>
+          <span class="text-xs font-mono-num text-slate-400 bg-white/[0.04] px-3 py-1 rounded-lg border border-white/[0.08]">Série Temporal</span>
+        </div>
+        <div class="h-72">
+          <canvas id="chartEvolucao"></canvas>
+        </div>
+      </div>
+
+      <!-- Gráfico 2: Mix de Energia (4 colunas) -->
+      <div class="lg:col-span-4 titanium-glass p-7">
+        <h3 class="text-base font-bold text-white tracking-tight mb-1">Matriz de Combustível</h3>
+        <p class="text-xs text-slate-400 mb-6">Proporção total de investimento (R$).</p>
+        <div class="h-72 flex items-center justify-center">
+          <canvas id="chartMix"></canvas>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Gráfico 3: Curva de Eficiência Energética (Full Width) -->
+    <div class="titanium-glass p-7">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h3 class="text-base font-bold text-white tracking-tight">Métrica de Rendimento: KM/L vs L/100km</h3>
+          <p class="text-xs text-slate-400">Análise de dispersão do rendimento ciclo a ciclo.</p>
+        </div>
+        <span class="text-xs font-mono-num text-slate-400 bg-white/[0.04] px-3 py-1 rounded-lg border border-white/[0.08]">Telemetria Dupla</span>
+      </div>
+      <div class="h-64">
+        <canvas id="chartEficiencia"></canvas>
+      </div>
+    </div>
+
+    <!-- Tabela Executiva de Registros -->
+    <div class="titanium-glass overflow-hidden">
+      <div class="p-6 border-b border-white/[0.08] flex items-center justify-between">
+        <div>
+          <h3 class="text-base font-bold text-white tracking-tight">Auditoria de Abastecimentos</h3>
+          <p class="text-xs text-slate-400">Histórico de dados sincronizados com a planilha Google.</p>
+        </div>
+        <button onclick="carregarDadosDaNuvem()" class="px-4 py-2 rounded-xl titanium-glass hover:bg-white/[0.08] text-xs font-semibold text-slate-200 transition-all font-mono-num">
+          Sincronizar Agora
+        </button>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs font-mono-num">
+          <thead>
+            <tr class="bg-black/40 text-slate-400 border-b border-white/[0.06] uppercase tracking-wider text-[10px]">
+              <th class="py-3.5 px-5">Data</th>
+              <th class="py-3.5 px-5">Odômetro</th>
+              <th class="py-3.5 px-5">Delta KM</th>
+              <th class="py-3.5 px-5">Tipo</th>
+              <th class="py-3.5 px-5">Litros</th>
+              <th class="py-3.5 px-5">Total Pago</th>
+              <th class="py-3.5 px-5">R$/Litro</th>
+              <th class="py-3.5 px-5">KM/L</th>
+              <th class="py-3.5 px-5">L/100km</th>
+              <th class="py-3.5 px-5">Custo/KM</th>
+            </tr>
+          </thead>
+          <tbody id="tabelaLogs" class="divide-y divide-white/[0.04] text-slate-300 font-medium">
+            <tr>
+              <td colspan="10" class="text-center py-10 text-slate-500">Conectando aos servidores de telemetria...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Modal Minimalista de Conexão com Google Sheets -->
+  <div id="modalConfig" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="titanium-glass max-w-lg w-full p-8 space-y-6 bg-slate-950/90 border border-white/20">
+      <div>
+        <h3 class="text-lg font-bold text-white tracking-tight">Endpoint Google Apps Script</h3>
+        <p class="text-xs text-slate-400 mt-1">Cole a URL de implantação do seu Google Sheets para habilitar a telemetria.</p>
+      </div>
+      <input type="text" id="apiEndpointInput" placeholder="https://script.google.com/macros/s/.../exec" class="titanium-input w-full px-4 py-3 rounded-xl text-xs font-mono-num">
+      <div class="flex justify-end space-x-3 pt-2">
+        <button onclick="toggleModalConfig()" class="px-5 py-2.5 rounded-xl titanium-glass text-xs font-semibold text-slate-300 hover:bg-white/[0.05]">Cancelar</button>
+        <button onclick="salvarApiEndpoint()" class="px-5 py-2.5 rounded-xl bg-white text-black font-extrabold text-xs hover:bg-slate-200">Conectar Endpoint</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Motor Lógico & Scripts de Telemetria -->
+  <script>
+    let API_ENDPOINT = localStorage.getItem("CCMV_SHEETS_ENDPOINT") || "COLE_AQUI_SEU_APPS_SCRIPT_URL";
+    let telemetria = [];
+    let chart1Instance, chart2Instance, chart3Instance;
+
+    function toggleModalConfig() {
+      const modal = document.getElementById('modalConfig');
+      document.getElementById('apiEndpointInput').value = API_ENDPOINT;
+      modal.classList.toggle('hidden');
+    }
+
+    function salvarApiEndpoint() {
+      const val = document.getElementById('apiEndpointInput').value.trim();
+      if(val) {
+        localStorage.setItem("CCMV_SHEETS_ENDPOINT", val);
+        API_ENDPOINT = val;
+        toggleModalConfig();
+        carregarDadosDaNuvem();
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      configurarChartsTemaTitanium();
+      if(API_ENDPOINT === "COLE_AQUI_SEU_APPS_SCRIPT_URL") {
+        toggleModalConfig();
+      } else {
+        carregarDadosDaNuvem();
+      }
+
+      ['inOdo', 'inLitros', 'inValor'].forEach(id => {
+        document.getElementById(id).addEventListener('input', calcularCockpitLivePreview);
+      });
+    });
+
+    // Preview HUD instantâneo durante digitação
+    function calcularCockpitLivePreview() {
+      const odo = Number(document.getElementById('inOdo').value) || 0;
+      const lit = Number(document.getElementById('inLitros').value) || 0;
+      const val = Number(document.getElementById('inValor').value) || 0;
+
+      const ultimoOdo = telemetria.length > 0 ? Number(telemetria[0].Odometro) : odo;
+      const delta = odo > ultimoOdo ? odo - ultimoOdo : 0;
+
+      document.getElementById('prevDeltaKm').innerText = delta > 0 ? `+${delta} km` : `0 km`;
+      document.getElementById('prevPrecoLitro').innerText = lit > 0 ? `R$ ${(val / lit).toFixed(2)}` : `R$ 0,00`;
+
+      if(delta > 0 && lit > 0) {
+        document.getElementById('prevKmL').innerText = `${(delta / lit).toFixed(2)} km/l`;
+      } else {
+        document.getElementById('prevKmL').innerText = `0.0 km/l`;
+      }
+    }
+
+    // Leitura via API
+    async function carregarDadosDaNuvem() {
+      if(!API_ENDPOINT || API_ENDPOINT.includes("COLE_AQUI")) return;
+      
+      const dot = document.getElementById('syncDot');
+      const text = document.getElementById('syncText');
+      dot.className = "w-2 h-2 rounded-full bg-amber-400 animate-ping";
+      text.innerText = "Syncing...";
+
+      try {
+        const res = await fetch(`${API_ENDPOINT}?action=read`);
+        const json = await res.json();
+        
+        telemetria = json.reverse(); // Mais recente no topo
+        renderHUDCompleto();
+        
+        dot.className = "w-2 h-2 rounded-full bg-emerald-400";
+        text.innerText = "Online";
+      } catch (err) {
+        console.error("Falha de conexão com a planilha:", err);
+        dot.className = "w-2 h-2 rounded-full bg-red-400";
+        text.innerText = "Offline";
+      }
+    }
+
+    // Renderização dos KPIs, Tabela e Gráficos
+    function renderHUDCompleto() {
+      const tbody = document.getElementById('tabelaLogs');
+      tbody.innerHTML = '';
+
+      if (telemetria.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="10" class="text-center py-12 text-slate-500">Nenhum evento telemétrico registrado. Faça o primeiro abastecimento.</td></tr>`;
+        return;
+      }
+
+      const ultOdo = Number(telemetria[0].Odometro);
+      document.getElementById('lastOdoBadge').innerText = `Último KM: ${ultOdo.toLocaleString('pt-BR')}`;
+
+      let totalGasto = 0, totalLitros = 0, totalKm = 0;
+      let gastoGas = 0, gastoEta = 0;
+
+      // Cálculo de períodos (Hoje, Esta Semana, Este Mês)
+      const agora = new Date();
+      let gastoMes = 0, gastoSemana = 0, kmMes = 0;
+
+      telemetria.forEach(item => {
+        const v = Number(item.Valor) || 0;
+        const l = Number(item.Litros) || 0;
+        const k = Number(item.KmRodado) || 0;
+        const d = new Date(item.Data);
+
+        totalGasto += v;
+        totalLitros += l;
+        totalKm += k;
+
+        if(item.Combustivel === 'Etanol') gastoEta += v;
+        else gastoGas += v;
+
+        // Análise de períodos
+        const diffDias = (agora - d) / (1000 * 60 * 60 * 24);
+        if (d.getMonth() === agora.getMonth() && d.getFullYear() === agora.getFullYear()) {
+          gastoMes += v;
+          kmMes += k;
+        }
+        if (diffDias <= 7) {
+          gastoSemana += v;
+        }
+
+        const tr = `
+          <tr class="hover:bg-white/[0.02] transition-colors">
+            <td class="py-4 px-5 text-slate-400">${d.toLocaleDateString('pt-BR')}</td>
+            <td class="py-4 px-5 font-bold text-white">${Number(item.Odometro).toLocaleString('pt-BR')}</td>
+            <td class="py-4 px-5 text-white font-bold">+${item.KmRodado} km</td>
+            <td class="py-4 px-5">
+              <span class="px-2 py-0.5 rounded text-[9px] font-bold ${item.Combustivel === 'Etanol' ? 'bg-amber-500/10 text-amber-300 border border-amber-500/20' : 'bg-slate-500/20 text-slate-200 border border-white/10'}">
+                ${item.Combustivel}
+              </span>
+            </td>
+            <td class="py-4 px-5">${l.toFixed(2)} L</td>
+            <td class="py-4 px-5 font-bold text-white">R$ ${v.toFixed(2)}</td>
+            <td class="py-4 px-5 text-slate-400">R$ ${Number(item.PrecoLitro).toFixed(2)}</td>
+            <td class="py-4 px-5 font-bold text-emerald-400">${Number(item.KmPorLitro).toFixed(2)}</td>
+            <td class="py-4 px-5 text-slate-400">${Number(item.Litros100km).toFixed(2)}</td>
+            <td class="py-4 px-5 text-slate-400">R$ ${Number(item.CustoPorKm).toFixed(2)}</td>
+          </tr>
+        `;
+        tbody.innerHTML += tr;
+      });
+
+      // Consolidação de KPIs
+      const mediaKmL = totalLitros > 0 ? (totalKm / totalLitros) : 0;
+      const mediaL100 = mediaKmL > 0 ? (100 / mediaKmL) : 0;
+      const custoKmMedio = totalKm > 0 ? (totalGasto / totalKm) : 0;
+      const autonomiaTanque50L = (mediaKmL * 50).toFixed(0);
+
+      document.getElementById('kpiKmL').innerText = mediaKmL.toFixed(2);
+      document.getElementById('kpiL100').innerText = `${mediaL100.toFixed(2)} L/100km`;
+      document.getElementById('kpiCustoKm').innerText = custoKmMedio.toFixed(2);
+      document.getElementById('kpiAutonomia').innerText = `~${autonomiaTanque50L} km`;
+      document.getElementById('kpiGastoMes').innerText = gastoMes.toFixed(2);
+      document.getElementById('kpiGastoSemana').innerText = `R$ ${gastoSemana.toFixed(2)}`;
+      document.getElementById('kpiOdometroTotal').innerText = ultOdo.toLocaleString('pt-BR');
+      document.getElementById('kpiKmRodadoMes').innerText = `${kmMes} km`;
+
+      atualizarGraficosTitanium(telemetria.slice().reverse(), gastoGas, gastoEta);
+    }
+
+    // Ingestão telemétrica de novo abastecimento
+    async function handleSubmitAbastecimento(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnSalvar');
+      btn.innerText = "Transmitindo...";
+      btn.disabled = true;
+
+      const odo = Number(document.getElementById('inOdo').value);
+      const lit = Number(document.getElementById('inLitros').value);
+      const val = Number(document.getElementById('inValor').value);
+      const comb = document.getElementById('inCombustivel').value;
+
+      const ultOdo = telemetria.length > 0 ? Number(telemetria[0].Odometro) : odo;
+      const kmRodado = odo > ultOdo ? odo - ultOdo : 0;
+      
+      const precoLitro = lit > 0 ? (val / lit) : 0;
+      const kmPorLitro = (kmRodado > 0 && lit > 0) ? (kmRodado / lit) : 0;
+      const litros100km = kmPorLitro > 0 ? (100 / kmPorLitro) : 0;
+      const custoPorKm = kmRodado > 0 ? (val / kmRodado) : 0;
+
+      const queryParams = new URLSearchParams({
+        action: "create",
+        data: new Date().toISOString(),
+        odometro: odo,
+        kmRodado: kmRodado,
+        litros: lit,
+        valor: val,
+        combustivel: comb,
+        kmPorLitro: kmPorLitro.toFixed(2),
+        litros100km: litros100km.toFixed(2),
+        custoPorKm: custoPorKm.toFixed(2),
+        precoLitro: precoLitro.toFixed(2)
+      });
+
+      try {
+        await fetch(`${API_ENDPOINT}?${queryParams.toString()}`);
+        document.getElementById('refuelForm').reset();
+        await carregarDadosDaNuvem();
+      } catch (err) {
+        alert("Erro de comunicação com o Google Sheets.");
+        console.error(err);
+      } finally {
+        btn.innerText = "Transmitir Dados para a Nuvem";
+        btn.disabled = false;
+      }
+    }
+
+    // Calculadora Flex
+    function runFlexEngine() {
+      const g = Number(document.getElementById('calcGas').value);
+      const e = Number(document.getElementById('calcEta').value);
+      const box = document.getElementById('flexCockpitBox');
+      const verd = document.getElementById('flexVerdict');
+      const ratio = document.getElementById('flexRatio');
+
+      if (!g || !e) return;
+
+      const paridade = (e / g) * 100;
+      ratio.innerText = `Relação: ${paridade.toFixed(1)}% do preço da gasolina`;
+
+      if (paridade <= 70) {
+        box.className = "mt-6 p-6 rounded-2xl bg-white/[0.05] border border-emerald-400/40 text-center transition-all shadow-[0_0_20px_rgba(52,211,153,0.1)]";
+        verd.className = "text-2xl font-extrabold text-emerald-400 font-mono-num tracking-tight";
+        verd.innerText = "ABASTEÇA COM ETANOL";
+      } else {
+        box.className = "mt-6 p-6 rounded-2xl bg-white/[0.05] border border-white/20 text-center transition-all";
+        verd.className = "text-2xl font-extrabold text-white font-mono-num tracking-tight";
+        verd.innerText = "ABASTEÇA COM GASOLINA";
+      }
+    }
+
+    // Configuração dos Gráficos com Tema Titanium Minimal
+    function configurarChartsTemaTitanium() {
+      Chart.defaults.color = '#64748B';
+      Chart.defaults.font.family = 'JetBrains Mono';
+      Chart.defaults.font.size = 10;
+
+      // 1. Linhas Monocromáticas de Precisão
+      const c1 = document.getElementById('chartEvolucao').getContext('2d');
+      chart1Instance = new Chart(c1, {
+        type: 'line',
+        data: { labels: [], datasets: [] },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { labels: { color: '#CBD5E1', boxWidth: 12 } } },
+          scales: {
+            x: { grid: { color: 'rgba(255, 255, 255, 0.04)' } },
+            y: { grid: { color: 'rgba(255, 255, 255, 0.04)' } }
+          }
+        }
+      });
+
+      // 2. Rosca Analítica
+      const c2 = document.getElementById('chartMix').getContext('2d');
+      chart2Instance = new Chart(c2, {
+        type: 'doughnut',
+        data: { labels: ['Gasolina', 'Etanol'], datasets: [] },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '75%',
+          plugins: { legend: { position: 'bottom', labels: { color: '#CBD5E1', boxWidth: 12 } } }
+        }
+      });
+
+      // 3. Eficiência em Barras Lapidadas
+      const c3 = document.getElementById('chartEficiencia').getContext('2d');
+      chart3Instance = new Chart(c3, {
+        type: 'bar',
+        data: { labels: [], datasets: [] },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { labels: { color: '#CBD5E1', boxWidth: 12 } } },
+          scales: {
+            x: { grid: { color: 'rgba(255, 255, 255, 0.04)' } },
+            y: { grid: { color: 'rgba(255, 255, 255, 0.04)' } }
+          }
+        }
+      });
+    }
+
+    // Atualização dos Gráficos
+    function atualizarGraficosTitanium(cronologico, gas, eta) {
+      const labels = cronologico.map(i => new Date(i.Data).toLocaleDateString('pt-BR'));
+
+      // Chart 1
+      chart1Instance.data = {
+        labels: labels,
+        datasets: [
+          {
+            label: 'Desembolso (R$)',
+            data: cronologico.map(i => Number(i.Valor)),
+            borderColor: '#FFFFFF',
+            borderWidth: 2,
+            backgroundColor: 'rgba(255, 255, 255, 0.03)',
+            fill: true,
+            tension: 0.35,
+            pointRadius: 3
+          },
+          {
+            label: 'Distância (KM)',
+            data: cronologico.map(i => Number(i.KmRodado)),
+            borderColor: '#64748B',
+            borderWidth: 1.5,
+            borderDash: [4, 4],
+            backgroundColor: 'transparent',
+            tension: 0.35,
+            pointRadius: 0
+          }
+        ]
+      };
+      chart1Instance.update();
+
+      // Chart 2
+      chart2Instance.data = {
+        labels: ['Gasolina', 'Etanol'],
+        datasets: [{
+          data: [gas, eta],
+          backgroundColor: ['#FFFFFF', '#D97706'],
+          borderWidth: 0
+        }]
+      };
+      chart2Instance.update();
+
+      // Chart 3
+      chart3Instance.data = {
+        labels: labels,
+        datasets: [
+          {
+            label: 'KM / Litro',
+            data: cronologico.map(i => Number(i.KmPorLitro)),
+            backgroundColor: '#FFFFFF',
+            borderRadius: 6
+          },
+          {
+            label: 'Litros / 100km',
+            data: cronologico.map(i => Number(i.Litros100km)),
+            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+            borderRadius: 6
+          }
+        ]
+      };
+      chart3Instance.update();
+    }
+  </script>
+</body>
+</html>
