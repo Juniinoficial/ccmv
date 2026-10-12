@@ -128,8 +128,6 @@
 
       <!-- Abas Principais + Ferramentas -->
       <div class="flex items-center space-x-2 sm:space-x-3">
-        
-        <!-- Seletor de Visão (Cockpit vs Aluguel) -->
         <div class="titanium-glass p-1 rounded-lg flex items-center space-x-1 text-xs">
           <button onclick="navegarAba('cockpit')" id="navCockpit" class="px-3 py-1 rounded font-bold transition-all bg-white text-slate-900 shadow-sm dark:bg-white dark:text-black">
             📊 Cockpit
@@ -139,7 +137,6 @@
           </button>
         </div>
 
-        <!-- Tema -->
         <div class="titanium-glass p-1 rounded-lg flex items-center space-x-1 text-xs">
           <button onclick="setTheme('auto')" id="btnThemeAuto" title="Auto" class="px-2 py-1 rounded font-bold">Auto</button>
           <button onclick="setTheme('light')" id="btnThemeLight" title="Claro" class="px-2 py-1 rounded font-bold">☀️</button>
@@ -161,36 +158,52 @@
     <!-- ========================================== -->
     <div id="viewCockpit" class="space-y-6">
       
-      <!-- Mini Banner Informativo do Aluguel Atual -->
-      <div id="bannerAluguelResumo" onclick="navegarAba('aluguel')" class="titanium-glass p-4 cursor-pointer hover:border-emerald-500/40 transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-emerald-500/20 bg-emerald-500/[0.02]">
-        <div class="flex items-center space-x-3">
-          <span class="text-2xl">🚗</span>
-          <div>
-            <h4 id="bannerCarroNome" class="text-xs font-bold text-white tracking-tight">Carro: Não configurado</h4>
-            <p id="bannerCarroSub" class="text-[11px] font-num" style="color: var(--text-secondary)">Clique aqui para configurar seu contrato de locação e franquia.</p>
+      <!-- Banner Inteligente do Carro Alugado com COTA DIÁRIA AUTOMÁTICA -->
+      <div id="bannerAluguelResumo" onclick="navegarAba('aluguel')" class="titanium-glass p-4 cursor-pointer hover:border-emerald-500/40 transition-all border-emerald-500/20 bg-emerald-500/[0.02]">
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div class="flex items-center space-x-3">
+            <span class="text-2xl">🚗</span>
+            <div>
+              <h4 id="bannerCarroNome" class="text-sm font-bold tracking-tight">Carro: Não configurado</h4>
+              <p id="bannerCarroSub" class="text-[11px] font-num" style="color: var(--text-secondary)">Clique aqui para configurar seu contrato de locação e limites de KM.</p>
+            </div>
           </div>
-        </div>
-        <div class="flex items-center space-x-3 text-xs font-num">
-          <div class="text-right">
-            <span class="text-[9px] uppercase tracking-wider block font-bold" style="color: var(--text-secondary)">Franquia Restante</span>
-            <span id="bannerFranquiaRestante" class="font-black text-emerald-400 text-sm">-- km</span>
-          </div>
-          <div class="text-right border-l pl-3" style="border-color: var(--input-border)">
-            <span class="text-[9px] uppercase tracking-wider block font-bold" style="color: var(--text-secondary)">Dias Restantes</span>
-            <span id="bannerDiasRestantes" class="font-black text-white text-sm">-- dias</span>
+          
+          <!-- Grid de Métricas do Banner -->
+          <div class="grid grid-cols-3 gap-4 w-full md:w-auto text-right font-num">
+            
+            <!-- COTA DIÁRIA AUTOMÁTICA -->
+            <div class="px-3 py-1 rounded-xl bg-black/10 dark:bg-white/5 border border-white/5">
+              <span class="text-[9px] uppercase tracking-wider block font-bold text-cyan-400">Cota Disponível/Dia</span>
+              <span id="bannerKmPorDia" class="font-black text-cyan-400 text-sm sm:text-base">-- km/dia</span>
+            </div>
+
+            <!-- SALDO DA FRANQUIA -->
+            <div class="px-3 py-1 rounded-xl bg-black/10 dark:bg-white/5 border border-white/5">
+              <span class="text-[9px] uppercase tracking-wider block font-bold" style="color: var(--text-secondary)">Saldo Franquia</span>
+              <span id="bannerFranquiaRestante" class="font-black text-emerald-400 text-sm sm:text-base">-- km</span>
+            </div>
+
+            <!-- DIAS RESTANTES -->
+            <div class="px-3 py-1 rounded-xl bg-black/10 dark:bg-white/5 border border-white/5">
+              <span class="text-[9px] uppercase tracking-wider block font-bold" style="color: var(--text-secondary)">Prazo Restante</span>
+              <span id="bannerDiasRestantes" class="font-black text-white text-sm sm:text-base">-- dias</span>
+            </div>
+
           </div>
         </div>
       </div>
 
       <!-- KPI HUD -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        
         <div class="titanium-glass p-5 relative overflow-hidden">
           <div class="flex justify-between items-start">
-            <span class="text-[10px] font-bold tracking-[0.2em] uppercase" style="color: var(--text-secondary)">Eficiência Média</span>
-            <span class="text-[9px] font-num px-1.5 py-0.5 rounded bg-black/20 dark:bg-white/10 font-bold border border-white/5">50L</span>
+            <span class="text-[10px] font-bold tracking-[0.2em] uppercase" style="color: var(--text-secondary)">Consumo Real Médio</span>
+            <span class="text-[9px] font-num px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-bold border border-emerald-500/20">TANQUE CHEIO</span>
           </div>
           <div class="mt-3 flex items-baseline space-x-1.5">
-            <h2 id="kpiKmL" class="text-3xl font-extrabold tracking-tight font-num">0.0</h2>
+            <h2 id="kpiKmL" class="text-3xl font-extrabold tracking-tight font-num text-emerald-400">0.0</h2>
             <span class="text-xs font-semibold" style="color: var(--text-secondary)">km/l</span>
           </div>
           <div class="mt-2.5 pt-2.5 flex justify-between text-[11px] font-num" style="border-top: 1px solid var(--kpi-border)">
@@ -242,7 +255,7 @@
         </div>
       </div>
 
-      <!-- Formulário de Abastecimento / KM Diário & Calculadora Flex -->
+      <!-- Formulário com Algoritmo de Reposição de Combustível -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
         <!-- Formulário de Registro -->
@@ -257,7 +270,7 @@
               </button>
             </div>
             <span id="lastOdoBadge" class="text-[10px] font-num px-2 py-1 rounded bg-black/5 dark:bg-white/5 border border-white/10" style="color: var(--text-secondary)">
-              Último KM: --
+              Último Abastecimento: --
             </span>
           </div>
 
@@ -270,6 +283,19 @@
             </div>
 
             <div id="secaoAbastecimento" class="space-y-4">
+              
+              <!-- Opções Inteligentes de Tanque Cheio -->
+              <div class="flex flex-wrap items-center gap-4 p-3 rounded-lg border text-xs" style="background: var(--input-bg); border-color: var(--input-border)">
+                <label class="flex items-center space-x-2 cursor-pointer">
+                  <input type="checkbox" id="chkTanqueCheio" checked class="w-4 h-4 rounded text-emerald-500 focus:ring-0">
+                  <span class="font-bold">Completou o Tanque? (Tanque Cheio)</span>
+                </label>
+                <label class="flex items-center space-x-2 cursor-pointer ml-auto text-[11px]" style="color: var(--text-secondary)">
+                  <input type="checkbox" id="chkPrimeiroAbastecimento" class="w-3.5 h-3.5 rounded text-blue-500 focus:ring-0">
+                  <span>1º Abastecimento (Ponto Zero / Tanque Inicial)</span>
+                </label>
+              </div>
+
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label class="block text-[10px] font-bold uppercase tracking-wider mb-1" style="color: var(--text-secondary)">Combustível</label>
@@ -285,8 +311,8 @@
                 </div>
 
                 <div>
-                  <label class="block text-[10px] font-bold uppercase tracking-wider mb-1" style="color: var(--text-secondary)">Litros Abastecidos</label>
-                  <input type="number" id="inLitros" step="0.01" placeholder="Ex: 28.00" class="titanium-input w-full px-3.5 py-2.5 rounded-lg text-sm font-num font-bold">
+                  <label class="block text-[10px] font-bold uppercase tracking-wider mb-1" style="color: var(--text-secondary)">Litros Repostos</label>
+                  <input type="number" id="inLitros" step="0.01" placeholder="Ex: 5.00" class="titanium-input w-full px-3.5 py-2.5 rounded-lg text-sm font-num font-bold">
                 </div>
 
                 <div>
@@ -294,29 +320,31 @@
                     <label class="text-[10px] font-bold uppercase tracking-wider" style="color: var(--text-secondary)">Valor Pago (R$)</label>
                     <span class="text-[8px] uppercase font-bold text-emerald-500 font-num">Auto ou Manual</span>
                   </div>
-                  <input type="number" id="inValor" step="0.01" placeholder="Ex: 140.00" class="titanium-input w-full px-3.5 py-2.5 rounded-lg text-sm font-num font-bold">
+                  <input type="number" id="inValor" step="0.01" placeholder="Ex: 29.45" class="titanium-input w-full px-3.5 py-2.5 rounded-lg text-sm font-num font-bold">
                 </div>
               </div>
 
+              <!-- Live Feedback Calculando Distância Real do Tanque -->
               <div class="grid grid-cols-3 gap-2 p-3 rounded-lg border text-center" style="background: var(--input-bg); border-color: var(--input-border)">
                 <div>
-                  <span class="text-[8px] uppercase tracking-wider block font-bold" style="color: var(--text-secondary)">Trecho Atual</span>
+                  <span class="text-[8px] uppercase tracking-wider block font-bold" style="color: var(--text-secondary)">Distância no Tanque</span>
                   <span id="prevDeltaKm" class="text-xs font-bold mt-0.5 block font-num">0 km</span>
                 </div>
                 <div>
-                  <span class="text-[8px] uppercase tracking-wider block font-bold" style="color: var(--text-secondary)">Custo/Litro</span>
+                  <span class="text-[8px] uppercase tracking-wider block font-bold" style="color: var(--text-secondary)">Custo Real/Litro</span>
                   <span id="prevPrecoReal" class="text-xs font-bold mt-0.5 block font-num">R$ 0,00</span>
                 </div>
                 <div>
-                  <span class="text-[8px] uppercase tracking-wider block font-bold" style="color: var(--text-secondary)">Rendimento</span>
-                  <span id="prevKmL" class="text-xs font-bold text-emerald-500 mt-0.5 block font-num">0.0 km/l</span>
+                  <span class="text-[8px] uppercase tracking-wider block font-bold" style="color: var(--text-secondary)">Média Real do Ciclo</span>
+                  <span id="prevKmL" class="text-xs font-bold text-emerald-400 mt-0.5 block font-num">0.0 km/l</span>
                 </div>
               </div>
             </div>
 
             <div id="secaoCheckinInfo" class="hidden p-3 rounded-lg border text-center" style="background: var(--input-bg); border-color: var(--input-border)">
-              <span class="text-[9px] uppercase tracking-wider block font-bold" style="color: var(--text-secondary)">Quilometragem Percorrida no Trecho</span>
+              <span class="text-[9px] uppercase tracking-wider block font-bold" style="color: var(--text-secondary)">Quilômetros Rodados Hoje</span>
               <span id="prevDeltaKmCheckin" class="text-xl font-black text-emerald-500 mt-1 block font-num">0 km</span>
+              <p class="text-[10px] mt-1" style="color: var(--text-secondary)">Apenas atualiza seu odômetro e o saldo do aluguel sem distorcer o cálculo de consumo do tanque.</p>
             </div>
 
             <button type="submit" id="btnSalvar" class="w-full py-3.5 rounded-lg font-extrabold text-xs tracking-wide transition-all shadow-md flex items-center justify-center space-x-2" style="background: var(--text-primary); color: var(--bg-canvas);">
@@ -406,9 +434,22 @@
     <!-- ========================================== -->
     <div id="viewAluguel" class="space-y-6 hidden">
       
-      <!-- HUD Executivo da Franquia de Aluguel -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
+        <div class="titanium-glass p-5 relative overflow-hidden">
+          <div class="flex justify-between items-start">
+            <span class="text-[10px] font-bold tracking-[0.2em] uppercase" style="color: var(--text-secondary)">Cota Por Dia Restante</span>
+            <span class="text-[9px] font-num px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-400 font-bold border border-cyan-500/20">DINÂMICA</span>
+          </div>
+          <div class="mt-3 flex items-baseline space-x-1.5">
+            <h2 id="hudMetaDiaria" class="text-3xl font-extrabold tracking-tight font-num text-cyan-400">0</h2>
+            <span class="text-xs font-semibold" style="color: var(--text-secondary)">km / dia</span>
+          </div>
+          <div class="mt-2.5 pt-2.5 flex justify-between text-[11px] font-num" style="border-top: 1px solid var(--kpi-border)">
+            <span style="color: var(--text-secondary)">Recalculada a cada dia</span>
+          </div>
+        </div>
+
         <div class="titanium-glass p-5 relative overflow-hidden">
           <div class="flex justify-between items-start">
             <span class="text-[10px] font-bold tracking-[0.2em] uppercase" style="color: var(--text-secondary)">Franquia Restante</span>
@@ -419,22 +460,8 @@
             <span class="text-xs font-semibold" style="color: var(--text-secondary)">km</span>
           </div>
           <div class="mt-2.5 pt-2.5 flex justify-between text-[11px] font-num" style="border-top: 1px solid var(--kpi-border)">
-            <span style="color: var(--text-secondary)">Franquia Total:</span>
+            <span style="color: var(--text-secondary)">Franquia Contratada:</span>
             <span id="hudFranquiaTotal" class="font-bold">0 km</span>
-          </div>
-        </div>
-
-        <div class="titanium-glass p-5 relative overflow-hidden">
-          <div class="flex justify-between items-start">
-            <span class="text-[10px] font-bold tracking-[0.2em] uppercase" style="color: var(--text-secondary)">Meta Diária Permitida</span>
-            <span class="text-[9px] font-num px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 font-bold border border-blue-500/20">TETO</span>
-          </div>
-          <div class="mt-3 flex items-baseline space-x-1.5">
-            <h2 id="hudMetaDiaria" class="text-3xl font-extrabold tracking-tight font-num text-blue-400">0</h2>
-            <span class="text-xs font-semibold" style="color: var(--text-secondary)">km / dia</span>
-          </div>
-          <div class="mt-2.5 pt-2.5 flex justify-between text-[11px] font-num" style="border-top: 1px solid var(--kpi-border)">
-            <span style="color: var(--text-secondary)">Para não estourar até devolução</span>
           </div>
         </div>
 
@@ -486,7 +513,7 @@
         </div>
       </div>
 
-      <!-- Formulário de Configuração do Contrato de Locação -->
+      <!-- Formulário de Configuração do Contrato -->
       <div class="titanium-glass p-6">
         <div class="pb-4 mb-5 border-b" style="border-color: var(--header-border)">
           <h3 class="text-base font-bold tracking-tight">Configurações do Contrato de Aluguel</h3>
@@ -550,9 +577,7 @@
 
   </main>
 
-  <!-- ========================================== -->
-  <!-- MODAL DE EDIÇÃO DIRETA DE LANÇAMENTO       -->
-  <!-- ========================================== -->
+  <!-- MODAL DE EDIÇÃO -->
   <div id="modalEditar" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="titanium-glass max-w-md w-full p-6 space-y-4">
       <div class="flex justify-between items-center pb-2 border-b" style="border-color: var(--header-border)">
@@ -607,7 +632,7 @@
     let chart1Instance, chart2Instance;
     let valorEditadoManualmente = false;
 
-    // --- CONTRATO DE ALUGUEL (Armazenamento Local) ---
+    // --- CONTRATO DE ALUGUEL ---
     let contratoAluguel = JSON.parse(localStorage.getItem("CCMV_CONTRATO_ALUGUEL")) || {
       carroNome: "",
       carroPlaca: "",
@@ -675,7 +700,7 @@
       if (chart1Instance) atualizarCoresGraficosParaTema(isDark);
     }
 
-    // --- CONFIGURAÇÃO DO FORMULÁRIO DE ALUGUEL ---
+    // --- CONFIGURAÇÃO DO ALUGUEL ---
     function carregarFormularioAluguel() {
       if (!contratoAluguel) return;
       document.getElementById('cfgCarroNome').value = contratoAluguel.carroNome || "";
@@ -702,18 +727,19 @@
       };
 
       localStorage.setItem("CCMV_CONTRATO_ALUGUEL", JSON.stringify(contratoAluguel));
-      alert("Contrato de Aluguel atualizado com sucesso!");
+      alert("Contrato salvo com sucesso!");
       renderAluguelHUD();
       navegarAba('cockpit');
     }
 
-    // --- RENDER HUD DO ALUGUEL ---
+    // --- RENDER DO HUD & BANNER DO ALUGUEL (DINÂMICO) ---
     function renderAluguelHUD() {
       const bBadge = document.getElementById('badgeCarroAtivo');
       const bNome = document.getElementById('bannerCarroNome');
       const bSub = document.getElementById('bannerCarroSub');
       const bFranquia = document.getElementById('bannerFranquiaRestante');
       const bDias = document.getElementById('bannerDiasRestantes');
+      const bKmPorDia = document.getElementById('bannerKmPorDia');
 
       if (!contratoAluguel.carroNome || !contratoAluguel.franquiaKm) {
         bBadge.innerText = "Sem contrato";
@@ -721,17 +747,18 @@
         bSub.innerText = "Clique aqui para configurar seu carro e limites de KM.";
         bFranquia.innerText = "-- km";
         bDias.innerText = "-- dias";
+        bKmPorDia.innerText = "-- km/dia";
         return;
       }
 
-      bBadge.innerText = `${contratoAluguel.carroNome} ${contratoAluguel.carroPlaca ? '• ' + contratoAluguel.carroPlaca : ''}`;
+      bBadge.innerText = `${contratoAluguel.carroNome}${contratoAluguel.carroPlaca ? '• ' + contratoAluguel.carroPlaca : ''}`;
       bNome.innerText = `Aluguel Ativo: ${contratoAluguel.carroNome} (${contratoAluguel.carroPlaca || 'Sem placa'})`;
 
       const odoAtual = telemetria.length > 0 ? Number(telemetria[0].Odometro) : contratoAluguel.odoInicial;
       const kmRodadosNoContrato = Math.max(0, odoAtual - contratoAluguel.odoInicial);
       const saldoFranquia = contratoAluguel.franquiaKm - kmRodadosNoContrato;
 
-      // Cálculo de datas
+      // Cálculo dinâmico de datas em tempo real
       const hoje = new Date();
       hoje.setHours(0,0,0,0);
       const dataFim = new Date(contratoAluguel.dataFim + "T00:00:00");
@@ -741,25 +768,22 @@
       const diasRestantes = Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
       const diasDecorridos = Math.max(1, Math.ceil((hoje - dataInicio) / (1000 * 60 * 60 * 24)));
 
-      // Meta Diária permitida para não estourar
-      const metaDiaria = diasRestantes > 0 ? Math.max(0, Math.round(saldoFranquia / diasRestantes)) : 0;
+      // COTA DISPONÍVEL POR DIA (Atualizada automaticamente dia após dia)
+      const cotaDisponivelPorDia = diasRestantes > 0 ? Math.max(0, (saldoFranquia / diasRestantes).toFixed(1)) : 0;
       
       // Ritmo Real
       const ritmoReal = Math.round(kmRodadosNoContrato / diasDecorridos);
       const projecaoTotalKm = Math.round(kmRodadosNoContrato + (ritmoReal * diasRestantes));
 
       // Atualiza Banner Superior
-      bFranquia.innerText = `${saldoFranquia.toLocaleString('pt-BR')} km`;
-      bFranquia.className = saldoFranquia >= 0 ? "font-black text-emerald-400 text-sm" : "font-black text-rose-500 text-sm";
-      bDias.innerText = `${diasRestantes} dias`;
-      bSub.innerText = `Início: ${contratoAluguel.odoInicial} km • Rodados: ${kmRodadosNoContrato} km • Saldo: ${saldoFranquia} km`;
+      bKmPorDia.innerText = `${cotaDisponivelPorDia} km/dia`;       bFranquia.innerText = `${saldoFranquia.toLocaleString('pt-BR')} km`;
+      bFranquia.className = saldoFranquia >= 0 ? "font-black text-emerald-400 text-sm sm:text-base" : "font-black text-rose-500 text-sm sm:text-base";
+      bDias.innerText = `${diasRestantes} dias`;       bSub.innerText = `Retirada: ${contratoAluguel.odoInicial} km • Rodados: ${kmRodadosNoContrato} km • Saldo: ${saldoFranquia} km`;
 
       // Atualiza HUD da Aba de Aluguel
+      document.getElementById('hudMetaDiaria').innerText = cotaDisponivelPorDia;
       document.getElementById('hudFranquiaRestante').innerText = saldoFranquia.toLocaleString('pt-BR');
-      document.getElementById('hudFranquiaTotal').innerText = `${contratoAluguel.franquiaKm.toLocaleString('pt-BR')} km`;
-      document.getElementById('hudMetaDiaria').innerText = metaDiaria.toLocaleString('pt-BR');
-      document.getElementById('hudRitmoReal').innerText = ritmoReal.toLocaleString('pt-BR');
-      document.getElementById('hudProjecaoTotal').innerText = `${projecaoTotalKm.toLocaleString('pt-BR')} km`;
+      document.getElementById('hudFranquiaTotal').innerText = `${contratoAluguel.franquiaKm.toLocaleString('pt-BR')} km`;       document.getElementById('hudRitmoReal').innerText = ritmoReal.toLocaleString('pt-BR');       document.getElementById('hudProjecaoTotal').innerText = `${projecaoTotalKm.toLocaleString('pt-BR')} km`;
       document.getElementById('hudDiasRestantes').innerText = diasRestantes;
       document.getElementById('hudDataFim').innerText = dataFim.toLocaleDateString('pt-BR');
 
@@ -771,21 +795,17 @@
         bRitmo.innerText = `ALERTA (+R$ ${multa.toFixed(0)})`;
         bRitmo.className = "text-[9px] font-num px-1.5 py-0.5 rounded bg-rose-500/10 text-rose-400 font-bold border border-rose-500/20";
       } else {
-        bRitmo.innerText = "NO PRAZO";
+        bRitmo.innerText = "DENTRO DA COTA";
         bRitmo.className = "text-[9px] font-num px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-bold border border-emerald-500/20";
       }
 
       // Barra de Progresso
       const pctUso = Math.min(100, Math.round((kmRodadosNoContrato / contratoAluguel.franquiaKm) * 100));
-      document.getElementById('lblPercentualFranquia').innerText = `${pctUso}% consumido`;
-      const bar = document.getElementById('barFranquiaProgress');
-      bar.style.width = `${pctUso}%`;
+      document.getElementById('lblPercentualFranquia').innerText = `${pctUso}\% consumido`;       const bar = document.getElementById('barFranquiaProgress');       bar.style.width = `${pctUso}%`;
       bar.className = pctUso > 90 ? "h-full rounded-full transition-all bg-rose-500" : (pctUso > 75 ? "h-full rounded-full transition-all bg-amber-500" : "h-full rounded-full transition-all bg-emerald-500");
 
-      document.getElementById('lblOdoInicial').innerText = `${contratoAluguel.odoInicial} km`;
-      document.getElementById('lblOdoAtual').innerText = `${odoAtual} km`;
-      document.getElementById('lblOdoLimite').innerText = `${contratoAluguel.odoInicial + contratoAluguel.franquiaKm} km`;
-      document.getElementById('kpiKmContrato').innerText = `${kmRodadosNoContrato} km`;
+      document.getElementById('lblOdoInicial').innerText = `${contratoAluguel.odoInicial} km`;       document.getElementById('lblOdoAtual').innerText = `${odoAtual} km`;
+      document.getElementById('lblOdoLimite').innerText = `${contratoAluguel.odoInicial + contratoAluguel.franquiaKm} km`;       document.getElementById('kpiKmContrato').innerText = `${kmRodadosNoContrato} km`;
     }
 
     // --- FORM MODES ---
@@ -817,12 +837,13 @@
       calcularPreviaInputs();
     }
 
-    // --- CÁLCULO LIVE DO FORM ---
+    // --- CÁLCULO LIVE DO FORM (ALGORITMO DE REPOSIÇÃO REAL) ---
     function initFormEvents() {
       const inL = document.getElementById('inLitros');
       const inP = document.getElementById('inPrecoLitro');
       const inV = document.getElementById('inValor');
       const inO = document.getElementById('inOdo');
+      const chkPrim = document.getElementById('chkPrimeiroAbastecimento');
 
       const recalcV = () => {
         if (!valorEditadoManualmente) {
@@ -837,34 +858,38 @@
       inP.addEventListener('input', recalcV);
       inV.addEventListener('input', () => { valorEditadoManualmente = true; calcularPreviaInputs(); });
       inO.addEventListener('input', calcularPreviaInputs);
+      chkPrim.addEventListener('change', calcularPreviaInputs);
+    }
+
+    // Encontra o odômetro do último abastecimento de combustível
+    function getOdometroUltimoAbastecimento() {
+      for (let item of telemetria) {
+        if (Number(item.Litros) > 0) {
+          return Number(item.Odometro);
+        }
+      }
+      return contratoAluguel.odoInicial || 0;
     }
 
     function calcularPreviaInputs() {
       const odo = Number(document.getElementById('inOdo').value) || 0;
       const lit = Number(document.getElementById('inLitros').value) || 0;
       const val = Number(document.getElementById('inValor').value) || 0;
+      const isPrimeiroAbast = document.getElementById('chkPrimeiroAbastecimento').checked;
 
-      const uOdo = telemetria.length > 0 ? Number(telemetria[0].Odometro) : (contratoAluguel.odoInicial || odo);
-      const delta = odo > uOdo ? odo - uOdo : 0;
-
-      document.getElementById('prevDeltaKmCheckin').innerText = delta > 0 ? `+${delta} km` : '0 km';
-      document.getElementById('prevDeltaKm').innerText = delta > 0 ? `+${delta} km` : '0 km';
+      const ultOdoGeral = telemetria.length > 0 ? Number(telemetria[0].Odometro) : (contratoAluguel.odoInicial || odo);
+      const deltaDiario = odo > ultOdoGeral ? odo - ultOdoGeral : 0;
+      document.getElementById('prevDeltaKmCheckin').innerText = deltaDiario > 0 ? `+${deltaDiario} km` : '0 km';        // Distância no tanque: Calculada a partir do ÚLTIMO ABASTECIMENTO (mesmo havendo check-ins diários intermediários!)       const ultOdoAbast = getOdometroUltimoAbastecimento();       const deltaTanque = (odo > ultOdoAbast && ultOdoAbast > 0) ? (odo - ultOdoAbast) : 0;        document.getElementById('prevDeltaKm').innerText = isPrimeiroAbast ? "Início (Ponto Zero)" : (deltaTanque > 0 ? `+${deltaTanque} km` : '0 km');
       
       const pReal = (lit > 0 && val > 0) ? (val / lit) : 0;
       document.getElementById('prevPrecoReal').innerText = `R$ ${pReal.toFixed(2)}`;
-      document.getElementById('prevKmL').innerText = (delta > 0 && lit > 0) ? `${(delta / lit).toFixed(2)} km/l` : '0.0 km/l';
-    }
 
-    // --- LEITURA DA PLANILHA ---
-    async function carregarDadosDaNuvem() {
-      if(!API_ENDPOINT) return;
-      const dot = document.getElementById('syncDot');
-      const text = document.getElementById('syncText');
-      dot.className = "w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping";
-      text.innerText = "Sync";
-
-      try {
-        const res = await fetch(`${API_ENDPOINT}?action=read`);
+      if (isPrimeiroAbast) {
+        document.getElementById('prevKmL').innerText = "Tanque Inicial";
+      } else if (deltaTanque > 0 && lit > 0) {
+        // Consumo exato dos litros repostos!
+        const mediaCiclo = (deltaTanque / lit).toFixed(2);
+        document.getElementById('prevKmL').innerText = `${mediaCiclo} km/l`;       } else {         document.getElementById('prevKmL').innerText = `0.0 km/l`;       }     }      // --- LEITURA & CÁLCULO PRECISO DO CONSUMO ACUMULADO ---     async function carregarDadosDaNuvem() {       if(!API_ENDPOINT) return;       const dot = document.getElementById('syncDot');       const text = document.getElementById('syncText');       dot.className = "w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping";       text.innerText = "Sync";        try {         const res = await fetch(`${API_ENDPOINT}?action=read`);
         const json = await res.json();
         telemetria = json.reverse(); // Mais recente primeiro
         renderDashboard();
@@ -884,222 +909,4 @@
       tbody.innerHTML = '';
 
       if (telemetria.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="9" class="text-center py-6 text-slate-500">Nenhum registro encontrado.</td></tr>`;
-        return;
-      }
-
-      const ultOdo = Number(telemetria[0].Odometro);
-      document.getElementById('lastOdoBadge').innerText = `Último KM: ${ultOdo.toLocaleString('pt-BR')}`;
-      document.getElementById('kpiOdometroTotal').innerText = ultOdo.toLocaleString('pt-BR');
-
-      let tGasto = 0, tLitros = 0, tKmAbast = 0, gGas = 0, gEta = 0, gMes = 0, gSem = 0;
-      const hoje = new Date();
-
-      telemetria.forEach((item, index) => {
-        const v = Number(item.Valor) || 0, l = Number(item.Litros) || 0, k = Number(item.KmRodado) || 0;
-        const d = new Date(item.Data);
-
-        tGasto += v; tLitros += l;
-        if (l > 0) {
-          tKmAbast += k;
-          if (item.Combustivel === 'Etanol') gEta += v; else gGas += v;
-        }
-
-        if (d.getMonth() === hoje.getMonth() && d.getFullYear() === hoje.getFullYear()) gMes += v;
-        if ((hoje - d)/(1000*60*60*24) <= 7) gSem += v;
-
-        const isCheck = l === 0;
-        const colorClass = isCheck ? 'bg-slate-500/10 text-slate-400' : (item.Combustivel==='Etanol'?'bg-amber-500/10 text-amber-500':'bg-blue-500/10 text-blue-500');
-        
-        tbody.innerHTML += `
-          <tr style="border-bottom: 1px solid var(--kpi-border)">
-            <td class="py-3 px-4" style="color:var(--text-secondary)">${d.toLocaleDateString('pt-BR')}</td>
-            <td class="py-3 px-4 font-bold">${Number(item.Odometro).toLocaleString('pt-BR')}</td>
-            <td class="py-3 px-4 text-emerald-500 font-bold">+${k}</td>
-            <td class="py-3 px-4"><span class="px-2 py-0.5 rounded text-[8px] font-bold ${colorClass}">${isCheck ? 'KM Dia' : item.Combustivel}</span></td>
-            <td class="py-3 px-4">${isCheck ? '--' : l.toFixed(2)}</td>
-            <td class="py-3 px-4 font-bold">${isCheck ? '--' : 'R$ '+v.toFixed(2)}</td>
-            <td class="py-3 px-4 text-emerald-500 font-bold">${isCheck ? '--' : Number(item.KmPorLitro).toFixed(2)}</td>
-            <td class="py-3 px-4" style="color:var(--text-secondary)">${isCheck ? '--' : Number(item.Litros100km).toFixed(2)}</td>
-            <td class="py-3 px-4 text-center">
-              <div class="flex items-center justify-center space-x-1">
-                <button onclick="abrirModalEditar(${index})" title="Editar" class="p-1 rounded hover:bg-white/10 text-slate-400 hover:text-white transition-colors">✏️</button>
-                <button onclick="handleExcluirRegistro(${item._rowIndex})" title="Excluir" class="p-1 rounded hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 transition-colors">🗑️</button>
-              </div>
-            </td>
-          </tr>
-        `;
-      });
-
-      const mKmL = tLitros > 0 ? (tKmAbast / tLitros) : 0;
-      document.getElementById('kpiKmL').innerText = mKmL.toFixed(2);
-      document.getElementById('kpiL100').innerText = mKmL>0 ? `${(100/mKmL).toFixed(2)} L` : '0.0 L';
-      document.getElementById('kpiCustoKm').innerText = tKmAbast>0 ? (tGasto/tKmAbast).toFixed(2) : '0.00';
-      document.getElementById('kpiAutonomia').innerText = `~${(mKmL*50).toFixed(0)} km`;
-      document.getElementById('kpiGastoMes').innerText = gMes.toFixed(2);
-      document.getElementById('kpiGastoSemana').innerText = `R$ ${gSem.toFixed(2)}`;
-
-      atualizarDadosGraficos(telemetria.slice().reverse(), gGas, gEta);
-    }
-
-    // --- SALVAR NOVO REGISTRO ---
-    async function handleSalvarRegistro(e) {
-      e.preventDefault();
-      const btn = document.getElementById('btnSalvar');
-      const bTxt = document.getElementById('btnSalvarTexto');
-      bTxt.innerText = "Gravando..."; btn.disabled = true;
-
-      const odo = Number(document.getElementById('inOdo').value);
-      const ultOdo = telemetria.length > 0 ? Number(telemetria[0].Odometro) : (contratoAluguel.odoInicial || odo);
-      const kR = odo > ultOdo ? odo - ultOdo : 0;
-
-      let lit = 0, val = 0, comb = "Check-in Diário", pL = 0, kL = 0, l100 = 0, cK = 0;
-
-      if (formModoAtual === 'abastecer') {
-        lit = Number(document.getElementById('inLitros').value) || 0;
-        val = Number(document.getElementById('inValor').value) || 0;
-        comb = document.getElementById('inCombustivel').value;
-        pL = lit>0?val/lit:0; kL = (kR>0&&lit>0)?kR/lit:0; l100 = kL>0?100/kL:0; cK = kR>0?val/kR:0;
-      }
-
-      const params = new URLSearchParams({
-        action: "create", data: new Date().toISOString(), odometro: odo, kmRodado: kR,
-        litros: lit, valor: val, combustivel: comb, kmPorLitro: kL.toFixed(2),
-        litros100km: l100.toFixed(2), custoPorKm: cK.toFixed(2), precoLitro: pL.toFixed(2)
-      });
-
-      try {
-        await fetch(`${API_ENDPOINT}?${params.toString()}`);
-        document.getElementById('registroForm').reset();
-        valorEditadoManualmente = false;
-        await carregarDadosDaNuvem();
-      } catch (err) { alert("Erro ao salvar."); }
-      finally { bTxt.innerText = formModoAtual === 'abastecer' ? "Salvar Abastecimento" : "Salvar KM Diário"; btn.disabled = false; }
-    }
-
-    // --- MODAL DE EDIÇÃO DIRETA ---
-    function abrirModalEditar(index) {
-      const item = telemetria[index];
-      if (!item) return;
-
-      document.getElementById('editRowIndex').value = item._rowIndex;
-      document.getElementById('editDataOriginal').value = item.Data;
-      document.getElementById('editOdo').value = item.Odometro;
-      document.getElementById('editComb').value = item.Combustivel || "Gasolina";
-      document.getElementById('editLitros').value = item.Litros || "";
-      document.getElementById('editValor').value = item.Valor || "";
-
-      document.getElementById('modalEditar').classList.remove('hidden');
-    }
-
-    function fecharModalEditar() {
-      document.getElementById('modalEditar').classList.add('hidden');
-    }
-
-    async function handleSalvarEdicao(e) {
-      e.preventDefault();
-      const btn = document.getElementById('btnSalvarEdit');
-      btn.innerText = "Salvando..."; btn.disabled = true;
-
-      const rowIndex = document.getElementById('editRowIndex').value;
-      const dataOriginal = document.getElementById('editDataOriginal').value;
-      const odo = Number(document.getElementById('editOdo').value);
-      const lit = Number(document.getElementById('editLitros').value) || 0;
-      const val = Number(document.getElementById('editValor').value) || 0;
-      const comb = document.getElementById('editComb').value;
-
-      // Cálculo simplificado na correção
-      const pL = lit > 0 ? (val / lit) : 0;
-
-      const params = new URLSearchParams({
-        action: "update",
-        rowIndex: rowIndex,
-        data: dataOriginal,
-        odometro: odo,
-        kmRodado: 0, // Recalculará no fluxo
-        litros: lit,
-        valor: val,
-        combustivel: comb,
-        kmPorLitro: 0,
-        litros100km: 0,
-        custoPorKm: 0,
-        precoLitro: pL.toFixed(2)
-      });
-
-      try {
-        await fetch(`${API_ENDPOINT}?${params.toString()}`);
-        fecharModalEditar();
-        await carregarDadosDaNuvem();
-      } catch (err) {
-        alert("Erro ao editar o lançamento.");
-      } finally {
-        btn.innerText = "Salvar Correção";
-        btn.disabled = false;
-      }
-    }
-
-    async function handleExcluirRegistro(rowIndex) {
-      if (!confirm("Tem certeza que deseja apagar este lançamento?")) return;
-      try {
-        await fetch(`${API_ENDPOINT}?action=delete&rowIndex=${rowIndex}`);
-        await carregarDadosDaNuvem();
-      } catch (e) {
-        alert("Erro ao excluir.");
-      }
-    }
-
-    // --- DECISOR FLEX ---
-    function runFlexEngine() {
-      const g = Number(document.getElementById('calcGas').value), e = Number(document.getElementById('calcEta').value);
-      const bx = document.getElementById('flexVerdictBox'), vd = document.getElementById('flexVerdict'), rt = document.getElementById('flexRatio');
-      if (!g || !e) return;
-      const p = (e / g) * 100;
-      rt.innerText = `Paridade: ${p.toFixed(1)}%`;
-      if (p <= 70) {
-        bx.style.borderColor = 'rgba(16, 185, 129, 0.4)'; bx.style.background = 'rgba(16, 185, 129, 0.05)';
-        vd.className = "text-xl font-extrabold font-num tracking-tight text-emerald-500"; vd.innerText = "ETANOL";
-      } else {
-        bx.style.borderColor = 'rgba(59, 130, 246, 0.4)'; bx.style.background = 'rgba(59, 130, 246, 0.05)';
-        vd.className = "text-xl font-extrabold font-num tracking-tight text-blue-500"; vd.innerText = "GASOLINA";
-      }
-    }
-
-    // --- GRÁFICOS ---
-    function initCharts() {
-      Chart.defaults.font.family = 'JetBrains Mono'; Chart.defaults.font.size = 9;
-      const c1 = document.getElementById('chartEvolucao').getContext('2d');
-      chart1Instance = new Chart(c1, { type: 'line', data: {labels:[],datasets:[]}, options: { responsive:true, maintainAspectRatio:false, scales: { x:{grid:{display:false}}, y:{grid:{borderDash:[4,4]}} } } });
-      const c2 = document.getElementById('chartMix').getContext('2d');
-      chart2Instance = new Chart(c2, { type: 'doughnut', data: {labels:['Gasolina','Etanol'],datasets:[]}, options: { responsive:true, maintainAspectRatio:false, cutout:'75%' } });
-      atualizarCoresGraficosParaTema(document.documentElement.classList.contains('theme-dark'));
-    }
-
-    function atualizarCoresGraficosParaTema(isDark) {
-      const tc = isDark ? '#94A3B8' : '#64748B', gc = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
-      [chart1Instance, chart2Instance].forEach(c => {
-        if (!c) return; c.options.plugins.legend.labels.color = tc;
-        if (c.options.scales?.x) { c.options.scales.x.ticks.color = tc; c.options.scales.y.ticks.color = tc; c.options.scales.y.grid.color = gc; }
-        c.update();
-      });
-    }
-
-    function atualizarDadosGraficos(dados, gGas, gEta) {
-      const lbls = dados.map(i => new Date(i.Data).toLocaleDateString('pt-BR'));
-      chart1Instance.data = { labels: lbls, datasets: [
-        { label: 'R$', data: dados.map(i=>Number(i.Valor)), borderColor: '#10B981', backgroundColor: 'rgba(16, 185, 129, 0.1)', fill: true, tension: 0.3 },
-        { label: 'KM', data: dados.map(i=>Number(i.KmRodado)), borderColor: '#64748B', borderDash: [4,4], tension: 0.3 }
-      ]}; chart1Instance.update();
-      chart2Instance.data = { labels: ['Gas','Eta'], datasets: [{ data: [gGas, gEta], backgroundColor: ['#3B82F6', '#F59E0B'], borderWidth: 0 }]}; chart2Instance.update();
-    }
-
-    // Inicialização Geral
-    window.addEventListener('DOMContentLoaded', () => { 
-      initTheme(); 
-      initCharts(); 
-      initFormEvents(); 
-      carregarFormularioAluguel();
-      carregarDadosDaNuvem(); 
-    });
-  </script>
-</body>
-</html>
+        tbody.innerHTML = `<tr><td colspan="9
