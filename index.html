@@ -105,14 +105,14 @@
 
     .vw-dash-segment {
       flex: 1;
-      height: 6px;
+      height: 7px;
       border-radius: 2px;
-      background: rgba(255, 255, 255, 0.10);
+      background: rgba(255, 255, 255, 0.12);
       transition: all 0.2s ease;
       cursor: pointer;
     }
     .vw-dash-segment:hover {
-      background: rgba(255, 255, 255, 0.35);
+      background: rgba(255, 255, 255, 0.4);
     }
     .vw-dash-segment.lit-white {
       background: #FFFFFF;
@@ -126,8 +126,8 @@
 </head>
 <body class="min-h-screen relative selection:bg-slate-500/20">
 
-  <!-- Header Mobile-First Fluido -->
-  <header style="background: var(--header-bg); border-bottom: 1px solid var(--header-border);" class="sticky top-0 z-40 backdrop-blur-xl transition-colors duration-300">
+  <!-- Header Fluido (Mobile & Desktop) -->
+  <header style="background: var(--header-bg); border-bottom: 1px solid var(--header-border);" class="sticky top-0 z-30 backdrop-blur-xl transition-colors duration-300">
     <div class="max-w-7xl mx-auto px-3 sm:px-6 h-14 sm:h-16 flex items-center justify-between">
       
       <!-- Logo + Título -->
@@ -144,7 +144,7 @@
           <div class="flex items-center gap-1.5">
             <h1 class="text-base sm:text-lg font-extrabold tracking-tight leading-none">CCMV</h1>
             <span id="badgeCarroAtivo" class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 truncate max-w-[120px] sm:max-w-none">
-              Sem carro
+              Carregando...
             </span>
           </div>
           <p class="text-[9px] font-medium uppercase tracking-wider hidden sm:block mt-0.5" style="color: var(--text-secondary)">
@@ -153,20 +153,32 @@
         </div>
       </div>
 
-      <!-- Ações do Topo: Sync & Menu de Configurações -->
+      <!-- Navegação Desktop -->
+      <div class="hidden sm:flex items-center space-x-1 titanium-glass p-1 rounded-xl text-xs font-bold">
+        <button onclick="navegarAba('cockpit')" id="navCockpitDesktop" class="px-4 py-1.5 rounded-lg transition-all bg-white text-slate-900 shadow-sm dark:bg-white dark:text-black">
+          📊 Cockpit
+        </button>
+        <button onclick="navegarAba('aluguel')" id="navAluguelDesktop" class="px-4 py-1.5 rounded-lg transition-all text-slate-400 hover:text-current">
+          🚘 Aluguel
+        </button>
+      </div>
+
+      <!-- Ações do Topo -->
       <div class="flex items-center space-x-2">
-        <button id="syncBadge" onclick="carregarDadosDaNuvem()" title="Sincronizar com Planilha" class="h-8 px-2.5 rounded-lg titanium-glass hover:border-emerald-500/40 flex items-center space-x-1.5 text-[11px] font-num cursor-pointer transition-all">
-          <span class="w-1.5 h-1.5 rounded-full bg-slate-400 animate-pulse" id="syncDot"></span>
-          <span id="syncText" class="font-medium text-[10px]">Sync</span>
+        <button id="syncBadge" onclick="carregarDadosDaNuvem()" title="Clique para sincronizar com a planilha" class="h-9 px-3 rounded-xl titanium-glass hover:border-emerald-500/40 flex items-center space-x-2 text-xs font-num cursor-pointer transition-all">
+          <span class="w-2 h-2 rounded-full bg-slate-400 animate-pulse" id="syncDot"></span>
+          <span id="syncText" class="font-bold text-[11px]">Sync</span>
         </button>
 
-        <button onclick="toggleModalMenu()" title="Preferências e Ajustes" class="w-8 h-8 rounded-lg titanium-glass hover:opacity-80 flex items-center justify-center text-xs">
-          ⚙️
+        <!-- Botão de Ajustes com Área de Toque Grande -->
+        <button onclick="abrirModalConfig()" title="Preferências e Ajustes da API" class="h-9 px-3 rounded-xl titanium-glass hover:opacity-80 flex items-center space-x-1.5 text-xs font-bold cursor-pointer">
+          <span>⚙️</span>
+          <span class="text-[11px] font-medium">Ajustes</span>
         </button>
       </div>
     </div>
 
-    <!-- Navegação Segmentada Fixa (Sem rolagem horizontal) -->
+    <!-- Navegação Segmentada Mobile (Sem rolagem horizontal) -->
     <div class="px-3 pb-2.5 sm:hidden">
       <div class="titanium-glass p-1 rounded-xl flex items-center text-xs font-bold w-full">
         <button onclick="navegarAba('cockpit')" id="navCockpitMobile" class="flex-1 py-1.5 rounded-lg transition-all text-center bg-white text-slate-900 shadow-sm dark:bg-white dark:text-black">
@@ -271,203 +283,4 @@
           </div>
           <div class="mt-2 sm:mt-3 flex items-baseline space-x-1">
             <h2 id="kpiKmL" class="text-2xl sm:text-3xl font-extrabold tracking-tight font-num text-emerald-400">0.0</h2>
-            <span class="text-[11px] font-semibold" style="color: var(--text-secondary)">km/l</span>
-          </div>
-          <p id="kpiL100" class="text-[10px] font-num mt-1 font-bold" style="color: var(--text-secondary)">0.0 L/100km</p>
-        </div>
-
-        <div class="titanium-glass p-3.5 sm:p-5 relative overflow-hidden">
-          <span class="text-[9px] sm:text-[10px] font-bold tracking-wider uppercase block" style="color: var(--text-secondary)">Odômetro</span>
-          <div class="mt-2 sm:mt-3 flex items-baseline space-x-1">
-            <h2 id="kpiOdometroTotal" class="text-2xl sm:text-3xl font-extrabold tracking-tight font-num">0</h2>
-            <span class="text-[11px] font-semibold" style="color: var(--text-secondary)">km</span>
-          </div>
-          <p id="kpiKmContrato" class="text-[10px] font-num mt-1 text-emerald-400 font-bold">0 km no contrato</p>
-        </div>
-
-        <div class="titanium-glass p-3.5 sm:p-5 relative overflow-hidden">
-          <span class="text-[9px] sm:text-[10px] font-bold tracking-wider uppercase block" style="color: var(--text-secondary)">Gasto no Mês</span>
-          <div class="mt-2 sm:mt-3 flex items-baseline space-x-1">
-            <span class="text-xs font-light" style="color: var(--text-secondary)">R$</span>
-            <h2 id="kpiGastoMes" class="text-2xl sm:text-3xl font-extrabold tracking-tight font-num">0,00</h2>
-          </div>
-          <p id="kpiGastoSemana" class="text-[10px] font-num mt-1" style="color: var(--text-secondary)">Semana: R$ 0,00</p>
-        </div>
-
-        <div class="titanium-glass p-3.5 sm:p-5 relative overflow-hidden">
-          <span class="text-[9px] sm:text-[10px] font-bold tracking-wider uppercase block" style="color: var(--text-secondary)">Custo / KM</span>
-          <div class="mt-2 sm:mt-3 flex items-baseline space-x-1">
-            <span class="text-xs font-light" style="color: var(--text-secondary)">R$</span>
-            <h2 id="kpiCustoKm" class="text-2xl sm:text-3xl font-extrabold tracking-tight font-num">0,00</h2>
-          </div>
-          <p id="kpiAutonomia" class="text-[10px] font-num mt-1 text-cyan-400 font-bold">~0 km restantes</p>
-        </div>
-      </div>
-
-      <!-- Formulário de Registro -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
-        
-        <div class="lg:col-span-7 titanium-glass p-4 sm:p-6">
-          <div class="flex items-center justify-between pb-3 sm:pb-4 border-b" style="border-color: var(--header-border)">
-            <div class="flex p-0.5 rounded-lg bg-black/10 dark:bg-white/5 border border-white/5 text-[11px] font-bold">
-              <button type="button" id="tabAbastecer" onclick="setFormMode('abastecer')" class="px-2.5 sm:px-3 py-1 rounded transition-all bg-white text-slate-900 shadow-sm font-bold dark:bg-white dark:text-black">
-                ⛽ Abastecer
-              </button>
-              <button type="button" id="tabCheckin" onclick="setFormMode('checkin')" class="px-2.5 sm:px-3 py-1 rounded transition-all text-slate-500 hover:text-current font-bold">
-                📍 KM Diário
-              </button>
-            </div>
-            <span id="lastOdoBadge" class="text-[9px] font-num px-2 py-0.5 rounded bg-black/5 dark:bg-white/5 border border-white/10" style="color: var(--text-secondary)">
-              Último: --
-            </span>
-          </div>
-
-          <form id="registroForm" class="mt-4 space-y-3 sm:space-y-4" onsubmit="handleSalvarRegistro(event)">
-            <div>
-              <label class="block text-[10px] font-bold uppercase tracking-wider mb-1" style="color: var(--text-secondary)">
-                Odômetro Atual (KM Total)
-              </label>
-              <input type="number" id="inOdo" required step="1" placeholder="Ex: 52140" class="titanium-input w-full px-3 py-2 rounded-lg text-sm font-num font-bold">
-            </div>
-
-            <div id="secaoAbastecimento" class="space-y-3">
-              <div class="grid grid-cols-2 gap-2.5 sm:gap-4">
-                <div>
-                  <label class="block text-[10px] font-bold uppercase tracking-wider mb-1" style="color: var(--text-secondary)">Combustível</label>
-                  <select id="inCombustivel" class="titanium-input w-full px-2.5 py-2 rounded-lg text-xs font-semibold">
-                    <option value="Gasolina">Gasolina</option>
-                    <option value="Etanol">Etanol</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label class="block text-[10px] font-bold uppercase tracking-wider mb-1" style="color: var(--text-secondary)">Preço Litro (R$)</label>
-                  <input type="number" id="inPrecoLitro" step="0.001" placeholder="Ex: 5.89" class="titanium-input w-full px-2.5 py-2 rounded-lg text-xs sm:text-sm font-num font-bold">
-                </div>
-
-                <div>
-                  <label class="block text-[10px] font-bold uppercase tracking-wider mb-1" style="color: var(--text-secondary)">Litros</label>
-                  <input type="number" id="inLitros" step="0.01" placeholder="Ex: 20.00" class="titanium-input w-full px-2.5 py-2 rounded-lg text-xs sm:text-sm font-num font-bold">
-                </div>
-
-                <div>
-                  <div class="flex justify-between items-center mb-1">
-                    <label class="text-[10px] font-bold uppercase tracking-wider" style="color: var(--text-secondary)">Total (R$)</label>
-                    <span class="text-[8px] font-bold text-emerald-500 font-num">Auto</span>
-                  </div>
-                  <input type="number" id="inValor" step="0.01" placeholder="Ex: 117.80" class="titanium-input w-full px-2.5 py-2 rounded-lg text-xs sm:text-sm font-num font-bold">
-                </div>
-              </div>
-
-              <!-- Live Feedback -->
-              <div class="grid grid-cols-3 gap-1.5 p-2.5 rounded-lg border text-center" style="background: var(--input-bg); border-color: var(--input-border)">
-                <div>
-                  <span class="text-[8px] uppercase tracking-wider block font-bold" style="color: var(--text-secondary)">Trecho</span>
-                  <span id="prevDeltaKm" class="text-xs font-bold mt-0.5 block font-num">0 km</span>
-                </div>
-                <div>
-                  <span class="text-[8px] uppercase tracking-wider block font-bold" style="color: var(--text-secondary)">R$/Litro</span>
-                  <span id="prevPrecoReal" class="text-xs font-bold mt-0.5 block font-num">R$ 0,00</span>
-                </div>
-                <div>
-                  <span class="text-[8px] uppercase tracking-wider block font-bold" style="color: var(--text-secondary)">Média Est.</span>
-                  <span id="prevKmL" class="text-xs font-bold text-emerald-400 mt-0.5 block font-num">0.0 km/l</span>
-                </div>
-              </div>
-            </div>
-
-            <div id="secaoCheckinInfo" class="hidden p-3 rounded-lg border text-center" style="background: var(--input-bg); border-color: var(--input-border)">
-              <span class="text-[9px] uppercase tracking-wider block font-bold" style="color: var(--text-secondary)">Distância Percorrida no Trecho</span>
-              <span id="prevDeltaKmCheckin" class="text-lg font-black text-emerald-500 mt-0.5 block font-num">0 km</span>
-            </div>
-
-            <button type="submit" id="btnSalvar" class="w-full py-3 rounded-lg font-extrabold text-xs tracking-wide transition-all shadow-md flex items-center justify-center space-x-2" style="background: var(--text-primary); color: var(--bg-canvas);">
-              <span id="btnSalvarTexto">Salvar Abastecimento</span>
-            </button>
-          </form>
-        </div>
-
-        <!-- Calculadora Flex -->
-        <div class="lg:col-span-5 titanium-glass p-4 sm:p-6 flex flex-col justify-between">
-          <div>
-            <div class="flex items-center justify-between pb-3 border-b" style="border-color: var(--header-border)">
-              <h2 class="text-sm sm:text-base font-bold tracking-tight">Decisor Flex (Bomba)</h2>
-              <span class="text-[8px] font-num font-bold px-1.5 py-0.5 rounded bg-white/10 border border-white/5">70% RATIO</span>
-            </div>
-
-            <div class="grid grid-cols-2 gap-2.5 mt-3 sm:mt-4">
-              <div>
-                <label class="block text-[9px] font-bold uppercase tracking-wider mb-1" style="color: var(--text-secondary)">Gasolina (R$)</label>
-                <input type="number" id="calcGas" step="0.01" placeholder="5.99" oninput="runFlexEngine()" class="titanium-input w-full px-2.5 py-2 rounded-lg text-xs font-num font-bold">
-              </div>
-              <div>
-                <label class="block text-[9px] font-bold uppercase tracking-wider mb-1" style="color: var(--text-secondary)">Etanol (R$)</label>
-                <input type="number" id="calcEta" step="0.01" placeholder="3.89" oninput="runFlexEngine()" class="titanium-input w-full px-2.5 py-2 rounded-lg text-xs font-num font-bold">
-              </div>
-            </div>
-
-            <div id="flexVerdictBox" class="mt-3 p-3.5 rounded-xl border text-center transition-all" style="background: var(--input-bg); border-color: var(--input-border)">
-              <span class="text-[8px] uppercase tracking-wider font-semibold block mb-0.5" style="color: var(--text-secondary)">Recomendação</span>
-              <h3 id="flexVerdict" class="text-base sm:text-lg font-extrabold font-num tracking-tight" style="color: var(--text-secondary)">--</h3>
-              <p id="flexRatio" class="text-[9px] font-num mt-1" style="color: var(--text-secondary)">Paridade: --</p>
-            </div>
-          </div>
-          <p class="text-[8px] text-center mt-3" style="color: var(--text-secondary)">*Relação de paridade em 0.70x.</p>
-        </div>
-
-      </div>
-
-      <!-- Telemetria Gráfica -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
-        <div class="lg:col-span-8 titanium-glass p-4 sm:p-6">
-          <h3 class="text-xs sm:text-sm font-bold tracking-tight mb-3">Desembolso Financeiro & KM</h3>
-          <div class="h-48 sm:h-60"><canvas id="chartEvolucao"></canvas></div>
-        </div>
-        <div class="lg:col-span-4 titanium-glass p-4 sm:p-6">
-          <h3 class="text-xs sm:text-sm font-bold tracking-tight mb-3">Gasto por Combustível</h3>
-          <div class="h-48 sm:h-60 flex items-center justify-center"><canvas id="chartMix"></canvas></div>
-        </div>
-      </div>
-
-      <!-- Histórico: Adaptativo Mobile (Cards no celular / Tabela no Desktop) -->
-      <div class="titanium-glass overflow-hidden">
-        <div class="p-3.5 sm:p-5 flex items-center justify-between border-b" style="border-color: var(--header-border)">
-          <div>
-            <h3 class="text-xs sm:text-sm font-bold tracking-tight">Histórico de Lançamentos</h3>
-            <p class="text-[9px] sm:text-[10px]" style="color: var(--text-secondary)">Abastecimentos e medições diárias.</p>
-          </div>
-          <button onclick="carregarDadosDaNuvem()" class="px-2.5 py-1 rounded-lg border text-[9px] font-bold font-num" style="border-color: var(--input-border); background: var(--input-bg)">
-            Atualizar
-          </button>
-        </div>
-
-        <!-- 1. Visão Mobile (Lista de Cards - Sem barra de rolagem horizontal) -->
-        <div id="listaHistoricoMobile" class="divide-y block sm:hidden font-num text-xs" style="border-color: var(--kpi-border)">
-          <div class="text-center py-6 text-slate-500 text-[11px]">Carregando histórico...</div>
-        </div>
-
-        <!-- 2. Visão Desktop (Tabela Executiva Completa) -->
-        <div class="hidden sm:block overflow-x-auto">
-          <table class="w-full text-left text-[11px] font-num">
-            <thead>
-              <tr class="uppercase tracking-wider text-[9px]" style="border-bottom: 1px solid var(--header-border); background: var(--input-bg); color: var(--text-secondary)">
-                <th class="py-3 px-4">Data</th>
-                <th class="py-3 px-4">Odômetro</th>
-                <th class="py-3 px-4">Delta KM</th>
-                <th class="py-3 px-4">Tipo</th>
-                <th class="py-3 px-4">Litros</th>
-                <th class="py-3 px-4">Total</th>
-                <th class="py-3 px-4">KM/L</th>
-                <th class="py-3 px-4">L/100km</th>
-                <th class="py-3 px-4 text-center">Ações</th>
-              </tr>
-            </thead>
-            <tbody id="tabelaLogs" class="divide-y font-medium" style="border-color: var(--kpi-border)">
-              <tr><td colspan="9" class="text-center py-8" style="color: var(--text-secondary)">Conectando...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- =
+            <span class="text-[11px] font-semibold" style="
