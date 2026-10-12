@@ -91,6 +91,28 @@
       z-index: -1; 
       transition: opacity 0.5s ease;
     }
+
+    /* Traços do Cluster Digital (Inspirado no painel do Tera) */
+    .gauge-segment {
+      flex: 1;
+      height: 14px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.08);
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+    .gauge-segment:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+    .gauge-segment.active-lit {
+      background: #FFFFFF;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.45);
+    }
+    .gauge-segment.active-reserva {
+      background: #EF4444;
+      box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+    }
   </style>
 </head>
 <body class="min-h-screen relative overflow-x-hidden selection:bg-slate-500/20">
@@ -199,7 +221,448 @@
         <div class="titanium-glass p-5 relative overflow-hidden">
           <div class="flex justify-between items-start">
             <span class="text-[10px] font-bold tracking-[0.2em] uppercase" style="color: var(--text-secondary)">Consumo Real Médio</span>
-            <span class="text-[9px] font-num px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-bold border border-emerald-500/20">TANQUE CHEIO</span>
+            <span id="kpiBadgeTanque" class="text-[9px] font-num px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-bold border border-emerald-500/20">50L REF</span>
           </div>
           <div class="mt-3 flex items-baseline space-x-1.5">
-            <h2 id="kpiKmL" class="text-3xl font-extrabold tracking-tight
+            <h2 id="kpiKmL" class="text-3xl font-extrabold tracking-tight font-num text-emerald-400">0.0</h2>
+            <span class="text-xs font-semibold" style="color: var(--text-secondary)">km/l</span>
+          </div>
+          <div class="mt-2.5 pt-2.5 flex justify-between text-[11px] font-num" style="border-top: 1px solid var(--kpi-border)">
+            <span style="color: var(--text-secondary)">Taxa 100km:</span>
+            <span id="kpiL100" class="font-bold">0.0 L</span>
+          </div>
+        </div>
+
+        <div class="titanium-glass p-5 relative overflow-hidden">
+          <div class="flex justify-between items-start">
+            <span class="text-[10px] font-bold tracking-[0.2em] uppercase" style="color: var(--text-secondary)">Odômetro Atual</span>
+          </div>
+          <div class="mt-3 flex items-baseline space-x-1.5">
+            <h2 id="kpiOdometroTotal" class="text-3xl font-extrabold tracking-tight font-num">0</h2>
+            <span class="text-xs font-semibold" style="color: var(--text-secondary)">km</span>
+          </div>
+          <div class="mt-2.5 pt-2.5 flex justify-between text-[11px] font-num" style="border-top: 1px solid var(--kpi-border)">
+            <span style="color: var(--text-secondary)">Rodados no contrato:</span>
+            <span id="kpiKmContrato" class="font-bold text-emerald-400">0 km</span>
+          </div>
+        </div>
+
+        <div class="titanium-glass p-5 relative overflow-hidden">
+          <div class="flex justify-between items-start">
+            <span class="text-[10px] font-bold tracking-[0.2em] uppercase" style="color: var(--text-secondary)">Gasto Combustível</span>
+          </div>
+          <div class="mt-3 flex items-baseline space-x-1.5">
+            <span class="text-sm font-light" style="color: var(--text-secondary)">R$</span>
+            <h2 id="kpiGastoMes" class="text-3xl font-extrabold tracking-tight font-num">0,00</h2>
+          </div>
+          <div class="mt-2.5 pt-2.5 flex justify-between text-[11px] font-num" style="border-top: 1px solid var(--kpi-border)">
+            <span style="color: var(--text-secondary)">Semana:</span>
+            <span id="kpiGastoSemana" class="font-bold">R$ 0,00</span>
+          </div>
+        </div>
+
+        <div class="titanium-glass p-5 relative overflow-hidden">
+          <div class="flex justify-between items-start">
+            <span class="text-[10px] font-bold tracking-[0.2em] uppercase" style="color: var(--text-secondary)">Nível do Tanque Agora</span>
+          </div>
+          <div class="mt-3 flex items-baseline space-x-1.5">
+            <h2 id="kpiLitrosTanqueAtual" class="text-3xl font-extrabold tracking-tight font-num text-cyan-400">0.0</h2>
+            <span class="text-xs font-semibold" style="color: var(--text-secondary)">litros no tanque</span>
+          </div>
+          <div class="mt-2.5 pt-2.5 flex justify-between text-[11px] font-num" style="border-top: 1px solid var(--kpi-border)">
+            <span style="color: var(--text-secondary)">Autonomia estimada:</span>
+            <span id="kpiAutonomia" class="font-bold text-cyan-400">~0 km</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Formulário com Marcador Digital de 4 Traços do Painel -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Formulário de Registro -->
+        <div class="lg:col-span-7 titanium-glass p-6">
+          <div class="flex items-center justify-between pb-4" style="border-bottom: 1px solid var(--header-border)">
+            <div class="flex p-1 rounded-lg bg-black/10 dark:bg-white/5 border border-white/5 text-xs font-bold">
+              <button type="button" id="tabAbastecer" onclick="setFormMode('abastecer')" class="px-3 py-1.5 rounded transition-all bg-white text-slate-900 shadow-sm font-bold dark:bg-white dark:text-black">
+                ⛽ Abastecimento
+              </button>
+              <button type="button" id="tabCheckin" onclick="setFormMode('checkin')" class="px-3 py-1.5 rounded transition-all text-slate-500 hover:text-current font-bold">
+                📍 KM Diário
+              </button>
+            </div>
+            <span id="lastOdoBadge" class="text-[10px] font-num px-2 py-1 rounded bg-black/5 dark:bg-white/5 border border-white/10" style="color: var(--text-secondary)">
+              Último Registro: --
+            </span>
+          </div>
+
+          <form id="registroForm" class="mt-5 space-y-4" onsubmit="handleSalvarRegistro(event)">
+            <div>
+              <label class="block text-[10px] font-bold uppercase tracking-wider mb-1" style="color: var(--text-secondary)">
+                Odômetro Atual (KM Total do Carro)
+              </label>
+              <input type="number" id="inOdo" required step="1" placeholder="Ex: 52140" class="titanium-input w-full px-3.5 py-2.5 rounded-lg text-sm font-num font-bold">
+            </div>
+
+            <!-- PAINEL CLUSTER: 4 TRAÇOS DE COMBUSTÍVEL (INSPIRADO NO SEU CARRO) -->
+            <div class="p-4 rounded-xl border space-y-3" style="background: var(--input-bg); border-color: var(--input-border)">
+              <div class="flex items-center justify-between">
+                <div>
+                  <span class="text-[10px] font-bold uppercase tracking-wider block" style="color: var(--text-secondary)">
+                    Marcador de Combustível no Painel (Clique no traço atual)
+                  </span>
+                  <span class="text-[11px] font-num font-bold text-white">
+                    Nível: <span id="lblClusterNivel" class="text-cyan-400">1/2 (2º Traço)</span> • <span id="lblClusterLitros" class="text-white">~25.0 Litros</span>
+                  </span>
+                </div>
+                <div class="text-right">
+                  <span class="text-[9px] font-num px-2 py-0.5 rounded bg-white/5 border border-white/10" id="lblCapacidadeTanqueRef">Tanque: 50L</span>
+                </div>
+              </div>
+
+              <!-- Régua Interativa com os 4 Traços do Painel -->
+              <div class="space-y-1.5">
+                <div class="flex items-center gap-1.5 p-1 rounded-lg bg-black/40 border border-white/5">
+                  <div class="gauge-segment" id="segReserva" onclick="setClusterNivel(0.08, 'Reserva (Crítico)')" title="Reserva (Aceso vermelho)"></div>
+                  <div class="gauge-segment" id="seg1" onclick="setClusterNivel(0.25, '1/4 (1º Traço)')" title="1/4 de tanque"></div>
+                  <div class="gauge-segment" id="seg2" onclick="setClusterNivel(0.50, '1/2 (2º Traço)')" title="Meio tanque"></div>
+                  <div class="gauge-segment" id="seg3" onclick="setClusterNivel(0.75, '3/4 (3º Traço)')" title="3/4 de tanque"></div>
+                  <div class="gauge-segment" id="seg4" onclick="setClusterNivel(1.00, '4/4 (Tanque Cheio)')" title="Tanque Cheio"></div>
+                </div>
+                <div class="flex justify-between text-[9px] font-num font-bold px-1" style="color: var(--text-secondary)">
+                  <span class="text-red-400">R</span>
+                  <span>1/4</span>
+                  <span>1/2</span>
+                  <span>3/4</span>
+                  <span class="text-emerald-400">1/1</span>
+                </div>
+              </div>
+
+              <!-- Campo Manual para Ajuste Fino de Litros no Tanque -->
+              <div class="flex items-center justify-between pt-2 border-t text-xs" style="border-color: var(--kpi-border)">
+                <span class="text-[10px]" style="color: var(--text-secondary)">Ajuste fino de litros restantes no tanque:</span>
+                <div class="flex items-center space-x-1.5">
+                  <input type="number" id="inLitrosTanqueManual" step="0.5" class="titanium-input w-20 px-2 py-1 rounded text-right font-num font-bold text-xs" value="25">
+                  <span class="text-[10px] font-bold">Litros</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Seção de Abastecimento -->
+            <div id="secaoAbastecimento" class="space-y-4">
+              
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-[10px] font-bold uppercase tracking-wider mb-1" style="color: var(--text-secondary)">Combustível</label>
+                  <select id="inCombustivel" class="titanium-input w-full px-3.5 py-2.5 rounded-lg text-xs font-semibold">
+                    <option value="Gasolina">Gasolina</option>
+                    <option value="Etanol">Etanol</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label class="block text-[10px] font-bold uppercase tracking-wider mb-1" style="color: var(--text-secondary)">Preço do Litro (R$)</label>
+                  <input type="number" id="inPrecoLitro" step="0.001" placeholder="Ex: 5.89" class="titanium-input w-full px-3.5 py-2.5 rounded-lg text-sm font-num font-bold">
+                </div>
+
+                <div>
+                  <label class="block text-[10px] font-bold uppercase tracking-wider mb-1" style="color: var(--text-secondary)">Litros Abastecidos</label>
+                  <input type="number" id="inLitros" step="0.01" placeholder="Ex: 20.00" class="titanium-input w-full px-3.5 py-2.5 rounded-lg text-sm font-num font-bold">
+                </div>
+
+                <div>
+                  <div class="flex justify-between items-center mb-1">
+                    <label class="text-[10px] font-bold uppercase tracking-wider" style="color: var(--text-secondary)">Valor Pago (R$)</label>
+                    <span class="text-[8px] uppercase font-bold text-emerald-500 font-num">Auto ou Manual</span>
+                  </div>
+                  <input type="number" id="inValor" step="0.01" placeholder="Ex: 117.80" class="titanium-input w-full px-3.5 py-2.5 rounded-lg text-sm font-num font-bold">
+                </div>
+              </div>
+
+              <!-- Live Feedback Calculando Consumo Real de Verdade -->
+              <div class="grid grid-cols-3 gap-2 p-3 rounded-lg border text-center" style="background: var(--input-bg); border-color: var(--input-border)">
+                <div>
+                  <span class="text-[8px] uppercase tracking-wider block font-bold" style="color: var(--text-secondary)">Distância no Trecho</span>
+                  <span id="prevDeltaKm" class="text-xs font-bold mt-0.5 block font-num">0 km</span>
+                </div>
+                <div>
+                  <span class="text-[8px] uppercase tracking-wider block font-bold" style="color: var(--text-secondary)">Custo Real/Litro</span>
+                  <span id="prevPrecoReal" class="text-xs font-bold mt-0.5 block font-num">R$ 0,00</span>
+                </div>
+                <div>
+                  <span class="text-[8px] uppercase tracking-wider block font-bold" style="color: var(--text-secondary)">Média Real do Ciclo</span>
+                  <span id="prevKmL" class="text-xs font-bold text-emerald-400 mt-0.5 block font-num">0.0 km/l</span>
+                </div>
+              </div>
+            </div>
+
+            <div id="secaoCheckinInfo" class="hidden p-3 rounded-lg border text-center" style="background: var(--input-bg); border-color: var(--input-border)">
+              <span class="text-[9px] uppercase tracking-wider block font-bold" style="color: var(--text-secondary)">Quilômetros Rodados no Trecho</span>
+              <span id="prevDeltaKmCheckin" class="text-xl font-black text-emerald-500 mt-1 block font-num">0 km</span>
+              <p class="text-[10px] mt-1" style="color: var(--text-secondary)">Atualiza odômetro, nível do tanque e metas do aluguel.</p>
+            </div>
+
+            <button type="submit" id="btnSalvar" class="w-full py-3.5 rounded-lg font-extrabold text-xs tracking-wide transition-all shadow-md flex items-center justify-center space-x-2" style="background: var(--text-primary); color: var(--bg-canvas);">
+              <span id="btnSalvarTexto">Salvar Abastecimento</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Calculadora Flex -->
+        <div class="lg:col-span-5 titanium-glass p-6 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between pb-4" style="border-bottom: 1px solid var(--header-border)">
+              <h2 class="text-base font-bold tracking-tight">Decisor Flex (Bomba)</h2>
+              <span class="text-[9px] font-num font-bold px-1.5 py-0.5 rounded bg-white/10 border border-white/5">70% RATIO</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 mt-5">
+              <div>
+                <label class="block text-[9px] font-bold uppercase tracking-wider mb-1" style="color: var(--text-secondary)">Gasolina (R$)</label>
+                <input type="number" id="calcGas" step="0.01" placeholder="5.99" oninput="runFlexEngine()" class="titanium-input w-full px-3 py-2 rounded-lg text-sm font-num font-bold">
+              </div>
+              <div>
+                <label class="block text-[9px] font-bold uppercase tracking-wider mb-1" style="color: var(--text-secondary)">Etanol (R$)</label>
+                <input type="number" id="calcEta" step="0.01" placeholder="3.89" oninput="runFlexEngine()" class="titanium-input w-full px-3 py-2 rounded-lg text-sm font-num font-bold">
+              </div>
+            </div>
+
+            <div id="flexVerdictBox" class="mt-5 p-5 rounded-xl border text-center transition-all" style="background: var(--input-bg); border-color: var(--input-border)">
+              <span class="text-[9px] uppercase tracking-[0.2em] font-semibold block mb-1.5" style="color: var(--text-secondary)">Recomendação</span>
+              <h3 id="flexVerdict" class="text-xl font-extrabold font-num tracking-tight" style="color: var(--text-secondary)">--</h3>
+              <p id="flexRatio" class="text-[10px] font-num mt-1.5" style="color: var(--text-secondary)">Paridade: --</p>
+            </div>
+          </div>
+          <p class="text-[9px] text-center mt-4" style="color: var(--text-secondary)">*Relação de paridade calculada em 0.70x.</p>
+        </div>
+
+      </div>
+
+      <!-- Telemetria Gráfica -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="lg:col-span-8 titanium-glass p-6">
+          <h3 class="text-sm font-bold tracking-tight mb-4">Desembolso Financeiro & KM</h3>
+          <div class="h-60"><canvas id="chartEvolucao"></canvas></div>
+        </div>
+        <div class="lg:col-span-4 titanium-glass p-6">
+          <h3 class="text-sm font-bold tracking-tight mb-4">Gasto por Combustível</h3>
+          <div class="h-60 flex items-center justify-center"><canvas id="chartMix"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Tabela com Ações de Edição e Exclusão -->
+      <div class="titanium-glass overflow-hidden">
+        <div class="p-5 flex items-center justify-between" style="border-bottom: 1px solid var(--header-border)">
+          <div>
+            <h3 class="text-sm font-bold tracking-tight">Histórico de Telemetria</h3>
+            <p class="text-[10px]" style="color: var(--text-secondary)">Lançamentos de abastecimentos e check-ins.</p>
+          </div>
+          <button onclick="carregarDadosDaNuvem()" class="px-3 py-1.5 rounded-lg border text-[10px] font-bold font-num" style="border-color: var(--input-border); background: var(--input-bg)">
+            Atualizar
+          </button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-[11px] font-num">
+            <thead>
+              <tr class="uppercase tracking-wider text-[9px]" style="border-bottom: 1px solid var(--header-border); background: var(--input-bg); color: var(--text-secondary)">
+                <th class="py-3 px-4">Data</th>
+                <th class="py-3 px-4">Odômetro</th>
+                <th class="py-3 px-4">Delta KM</th>
+                <th class="py-3 px-4">Tipo</th>
+                <th class="py-3 px-4">Litros</th>
+                <th class="py-3 px-4">Total</th>
+                <th class="py-3 px-4">KM/L</th>
+                <th class="py-3 px-4">L/100km</th>
+                <th class="py-3 px-4 text-center">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tabelaLogs" class="divide-y font-medium" style="border-color: var(--kpi-border)">
+              <tr><td colspan="9" class="text-center py-8" style="color: var(--text-secondary)">Conectando...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- VIEW 2: GESTÃO DO ALUGUEL & FRANQUIA       -->
+    <!-- ========================================== -->
+    <div id="viewAluguel" class="space-y-6 hidden">
+      
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <div class="titanium-glass p-5 relative overflow-hidden">
+          <div class="flex justify-between items-start">
+            <span class="text-[10px] font-bold tracking-[0.2em] uppercase" style="color: var(--text-secondary)">Cota Por Dia Restante</span>
+            <span class="text-[9px] font-num px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-400 font-bold border border-cyan-500/20">DINÂMICA</span>
+          </div>
+          <div class="mt-3 flex items-baseline space-x-1.5">
+            <h2 id="hudMetaDiaria" class="text-3xl font-extrabold tracking-tight font-num text-cyan-400">0</h2>
+            <span class="text-xs font-semibold" style="color: var(--text-secondary)">km / dia</span>
+          </div>
+          <div class="mt-2.5 pt-2.5 flex justify-between text-[11px] font-num" style="border-top: 1px solid var(--kpi-border)">
+            <span style="color: var(--text-secondary)">Recalculada a cada dia</span>
+          </div>
+        </div>
+
+        <div class="titanium-glass p-5 relative overflow-hidden">
+          <div class="flex justify-between items-start">
+            <span class="text-[10px] font-bold tracking-[0.2em] uppercase" style="color: var(--text-secondary)">Franquia Restante</span>
+            <span class="text-[9px] font-num px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-bold border border-emerald-500/20">SALDO</span>
+          </div>
+          <div class="mt-3 flex items-baseline space-x-1.5">
+            <h2 id="hudFranquiaRestante" class="text-3xl font-extrabold tracking-tight font-num text-emerald-400">0</h2>
+            <span class="text-xs font-semibold" style="color: var(--text-secondary)">km</span>
+          </div>
+          <div class="mt-2.5 pt-2.5 flex justify-between text-[11px] font-num" style="border-top: 1px solid var(--kpi-border)">
+            <span style="color: var(--text-secondary)">Franquia Contratada:</span>
+            <span id="hudFranquiaTotal" class="font-bold">0 km</span>
+          </div>
+        </div>
+
+        <div class="titanium-glass p-5 relative overflow-hidden">
+          <div class="flex justify-between items-start">
+            <span class="text-[10px] font-bold tracking-[0.2em] uppercase" style="color: var(--text-secondary)">Ritmo Real Médio</span>
+            <span id="hudBadgeRitmo" class="text-[9px] font-num px-1.5 py-0.5 rounded font-bold">STATUS</span>
+          </div>
+          <div class="mt-3 flex items-baseline space-x-1.5">
+            <h2 id="hudRitmoReal" class="text-3xl font-extrabold tracking-tight font-num">0</h2>
+            <span class="text-xs font-semibold" style="color: var(--text-secondary)">km / dia</span>
+          </div>
+          <div class="mt-2.5 pt-2.5 flex justify-between text-[11px] font-num" style="border-top: 1px solid var(--kpi-border)">
+            <span style="color: var(--text-secondary)">Projeção final:</span>
+            <span id="hudProjecaoTotal" class="font-bold">0 km</span>
+          </div>
+        </div>
+
+        <div class="titanium-glass p-5 relative overflow-hidden">
+          <div class="flex justify-between items-start">
+            <span class="text-[10px] font-bold tracking-[0.2em] uppercase" style="color: var(--text-secondary)">Prazo do Contrato</span>
+            <span class="text-[9px] font-num px-1.5 py-0.5 rounded bg-white/10 font-bold border border-white/5">DIAS</span>
+          </div>
+          <div class="mt-3 flex items-baseline space-x-1.5">
+            <h2 id="hudDiasRestantes" class="text-3xl font-extrabold tracking-tight font-num">0</h2>
+            <span class="text-xs font-semibold" style="color: var(--text-secondary)">dias restam</span>
+          </div>
+          <div class="mt-2.5 pt-2.5 flex justify-between text-[11px] font-num" style="border-top: 1px solid var(--kpi-border)">
+            <span style="color: var(--text-secondary)">Devolução:</span>
+            <span id="hudDataFim" class="font-bold">--/--/----</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Barra Visual de Consumo da Franquia -->
+      <div class="titanium-glass p-6 space-y-3">
+        <div class="flex justify-between items-center text-xs font-num">
+          <span class="font-bold tracking-wider uppercase text-[10px]" style="color: var(--text-secondary)">Barra de Consumo da Franquia de KM</span>
+          <span id="lblPercentualFranquia" class="font-extrabold text-emerald-400">0% consumido</span>
+        </div>
+        <div class="w-full h-3 rounded-full overflow-hidden p-0.5 border" style="background: var(--input-bg); border-color: var(--input-border)">
+          <div id="barFranquiaProgress" class="h-full rounded-full transition-all duration-500 bg-emerald-500" style="width: 0%"></div>
+        </div>
+        <div class="flex justify-between text-[10px] font-num" style="color: var(--text-secondary)">
+          <span>Retirada: <b id="lblOdoInicial" class="text-current">0 km</b></span>
+          <span>Atual: <b id="lblOdoAtual" class="text-current">0 km</b></span>
+          <span>Limite Máximo: <b id="lblOdoLimite" class="text-current">0 km</b></span>
+        </div>
+      </div>
+
+      <!-- Formulário de Configuração do Contrato -->
+      <div class="titanium-glass p-6">
+        <div class="pb-4 mb-5 border-b" style="border-color: var(--header-border)">
+          <h3 class="text-base font-bold tracking-tight">Configurações do Veículo & Contrato</h3>
+          <p class="text-xs mt-0.5" style="color: var(--text-secondary)">Defina a litragem do tanque e as regras de quilometragem da locação.</p>
+        </div>
+
+        <form id="formConfigAluguel" onsubmit="salvarConfiguracaoAluguel(event)" class="space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            
+            <div>
+              <label class="block text-[10px] font-bold uppercase tracking-wider mb-1" style="color: var(--text-secondary)">Modelo do Carro</label>
+              <input type="text" id="cfgCarroNome" placeholder="Ex: VW Tera 1.0 TSI" required class="titanium-input w-full px-3.5 py-2.5 rounded-lg text-xs font-semibold">
+            </div>
+
+            <!-- CAPACIDADE DO TANQUE (NOVO) -->
+            <div>
+              <div class="flex justify-between items-center mb-1">
+                <label class="text-[10px] font-bold uppercase tracking-wider" style="color: var(--text-secondary)">Capacidade do Tanque (Litros)</label>
+                <select onchange="aplicarPresetTanque(this.value)" class="text-[9px] bg-transparent text-cyan-400 border-none outline-none font-bold cursor-pointer">
+                  <option value="" class="bg-slate-900 text-white">Predefinições ▾</option>
+                  <option value="50" class="bg-slate-900 text-white">VW Tera / Nivus / T-Cross (50L)</option>
+                  <option value="52" class="bg-slate-900 text-white">VW Polo (52L)</option>
+                  <option value="47" class="bg-slate-900 text-white">Fiat Mobi (47L)</option>
+                  <option value="48" class="bg-slate-900 text-white">Fiat Argo / Cronos (48L)</option>
+                  <option value="44" class="bg-slate-900 text-white">GM Onix / Tracker (44L)</option>
+                  <option value="50" class="bg-slate-900 text-white">Hyundai HB20 (50L)</option>
+                </select>
+              </div>
+              <input type="number" id="cfgCapacidadeTanque" required step="1" placeholder="Ex: 50" class="titanium-input w-full px-3.5 py-2.5 rounded-lg text-xs font-num font-bold">
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-bold uppercase tracking-wider mb-1" style="color: var(--text-secondary)">Placa / Identificador</label>
+              <input type="text" id="cfgCarroPlaca" placeholder="Ex: BRA2E19" class="titanium-input w-full px-3.5 py-2.5 rounded-lg text-xs font-num font-bold">
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-bold uppercase tracking-wider mb-1" style="color: var(--text-secondary)">Odômetro ao Retirar (KM Inicial)</label>
+              <input type="number" id="cfgOdoInicial" required step="1" placeholder="Ex: 48350" class="titanium-input w-full px-3.5 py-2.5 rounded-lg text-xs font-num font-bold">
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-bold uppercase tracking-wider mb-1" style="color: var(--text-secondary)">Data de Retirada (Início)</label>
+              <input type="date" id="cfgDataInicio" required class="titanium-input w-full px-3.5 py-2.5 rounded-lg text-xs font-num">
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-bold uppercase tracking-wider mb-1" style="color: var(--text-secondary)">Data de Devolução (Fim)</label>
+              <input type="date" id="cfgDataFim" required class="titanium-input w-full px-3.5 py-2.5 rounded-lg text-xs font-num">
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-bold uppercase tracking-wider mb-1" style="color: var(--text-secondary)">Franquia Total de KM (Mês/Período)</label>
+              <input type="number" id="cfgFranquiaKm" required step="1" placeholder="Ex: 3000" class="titanium-input w-full px-3.5 py-2.5 rounded-lg text-xs font-num font-bold">
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-bold uppercase tracking-wider mb-1" style="color: var(--text-secondary)">Valor do KM Excedente (R$/km)</label>
+              <input type="number" id="cfgPrecoKmExtra" step="0.01" placeholder="Ex: 0.75" class="titanium-input w-full px-3.5 py-2.5 rounded-lg text-xs font-num font-bold">
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-bold uppercase tracking-wider mb-1" style="color: var(--text-secondary)">Valor da Locação (R$/mês)</label>
+              <input type="number" id="cfgValorLocacao" step="0.01" placeholder="Ex: 2100.00" class="titanium-input w-full px-3.5 py-2.5 rounded-lg text-xs font-num font-bold">
+            </div>
+
+          </div>
+
+          <div class="flex justify-end pt-3">
+            <button type="submit" class="px-6 py-3 rounded-lg font-bold text-xs shadow-md transition-all" style="background: var(--text-primary); color: var(--bg-canvas);">
+              Salvar Dados do Veículo
+            </button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- MODAL DE CONFIGURAÇÃO DA API -->
+  <div id="modalConfig" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="titanium-glass max-w-lg w-full p-6 space-y-4">
+      <div class="flex justify-between items-center pb-2 border-b" style="border-color: var(--header-border)">
+        <h3 class="text-sm font-bold tracking-tight">Endpoint Google Apps Script</h3>
+        <button onclick="toggleModalConfig()" class="text-xs text-slate-400 hover:text-white">✕</button>
+      </div>
+
+      <p class="text-xs" style="color: var(--text-secondary)">URL do aplicativo da Web conectado à sua planilha Google:</p>
+      
+      <input type="text" id="apiEndpointInput" class="titanium-input w-full px-3.5 py-2.5 rounded-lg text-xs font-num">
+      
+      <div id="apiTestStatus" class="text-xs font-num p-2.5 rounded-lg hidden"></div>
+
+      <div class="flex flex-wrap items-center justify-between gap-2 pt-2">
+        <button onclick="restaurarApiPadrao()" type="button" class="text-[11px] text-slate-400 hover:text-white underline">Restaurar URL Oficial</button>
+        <div class="flex space-x-2">
+          <button onclick="testarConexaoApi()" type="button" class="px-3 py-2
