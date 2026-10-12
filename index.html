@@ -21,14 +21,14 @@
     :root {
       --bg-canvas: #07090E;
       --card-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
-      --card-border: rgba(255, 255, 255, 0.09);
-      --card-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.8);
-      --card-specular: rgba(255, 255, 255, 0.12);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --card-shadow: 0 15px 35px -15px rgba(0, 0, 0, 0.8);
+      --card-specular: rgba(255, 255, 255, 0.10);
       --input-bg: rgba(255, 255, 255, 0.03); 
       --input-border: rgba(255, 255, 255, 0.08);
       --text-primary: #FFFFFF;
       --text-secondary: #94A3B8;
-      --header-bg: rgba(7, 9, 14, 0.75);
+      --header-bg: rgba(7, 9, 14, 0.85);
       --header-border: rgba(255, 255, 255, 0.08);
       --kpi-border: rgba(255, 255, 255, 0.06);
     }
@@ -37,13 +37,13 @@
       --bg-canvas: #F8FAFC;
       --card-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.8) 100%);
       --card-border: rgba(0, 0, 0, 0.08);
-      --card-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.05);
+      --card-shadow: 0 10px 25px -10px rgba(0, 0, 0, 0.05);
       --card-specular: rgba(255, 255, 255, 0.8);
       --input-bg: #FFFFFF;
-      --input-border: rgba(0, 0, 0, 0.14);
+      --input-border: rgba(0, 0, 0, 0.12);
       --text-primary: #0F172A;
       --text-secondary: #64748B;
-      --header-bg: rgba(248, 250, 252, 0.85);
+      --header-bg: rgba(248, 250, 252, 0.90);
       --header-border: rgba(0, 0, 0, 0.08);
       --kpi-border: rgba(0, 0, 0, 0.06);
     }
@@ -54,6 +54,7 @@
       color: var(--text-primary);
       transition: background-color 0.3s ease, color 0.3s ease;
       -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
 
     .font-num {
@@ -63,8 +64,8 @@
 
     .titanium-glass {
       background: var(--card-bg);
-      backdrop-filter: blur(24px) saturate(160%);
-      -webkit-backdrop-filter: blur(24px) saturate(160%);
+      backdrop-filter: blur(20px) saturate(160%);
+      -webkit-backdrop-filter: blur(20px) saturate(160%);
       border: 1px solid var(--card-border);
       box-shadow: inset 0 1px 1px 0 var(--card-specular), var(--card-shadow);
       border-radius: 16px;
@@ -83,18 +84,7 @@
       box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.05);
     }
 
-    .orb-glow {
-      position: fixed;
-      border-radius: 50%;
-      filter: blur(140px);
-      pointer-events: none;
-      z-index: -1; 
-      transition: opacity 0.5s ease;
-    }
-
-    /* ==========================================================
-       CLUSTER DIGITAL VW (8 BARRAS - RÉPLICA FIEL DO PAINEL)
-       ========================================================== */
+    /* CLUSTER DIGITAL VW (8 BARRAS) */
     .vw-cluster-container {
       background: radial-gradient(circle at 50% 0%, #151d2f 0%, #080b12 85%);
       border: 1px solid rgba(255, 255, 255, 0.12);
@@ -103,53 +93,47 @@
       position: relative;
       overflow: hidden;
     }
-
-    /* Linha sutil de iluminação ambiente superior azul VW */
     .vw-cluster-container::before {
       content: '';
       position: absolute;
       top: 0;
-      left: 15%;
-      right: 15%;
+      left: 10%;
+      right: 10%;
       height: 2px;
-      background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.6), transparent);
+      background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.5), transparent);
     }
 
     .vw-dash-segment {
       flex: 1;
       height: 6px;
       border-radius: 2px;
-      background: rgba(255, 255, 255, 0.12);
-      transition: all 0.25s ease;
+      background: rgba(255, 255, 255, 0.10);
+      transition: all 0.2s ease;
       cursor: pointer;
     }
     .vw-dash-segment:hover {
-      background: rgba(255, 255, 255, 0.4);
+      background: rgba(255, 255, 255, 0.35);
     }
     .vw-dash-segment.lit-white {
       background: #FFFFFF;
-      box-shadow: 0 0 8px rgba(255, 255, 255, 0.9), 0 0 16px rgba(255, 255, 255, 0.4);
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.9), 0 0 14px rgba(255, 255, 255, 0.4);
     }
     .vw-dash-segment.lit-red {
       background: #EF4444;
-      box-shadow: 0 0 8px rgba(239, 68, 68, 0.9), 0 0 16px rgba(239, 68, 68, 0.4);
+      box-shadow: 0 0 8px rgba(239, 68, 68, 0.9), 0 0 14px rgba(239, 68, 68, 0.4);
     }
   </style>
 </head>
-<body class="min-h-screen relative overflow-x-hidden selection:bg-slate-500/20">
+<body class="min-h-screen relative selection:bg-slate-500/20">
 
-  <!-- Ambient Lights -->
-  <div id="orb1" class="orb-glow w-[500px] h-[500px] bg-emerald-500/5 -top-40 -left-40"></div>
-  <div id="orb2" class="orb-glow w-[600px] h-[600px] bg-slate-500/5 top-1/2 -right-60"></div>
-
-  <!-- Header Fixo -->
+  <!-- Header Mobile-First Fluido -->
   <header style="background: var(--header-bg); border-bottom: 1px solid var(--header-border);" class="sticky top-0 z-40 backdrop-blur-xl transition-colors duration-300">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 h-14 sm:h-16 flex items-center justify-between">
       
-      <!-- Brand & Carro Ativo Badge -->
-      <div class="flex items-center space-x-3">
-        <div class="w-10 h-10 rounded-xl titanium-glass flex items-center justify-center border-white/20 shadow-inner">
-          <svg class="w-6 h-6 text-current" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <!-- Logo + Título -->
+      <div class="flex items-center space-x-2.5">
+        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl titanium-glass flex items-center justify-center border-white/20 shadow-inner">
+          <svg class="w-4 h-4 sm:w-5 sm:h-5 text-current" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9C2.1 11.1 2 11.5 2 12v4c0 .6.4 1 1 1h2"/>
             <circle cx="7" cy="17" r="2"/>
             <path d="M9 17h6"/>
@@ -157,262 +141,333 @@
           </svg>
         </div>
         <div>
-          <div class="flex items-center gap-2">
-            <h1 class="text-base font-extrabold tracking-tight leading-none">CCMV</h1>
-            <span id="badgeCarroAtivo" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-              Carro não definido
+          <div class="flex items-center gap-1.5">
+            <h1 class="text-base sm:text-lg font-extrabold tracking-tight leading-none">CCMV</h1>
+            <span id="badgeCarroAtivo" class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 truncate max-w-[120px] sm:max-w-none">
+              Sem carro
             </span>
           </div>
-          <p class="text-[10px] font-medium uppercase tracking-wider mt-0.5" style="color: var(--text-secondary)">
-            Telemetria & Gestão de Locação
+          <p class="text-[9px] font-medium uppercase tracking-wider hidden sm:block mt-0.5" style="color: var(--text-secondary)">
+            Telemetria & Gestão de Frotas
           </p>
         </div>
       </div>
 
-      <!-- Abas Principais + Ferramentas -->
-      <div class="flex items-center space-x-2 sm:space-x-3">
-        <div class="titanium-glass p-1 rounded-lg flex items-center space-x-1 text-xs">
-          <button onclick="navegarAba('cockpit')" id="navCockpit" class="px-3 py-1 rounded font-bold transition-all bg-white text-slate-900 shadow-sm dark:bg-white dark:text-black">
-            📊 Cockpit
-          </button>
-          <button onclick="navegarAba('aluguel')" id="navAluguel" class="px-3 py-1 rounded font-bold transition-all text-slate-400 hover:text-current">
-            🚘 Aluguel
-          </button>
-        </div>
-
-        <button onclick="toggleModalConfig()" title="Configurações da API" class="h-8 px-2.5 rounded-lg titanium-glass hover:opacity-80 text-xs font-semibold flex items-center space-x-1">
-          <span>⚙️</span>
-          <span class="hidden md:inline text-[11px]">API</span>
+      <!-- Ações do Topo: Sync & Menu de Configurações -->
+      <div class="flex items-center space-x-2">
+        <button id="syncBadge" onclick="carregarDadosDaNuvem()" title="Sincronizar com Planilha" class="h-8 px-2.5 rounded-lg titanium-glass hover:border-emerald-500/40 flex items-center space-x-1.5 text-[11px] font-num cursor-pointer transition-all">
+          <span class="w-1.5 h-1.5 rounded-full bg-slate-400 animate-pulse" id="syncDot"></span>
+          <span id="syncText" class="font-medium text-[10px]">Sync</span>
         </button>
 
-        <div class="titanium-glass p-1 rounded-lg flex items-center space-x-1 text-xs">
-          <button onclick="setTheme('auto')" id="btnThemeAuto" title="Auto" class="px-2 py-1 rounded font-bold">Auto</button>
-          <button onclick="setTheme('light')" id="btnThemeLight" title="Claro" class="px-2 py-1 rounded font-bold">☀️</button>
-          <button onclick="setTheme('dark')" id="btnThemeDark" title="Escuro" class="px-2 py-1 rounded font-bold">🌙</button>
-        </div>
+        <button onclick="toggleModalMenu()" title="Preferências e Ajustes" class="w-8 h-8 rounded-lg titanium-glass hover:opacity-80 flex items-center justify-center text-xs">
+          ⚙️
+        </button>
+      </div>
+    </div>
 
-        <button id="syncBadge" onclick="carregarDadosDaNuvem()" title="Clique para sincronizar agora" class="h-8 px-2.5 rounded-lg titanium-glass hover:border-emerald-500/40 flex items-center space-x-1.5 text-[11px] font-num cursor-pointer transition-all">
-          <span class="w-1.5 h-1.5 rounded-full bg-slate-400 animate-pulse" id="syncDot"></span>
-          <span id="syncText" class="font-medium hidden sm:inline">Sync</span>
+    <!-- Navegação Segmentada Fixa (Sem rolagem horizontal) -->
+    <div class="px-3 pb-2.5 sm:hidden">
+      <div class="titanium-glass p-1 rounded-xl flex items-center text-xs font-bold w-full">
+        <button onclick="navegarAba('cockpit')" id="navCockpitMobile" class="flex-1 py-1.5 rounded-lg transition-all text-center bg-white text-slate-900 shadow-sm dark:bg-white dark:text-black">
+          📊 Cockpit
+        </button>
+        <button onclick="navegarAba('aluguel')" id="navAluguelMobile" class="flex-1 py-1.5 rounded-lg transition-all text-center text-slate-400 hover:text-current">
+          🚘 Aluguel
         </button>
       </div>
     </div>
   </header>
 
-  <main class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+  <main class="max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
 
     <!-- ========================================== -->
     <!-- VIEW 1: COCKPIT DE CONSUMO & TELEMETRIA   -->
     <!-- ========================================== -->
-    <div id="viewCockpit" class="space-y-6">
+    <div id="viewCockpit" class="space-y-4 sm:space-y-6">
       
-      <!-- Banner Inteligente do Aluguel com COTA DIÁRIA AUTOMÁTICA -->
-      <div id="bannerAluguelResumo" onclick="navegarAba('aluguel')" class="titanium-glass p-4 cursor-pointer hover:border-emerald-500/40 transition-all border-emerald-500/20 bg-emerald-500/[0.02]">
-        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <div class="flex items-center space-x-3">
-            <span class="text-2xl">🚗</span>
+      <!-- Banner Resumo do Aluguel -->
+      <div id="bannerAluguelResumo" onclick="navegarAba('aluguel')" class="titanium-glass p-3.5 sm:p-4 cursor-pointer hover:border-emerald-500/40 transition-all border-emerald-500/20 bg-emerald-500/[0.02]">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div class="flex items-center space-x-2.5">
+            <span class="text-xl sm:text-2xl">🚗</span>
             <div>
-              <h4 id="bannerCarroNome" class="text-sm font-bold tracking-tight">Carro: Não configurado</h4>
-              <p id="bannerCarroSub" class="text-[11px] font-num" style="color: var(--text-secondary)">Clique aqui para configurar seu contrato de locação e limites de KM.</p>
+              <h4 id="bannerCarroNome" class="text-xs sm:text-sm font-bold tracking-tight">Carro: Não configurado</h4>
+              <p id="bannerCarroSub" class="text-[10px] font-num" style="color: var(--text-secondary)">Toque aqui para configurar franquia e datas.</p>
             </div>
           </div>
           
-          <div class="grid grid-cols-3 gap-3 w-full md:w-auto text-right font-num">
-            <div class="px-3 py-1.5 rounded-xl bg-black/10 dark:bg-white/5 border border-white/5">
-              <span class="text-[9px] uppercase tracking-wider block font-bold text-cyan-400">Cota/Dia Restante</span>
-              <span id="bannerKmPorDia" class="font-black text-cyan-400 text-sm sm:text-base">-- km/dia</span>
+          <div class="grid grid-cols-3 gap-2 w-full sm:w-auto text-right font-num">
+            <div class="px-2 py-1 rounded-lg bg-black/10 dark:bg-white/5 border border-white/5">
+              <span class="text-[8px] uppercase tracking-wider block font-bold text-cyan-400">Cota/Dia</span>
+              <span id="bannerKmPorDia" class="font-black text-cyan-400 text-xs sm:text-sm">-- km</span>
             </div>
-
-            <div class="px-3 py-1.5 rounded-xl bg-black/10 dark:bg-white/5 border border-white/5">
-              <span class="text-[9px] uppercase tracking-wider block font-bold" style="color: var(--text-secondary)">Saldo Franquia</span>
-              <span id="bannerFranquiaRestante" class="font-black text-emerald-400 text-sm sm:text-base">-- km</span>
+            <div class="px-2 py-1 rounded-lg bg-black/10 dark:bg-white/5 border border-white/5">
+              <span class="text-[8px] uppercase tracking-wider block font-bold" style="color: var(--text-secondary)">Saldo</span>
+              <span id="bannerFranquiaRestante" class="font-black text-emerald-400 text-xs sm:text-sm">-- km</span>
             </div>
-
-            <div class="px-3 py-1.5 rounded-xl bg-black/10 dark:bg-white/5 border border-white/5">
-              <span class="text-[9px] uppercase tracking-wider block font-bold" style="color: var(--text-secondary)">Prazo Restante</span>
-              <span id="bannerDiasRestantes" class="font-black text-white text-sm sm:text-base">-- dias</span>
+            <div class="px-2 py-1 rounded-lg bg-black/10 dark:bg-white/5 border border-white/5">
+              <span class="text-[8px] uppercase tracking-wider block font-bold" style="color: var(--text-secondary)">Prazo</span>
+              <span id="bannerDiasRestantes" class="font-black text-white text-xs sm:text-sm">-- dias</span>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- NOVO WIDGET: RÉPLICA DO PAINEL DIGITAL VW (8 BARRAS) -->
-      <div class="vw-cluster-container p-5 text-white">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-white/10">
+      <!-- RÉPLICA DO PAINEL DIGITAL VW (8 BARRAS) -->
+      <div class="vw-cluster-container p-4 sm:p-5 text-white">
+        <div class="flex items-center justify-between pb-3 border-b border-white/10">
           <div>
             <div class="flex items-center space-x-2">
-              <span class="text-xs uppercase font-extrabold tracking-widest text-slate-400">Medidor de Nível de Combustível</span>
-              <span class="text-[9px] px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 font-num font-bold">Painel Digital</span>
+              <span class="text-[10px] sm:text-xs uppercase font-extrabold tracking-widest text-slate-400">Nível do Tanque</span>
+              <span class="text-[8px] sm:text-[9px] px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 font-num font-bold">VW Cluster</span>
             </div>
-            <p class="text-xs text-slate-300 font-num mt-1">
-              Volume no Tanque: <b id="clusterLitrosTexto" class="text-white text-sm">-- L</b> 
-              (<span id="clusterPercentualTexto" class="text-cyan-400">--%</span>) • 
-              Autonomia Est.: <b id="clusterAutonomiaTexto" class="text-emerald-400 text-sm">~-- km</b>
+            <p class="text-[11px] sm:text-xs text-slate-300 font-num mt-0.5">
+              Volume: <b id="clusterLitrosTexto" class="text-white">-- L</b> (<span id="clusterPercentualTexto" class="text-cyan-400">--%</span>) • Autonomia: <b id="clusterAutonomiaTexto" class="text-emerald-400">~-- km</b>
             </p>
           </div>
           
-          <button onclick="abrirAjusteRapidoTanque()" class="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-bold font-num border border-white/15 transition-all flex items-center justify-center space-x-1 self-start sm:self-auto">
-            <span>⚙️</span>
-            <span>Calibrar Nível com Painel</span>
+          <button onclick="abrirAjusteRapidoTanque()" class="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-[10px] font-bold font-num border border-white/15 transition-all">
+            Calibrar
           </button>
         </div>
 
-        <!-- Réplica Exata dos 8 Traços da Foto -->
-        <div class="max-w-md mx-auto pt-5 pb-2">
-          
-          <!-- As 8 barras de LED horizontais -->
-          <div class="flex items-center gap-1.5 px-2">
-            <div class="vw-dash-segment" id="seg1" onclick="definirBarraTanque(1)" title="1/8 (Reserva Crítica)"></div>
-            <div class="vw-dash-segment" id="seg2" onclick="definirBarraTanque(2)" title="2/8 (1/4 de tanque)"></div>
+        <!-- 8 Traços da Foto -->
+        <div class="max-w-md mx-auto pt-4 pb-1">
+          <div class="flex items-center gap-1 sm:gap-1.5 px-1">
+            <div class="vw-dash-segment" id="seg1" onclick="definirBarraTanque(1)" title="1/8 (Reserva)"></div>
+            <div class="vw-dash-segment" id="seg2" onclick="definirBarraTanque(2)" title="2/8"></div>
             <div class="vw-dash-segment" id="seg3" onclick="definirBarraTanque(3)" title="3/8"></div>
-            <div class="vw-dash-segment" id="seg4" onclick="definirBarraTanque(4)" title="4/8 (Meio tanque - 1/2)"></div>
+            <div class="vw-dash-segment" id="seg4" onclick="definirBarraTanque(4)" title="4/8 (Meio tanque)"></div>
             <div class="vw-dash-segment" id="seg5" onclick="definirBarraTanque(5)" title="5/8"></div>
-            <div class="vw-dash-segment" id="seg6" onclick="definirBarraTanque(6)" title="6/8 (3/4 de tanque)"></div>
+            <div class="vw-dash-segment" id="seg6" onclick="definirBarraTanque(6)" title="6/8"></div>
             <div class="vw-dash-segment" id="seg7" onclick="definirBarraTanque(7)" title="7/8"></div>
-            <div class="vw-dash-segment" id="seg8" onclick="definirBarraTanque(8)" title="8/8 (Tanque Cheio - 1/1)"></div>
+            <div class="vw-dash-segment" id="seg8" onclick="definirBarraTanque(8)" title="8/8 (Cheio)"></div>
           </div>
 
-          <!-- Escala Numérica Idêntica à Foto: 0, |, 1/2, |, 1 + Bomba -->
-          <div class="flex items-center justify-between text-xs font-num font-extrabold text-white px-2 mt-2">
-            <span class="w-4 text-center">0</span>
-            <span class="w-4 text-center text-slate-400 font-light">|</span>
-            <span class="w-8 text-center">1/2</span>
-            <span class="w-4 text-center text-slate-400 font-light">|</span>
-            <div class="flex items-center space-x-1.5 pr-1">
-              <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
+          <div class="flex items-center justify-between text-[11px] sm:text-xs font-num font-extrabold text-white px-1 mt-2">
+            <span class="w-3 text-center">0</span>
+            <span class="w-3 text-center text-slate-400 font-light">|</span>
+            <span class="w-6 text-center">1/2</span>
+            <span class="w-3 text-center text-slate-400 font-light">|</span>
+            <div class="flex items-center space-x-1">
+              <svg class="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M19 5h-1V4a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1v16H4v2h16v-2h-1V7a2 2 0 0 1 2-2V4a1 1 0 0 0-2-1zm-4 4H9V5h6v4zm4 0h-2V7h2v2z"/>
               </svg>
-              <span class="text-[9px] text-white">▶</span>
+              <span class="text-[8px] text-white">▶</span>
               <span>1</span>
             </div>
           </div>
-          
-          <p class="text-center text-[10px] text-slate-400 font-num mt-3">
-            *Clique sobre a barra correspondente para igualar ao visor do carro.
-          </p>
         </div>
       </div>
 
-      <!-- KPI HUD -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <!-- KPI HUD Compacto -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
         
-        <div class="titanium-glass p-5 relative overflow-hidden">
+        <div class="titanium-glass p-3.5 sm:p-5 relative overflow-hidden">
           <div class="flex justify-between items-start">
-            <span class="text-[10px] font-bold tracking-[0.2em] uppercase" style="color: var(--text-secondary)">Consumo Real Médio</span>
-            <span id="kpiBadgeTanque" class="text-[9px] font-num px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-bold border border-emerald-500/20">50L REF</span>
+            <span class="text-[9px] sm:text-[10px] font-bold tracking-wider uppercase" style="color: var(--text-secondary)">Média Real</span>
+            <span id="kpiBadgeTanque" class="text-[8px] font-num px-1 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-bold border border-emerald-500/20">50L</span>
           </div>
-          <div class="mt-3 flex items-baseline space-x-1.5">
-            <h2 id="kpiKmL" class="text-3xl font-extrabold tracking-tight font-num text-emerald-400">0.0</h2>
-            <span class="text-xs font-semibold" style="color: var(--text-secondary)">km/l</span>
+          <div class="mt-2 sm:mt-3 flex items-baseline space-x-1">
+            <h2 id="kpiKmL" class="text-2xl sm:text-3xl font-extrabold tracking-tight font-num text-emerald-400">0.0</h2>
+            <span class="text-[11px] font-semibold" style="color: var(--text-secondary)">km/l</span>
           </div>
-          <div class="mt-2.5 pt-2.5 flex justify-between text-[11px] font-num" style="border-top: 1px solid var(--kpi-border)">
-            <span style="color: var(--text-secondary)">Taxa 100km:</span>
-            <span id="kpiL100" class="font-bold">0.0 L</span>
-          </div>
+          <p id="kpiL100" class="text-[10px] font-num mt-1 font-bold" style="color: var(--text-secondary)">0.0 L/100km</p>
         </div>
 
-        <div class="titanium-glass p-5 relative overflow-hidden">
-          <div class="flex justify-between items-start">
-            <span class="text-[10px] font-bold tracking-[0.2em] uppercase" style="color: var(--text-secondary)">Odômetro Atual</span>
+        <div class="titanium-glass p-3.5 sm:p-5 relative overflow-hidden">
+          <span class="text-[9px] sm:text-[10px] font-bold tracking-wider uppercase block" style="color: var(--text-secondary)">Odômetro</span>
+          <div class="mt-2 sm:mt-3 flex items-baseline space-x-1">
+            <h2 id="kpiOdometroTotal" class="text-2xl sm:text-3xl font-extrabold tracking-tight font-num">0</h2>
+            <span class="text-[11px] font-semibold" style="color: var(--text-secondary)">km</span>
           </div>
-          <div class="mt-3 flex items-baseline space-x-1.5">
-            <h2 id="kpiOdometroTotal" class="text-3xl font-extrabold tracking-tight font-num">0</h2>
-            <span class="text-xs font-semibold" style="color: var(--text-secondary)">km</span>
-          </div>
-          <div class="mt-2.5 pt-2.5 flex justify-between text-[11px] font-num" style="border-top: 1px solid var(--kpi-border)">
-            <span style="color: var(--text-secondary)">Total no contrato:</span>
-            <span id="kpiKmContrato" class="font-bold text-emerald-400">0 km</span>
-          </div>
+          <p id="kpiKmContrato" class="text-[10px] font-num mt-1 text-emerald-400 font-bold">0 km no contrato</p>
         </div>
 
-        <div class="titanium-glass p-5 relative overflow-hidden">
-          <div class="flex justify-between items-start">
-            <span class="text-[10px] font-bold tracking-[0.2em] uppercase" style="color: var(--text-secondary)">Gasto Combustível</span>
+        <div class="titanium-glass p-3.5 sm:p-5 relative overflow-hidden">
+          <span class="text-[9px] sm:text-[10px] font-bold tracking-wider uppercase block" style="color: var(--text-secondary)">Gasto no Mês</span>
+          <div class="mt-2 sm:mt-3 flex items-baseline space-x-1">
+            <span class="text-xs font-light" style="color: var(--text-secondary)">R$</span>
+            <h2 id="kpiGastoMes" class="text-2xl sm:text-3xl font-extrabold tracking-tight font-num">0,00</h2>
           </div>
-          <div class="mt-3 flex items-baseline space-x-1.5">
-            <span class="text-sm font-light" style="color: var(--text-secondary)">R$</span>
-            <h2 id="kpiGastoMes" class="text-3xl font-extrabold tracking-tight font-num">0,00</h2>
-          </div>
-          <div class="mt-2.5 pt-2.5 flex justify-between text-[11px] font-num" style="border-top: 1px solid var(--kpi-border)">
-            <span style="color: var(--text-secondary)">Semana:</span>
-            <span id="kpiGastoSemana" class="font-bold">R$ 0,00</span>
-          </div>
+          <p id="kpiGastoSemana" class="text-[10px] font-num mt-1" style="color: var(--text-secondary)">Semana: R$ 0,00</p>
         </div>
 
-        <div class="titanium-glass p-5 relative overflow-hidden">
-          <div class="flex justify-between items-start">
-            <span class="text-[10px] font-bold tracking-[0.2em] uppercase" style="color: var(--text-secondary)">Custo por KM</span>
+        <div class="titanium-glass p-3.5 sm:p-5 relative overflow-hidden">
+          <span class="text-[9px] sm:text-[10px] font-bold tracking-wider uppercase block" style="color: var(--text-secondary)">Custo / KM</span>
+          <div class="mt-2 sm:mt-3 flex items-baseline space-x-1">
+            <span class="text-xs font-light" style="color: var(--text-secondary)">R$</span>
+            <h2 id="kpiCustoKm" class="text-2xl sm:text-3xl font-extrabold tracking-tight font-num">0,00</h2>
           </div>
-          <div class="mt-3 flex items-baseline space-x-1.5">
-            <span class="text-sm font-light" style="color: var(--text-secondary)">R$</span>
-            <h2 id="kpiCustoKm" class="text-3xl font-extrabold tracking-tight font-num">0,00</h2>
-          </div>
-          <div class="mt-2.5 pt-2.5 flex justify-between text-[11px] font-num" style="border-top: 1px solid var(--kpi-border)">
-            <span style="color: var(--text-secondary)">Autonomia estimada:</span>
-            <span id="kpiAutonomia" class="font-bold text-cyan-400">~0 km</span>
-          </div>
+          <p id="kpiAutonomia" class="text-[10px] font-num mt-1 text-cyan-400 font-bold">~0 km restantes</p>
         </div>
       </div>
 
       <!-- Formulário de Registro -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
         
-        <div class="lg:col-span-7 titanium-glass p-6">
-          <div class="flex items-center justify-between pb-4" style="border-bottom: 1px solid var(--header-border)">
-            <div class="flex p-1 rounded-lg bg-black/10 dark:bg-white/5 border border-white/5 text-xs font-bold">
-              <button type="button" id="tabAbastecer" onclick="setFormMode('abastecer')" class="px-3 py-1.5 rounded transition-all bg-white text-slate-900 shadow-sm font-bold dark:bg-white dark:text-black">
-                ⛽ Abastecimento
+        <div class="lg:col-span-7 titanium-glass p-4 sm:p-6">
+          <div class="flex items-center justify-between pb-3 sm:pb-4 border-b" style="border-color: var(--header-border)">
+            <div class="flex p-0.5 rounded-lg bg-black/10 dark:bg-white/5 border border-white/5 text-[11px] font-bold">
+              <button type="button" id="tabAbastecer" onclick="setFormMode('abastecer')" class="px-2.5 sm:px-3 py-1 rounded transition-all bg-white text-slate-900 shadow-sm font-bold dark:bg-white dark:text-black">
+                ⛽ Abastecer
               </button>
-              <button type="button" id="tabCheckin" onclick="setFormMode('checkin')" class="px-3 py-1.5 rounded transition-all text-slate-500 hover:text-current font-bold">
+              <button type="button" id="tabCheckin" onclick="setFormMode('checkin')" class="px-2.5 sm:px-3 py-1 rounded transition-all text-slate-500 hover:text-current font-bold">
                 📍 KM Diário
               </button>
             </div>
-            <span id="lastOdoBadge" class="text-[10px] font-num px-2 py-1 rounded bg-black/5 dark:bg-white/5 border border-white/10" style="color: var(--text-secondary)">
-              Último Registro: --
+            <span id="lastOdoBadge" class="text-[9px] font-num px-2 py-0.5 rounded bg-black/5 dark:bg-white/5 border border-white/10" style="color: var(--text-secondary)">
+              Último: --
             </span>
           </div>
 
-          <form id="registroForm" class="mt-5 space-y-4" onsubmit="handleSalvarRegistro(event)">
+          <form id="registroForm" class="mt-4 space-y-3 sm:space-y-4" onsubmit="handleSalvarRegistro(event)">
             <div>
               <label class="block text-[10px] font-bold uppercase tracking-wider mb-1" style="color: var(--text-secondary)">
-                Odômetro Atual (KM Total do Carro)
+                Odômetro Atual (KM Total)
               </label>
-              <input type="number" id="inOdo" required step="1" placeholder="Ex: 52140" class="titanium-input w-full px-3.5 py-2.5 rounded-lg text-sm font-num font-bold">
+              <input type="number" id="inOdo" required step="1" placeholder="Ex: 52140" class="titanium-input w-full px-3 py-2 rounded-lg text-sm font-num font-bold">
             </div>
 
-            <!-- Seção de Abastecimento -->
-            <div id="secaoAbastecimento" class="space-y-4">
-              
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div id="secaoAbastecimento" class="space-y-3">
+              <div class="grid grid-cols-2 gap-2.5 sm:gap-4">
                 <div>
                   <label class="block text-[10px] font-bold uppercase tracking-wider mb-1" style="color: var(--text-secondary)">Combustível</label>
-                  <select id="inCombustivel" class="titanium-input w-full px-3.5 py-2.5 rounded-lg text-xs font-semibold">
+                  <select id="inCombustivel" class="titanium-input w-full px-2.5 py-2 rounded-lg text-xs font-semibold">
                     <option value="Gasolina">Gasolina</option>
                     <option value="Etanol">Etanol</option>
                   </select>
                 </div>
 
                 <div>
-                  <label class="block text-[10px] font-bold uppercase tracking-wider mb-1" style="color: var(--text-secondary)">Preço do Litro (R$)</label>
-                  <input type="number" id="inPrecoLitro" step="0.001" placeholder="Ex: 5.89" class="titanium-input w-full px-3.5 py-2.5 rounded-lg text-sm font-num font-bold">
+                  <label class="block text-[10px] font-bold uppercase tracking-wider mb-1" style="color: var(--text-secondary)">Preço Litro (R$)</label>
+                  <input type="number" id="inPrecoLitro" step="0.001" placeholder="Ex: 5.89" class="titanium-input w-full px-2.5 py-2 rounded-lg text-xs sm:text-sm font-num font-bold">
                 </div>
 
                 <div>
-                  <label class="block text-[10px] font-bold uppercase tracking-wider mb-1" style="color: var(--text-secondary)">Litros Abastecidos</label>
-                  <input type="number" id="inLitros" step="0.01" placeholder="Ex: 20.00" class="titanium-input w-full px-3.5 py-2.5 rounded-lg text-sm font-num font-bold">
+                  <label class="block text-[10px] font-bold uppercase tracking-wider mb-1" style="color: var(--text-secondary)">Litros</label>
+                  <input type="number" id="inLitros" step="0.01" placeholder="Ex: 20.00" class="titanium-input w-full px-2.5 py-2 rounded-lg text-xs sm:text-sm font-num font-bold">
                 </div>
 
                 <div>
                   <div class="flex justify-between items-center mb-1">
-                    <label class="text-[10px] font-bold uppercase tracking-wider" style="color: var(--text-secondary)">Valor Pago (R$)</label>
-                    <span class="text-[8px] uppercase font-bold text-emerald-500 font-num">Auto ou Manual</span>
+                    <label class="text-[10px] font-bold uppercase tracking-wider" style="color: var(--text-secondary)">Total (R$)</label>
+                    <span class="text-[8px] font-bold text-emerald-500 font-num">Auto</span>
                   </div>
-                  <input type="number" id="inValor" step="0.01" placeholder="Ex: 117.80" class="titanium-input w-full px-3.5 py-2.5 rounded-lg text-sm font-num font-bold">
+                  <input type="number" id="inValor" step="0.01" placeholder="Ex: 117.80" class="titanium-input w-full px-2.5 py-2 rounded-lg text-xs sm:text-sm font-num font-bold">
                 </div>
               </div>
 
               <!-- Live Feedback -->
-              <div class="grid grid-cols-3 gap-2 p-3 rounded-lg border text-center" style="background: var(--input-bg); border-color: var(--input-border)">
+              <div class="grid grid-cols-3 gap-1.5 p-2.5 rounded-lg border text-center" style="background: var(--input-bg); border-color: var(--input-border)">
                 <div>
-                  <span class="text-[8px] uppercase tracking-wider block font-bold" style="color: var(--text-secondary)">Distância no Trecho</span>
-                  <span id="prevDeltaKm" class="text-xs font-bold mt-0
+                  <span class="text-[8px] uppercase tracking-wider block font-bold" style="color: var(--text-secondary)">Trecho</span>
+                  <span id="prevDeltaKm" class="text-xs font-bold mt-0.5 block font-num">0 km</span>
+                </div>
+                <div>
+                  <span class="text-[8px] uppercase tracking-wider block font-bold" style="color: var(--text-secondary)">R$/Litro</span>
+                  <span id="prevPrecoReal" class="text-xs font-bold mt-0.5 block font-num">R$ 0,00</span>
+                </div>
+                <div>
+                  <span class="text-[8px] uppercase tracking-wider block font-bold" style="color: var(--text-secondary)">Média Est.</span>
+                  <span id="prevKmL" class="text-xs font-bold text-emerald-400 mt-0.5 block font-num">0.0 km/l</span>
+                </div>
+              </div>
+            </div>
+
+            <div id="secaoCheckinInfo" class="hidden p-3 rounded-lg border text-center" style="background: var(--input-bg); border-color: var(--input-border)">
+              <span class="text-[9px] uppercase tracking-wider block font-bold" style="color: var(--text-secondary)">Distância Percorrida no Trecho</span>
+              <span id="prevDeltaKmCheckin" class="text-lg font-black text-emerald-500 mt-0.5 block font-num">0 km</span>
+            </div>
+
+            <button type="submit" id="btnSalvar" class="w-full py-3 rounded-lg font-extrabold text-xs tracking-wide transition-all shadow-md flex items-center justify-center space-x-2" style="background: var(--text-primary); color: var(--bg-canvas);">
+              <span id="btnSalvarTexto">Salvar Abastecimento</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Calculadora Flex -->
+        <div class="lg:col-span-5 titanium-glass p-4 sm:p-6 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between pb-3 border-b" style="border-color: var(--header-border)">
+              <h2 class="text-sm sm:text-base font-bold tracking-tight">Decisor Flex (Bomba)</h2>
+              <span class="text-[8px] font-num font-bold px-1.5 py-0.5 rounded bg-white/10 border border-white/5">70% RATIO</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2.5 mt-3 sm:mt-4">
+              <div>
+                <label class="block text-[9px] font-bold uppercase tracking-wider mb-1" style="color: var(--text-secondary)">Gasolina (R$)</label>
+                <input type="number" id="calcGas" step="0.01" placeholder="5.99" oninput="runFlexEngine()" class="titanium-input w-full px-2.5 py-2 rounded-lg text-xs font-num font-bold">
+              </div>
+              <div>
+                <label class="block text-[9px] font-bold uppercase tracking-wider mb-1" style="color: var(--text-secondary)">Etanol (R$)</label>
+                <input type="number" id="calcEta" step="0.01" placeholder="3.89" oninput="runFlexEngine()" class="titanium-input w-full px-2.5 py-2 rounded-lg text-xs font-num font-bold">
+              </div>
+            </div>
+
+            <div id="flexVerdictBox" class="mt-3 p-3.5 rounded-xl border text-center transition-all" style="background: var(--input-bg); border-color: var(--input-border)">
+              <span class="text-[8px] uppercase tracking-wider font-semibold block mb-0.5" style="color: var(--text-secondary)">Recomendação</span>
+              <h3 id="flexVerdict" class="text-base sm:text-lg font-extrabold font-num tracking-tight" style="color: var(--text-secondary)">--</h3>
+              <p id="flexRatio" class="text-[9px] font-num mt-1" style="color: var(--text-secondary)">Paridade: --</p>
+            </div>
+          </div>
+          <p class="text-[8px] text-center mt-3" style="color: var(--text-secondary)">*Relação de paridade em 0.70x.</p>
+        </div>
+
+      </div>
+
+      <!-- Telemetria Gráfica -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
+        <div class="lg:col-span-8 titanium-glass p-4 sm:p-6">
+          <h3 class="text-xs sm:text-sm font-bold tracking-tight mb-3">Desembolso Financeiro & KM</h3>
+          <div class="h-48 sm:h-60"><canvas id="chartEvolucao"></canvas></div>
+        </div>
+        <div class="lg:col-span-4 titanium-glass p-4 sm:p-6">
+          <h3 class="text-xs sm:text-sm font-bold tracking-tight mb-3">Gasto por Combustível</h3>
+          <div class="h-48 sm:h-60 flex items-center justify-center"><canvas id="chartMix"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Histórico: Adaptativo Mobile (Cards no celular / Tabela no Desktop) -->
+      <div class="titanium-glass overflow-hidden">
+        <div class="p-3.5 sm:p-5 flex items-center justify-between border-b" style="border-color: var(--header-border)">
+          <div>
+            <h3 class="text-xs sm:text-sm font-bold tracking-tight">Histórico de Lançamentos</h3>
+            <p class="text-[9px] sm:text-[10px]" style="color: var(--text-secondary)">Abastecimentos e medições diárias.</p>
+          </div>
+          <button onclick="carregarDadosDaNuvem()" class="px-2.5 py-1 rounded-lg border text-[9px] font-bold font-num" style="border-color: var(--input-border); background: var(--input-bg)">
+            Atualizar
+          </button>
+        </div>
+
+        <!-- 1. Visão Mobile (Lista de Cards - Sem barra de rolagem horizontal) -->
+        <div id="listaHistoricoMobile" class="divide-y block sm:hidden font-num text-xs" style="border-color: var(--kpi-border)">
+          <div class="text-center py-6 text-slate-500 text-[11px]">Carregando histórico...</div>
+        </div>
+
+        <!-- 2. Visão Desktop (Tabela Executiva Completa) -->
+        <div class="hidden sm:block overflow-x-auto">
+          <table class="w-full text-left text-[11px] font-num">
+            <thead>
+              <tr class="uppercase tracking-wider text-[9px]" style="border-bottom: 1px solid var(--header-border); background: var(--input-bg); color: var(--text-secondary)">
+                <th class="py-3 px-4">Data</th>
+                <th class="py-3 px-4">Odômetro</th>
+                <th class="py-3 px-4">Delta KM</th>
+                <th class="py-3 px-4">Tipo</th>
+                <th class="py-3 px-4">Litros</th>
+                <th class="py-3 px-4">Total</th>
+                <th class="py-3 px-4">KM/L</th>
+                <th class="py-3 px-4">L/100km</th>
+                <th class="py-3 px-4 text-center">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tabelaLogs" class="divide-y font-medium" style="border-color: var(--kpi-border)">
+              <tr><td colspan="9" class="text-center py-8" style="color: var(--text-secondary)">Conectando...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- =
