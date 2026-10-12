@@ -28,7 +28,7 @@
       --input-border: rgba(255, 255, 255, 0.08);
       --text-primary: #FFFFFF;
       --text-secondary: #94A3B8;
-      --header-bg: rgba(7, 9, 14, 0.85);
+      --header-bg: rgba(7, 9, 14, 0.88);
       --header-border: rgba(255, 255, 255, 0.08);
       --kpi-border: rgba(255, 255, 255, 0.06);
     }
@@ -43,7 +43,7 @@
       --input-border: rgba(0, 0, 0, 0.12);
       --text-primary: #0F172A;
       --text-secondary: #64748B;
-      --header-bg: rgba(248, 250, 252, 0.90);
+      --header-bg: rgba(248, 250, 252, 0.92);
       --header-border: rgba(0, 0, 0, 0.08);
       --kpi-border: rgba(0, 0, 0, 0.06);
     }
@@ -77,10 +77,11 @@
       border: 1px solid var(--input-border);
       color: var(--text-primary);
       transition: all 0.2s ease;
+      font-size: 16px; /* Evita zoom automático no iOS */
     }
     .titanium-input:focus {
       outline: none;
-      border-color: rgba(255, 255, 255, 0.3);
+      border-color: rgba(255, 255, 255, 0.35);
       box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.05);
     }
 
@@ -100,12 +101,12 @@
       left: 10%;
       right: 10%;
       height: 2px;
-      background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.5), transparent);
+      background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.6), transparent);
     }
 
     .vw-dash-segment {
       flex: 1;
-      height: 7px;
+      height: 8px;
       border-radius: 2px;
       background: rgba(255, 255, 255, 0.12);
       transition: all 0.2s ease;
@@ -126,7 +127,7 @@
 </head>
 <body class="min-h-screen relative selection:bg-slate-500/20">
 
-  <!-- Header Fluido (Mobile & Desktop) -->
+  <!-- Header Mobile-First Fluido -->
   <header style="background: var(--header-bg); border-bottom: 1px solid var(--header-border);" class="sticky top-0 z-30 backdrop-blur-xl transition-colors duration-300">
     <div class="max-w-7xl mx-auto px-3 sm:px-6 h-14 sm:h-16 flex items-center justify-between">
       
@@ -163,14 +164,13 @@
         </button>
       </div>
 
-      <!-- Ações do Topo -->
+      <!-- Ações do Topo: Sync & Ajustes -->
       <div class="flex items-center space-x-2">
-        <button id="syncBadge" onclick="carregarDadosDaNuvem()" title="Clique para sincronizar com a planilha" class="h-9 px-3 rounded-xl titanium-glass hover:border-emerald-500/40 flex items-center space-x-2 text-xs font-num cursor-pointer transition-all">
+        <button id="syncBadge" onclick="carregarDadosDaNuvem()" title="Sincronizar com Planilha" class="h-9 px-3 rounded-xl titanium-glass hover:border-emerald-500/40 flex items-center space-x-2 text-xs font-num cursor-pointer transition-all">
           <span class="w-2 h-2 rounded-full bg-slate-400 animate-pulse" id="syncDot"></span>
           <span id="syncText" class="font-bold text-[11px]">Sync</span>
         </button>
 
-        <!-- Botão de Ajustes com Área de Toque Grande -->
         <button onclick="abrirModalConfig()" title="Preferências e Ajustes da API" class="h-9 px-3 rounded-xl titanium-glass hover:opacity-80 flex items-center space-x-1.5 text-xs font-bold cursor-pointer">
           <span>⚙️</span>
           <span class="text-[11px] font-medium">Ajustes</span>
@@ -181,10 +181,10 @@
     <!-- Navegação Segmentada Mobile (Sem rolagem horizontal) -->
     <div class="px-3 pb-2.5 sm:hidden">
       <div class="titanium-glass p-1 rounded-xl flex items-center text-xs font-bold w-full">
-        <button onclick="navegarAba('cockpit')" id="navCockpitMobile" class="flex-1 py-1.5 rounded-lg transition-all text-center bg-white text-slate-900 shadow-sm dark:bg-white dark:text-black">
+        <button onclick="navegarAba('cockpit')" id="navCockpitMobile" class="flex-1 py-1.5 rounded-lg transition-all text-center bg-white text-slate-900 shadow-sm dark:bg-white dark:text-black font-bold">
           📊 Cockpit
         </button>
-        <button onclick="navegarAba('aluguel')" id="navAluguelMobile" class="flex-1 py-1.5 rounded-lg transition-all text-center text-slate-400 hover:text-current">
+        <button onclick="navegarAba('aluguel')" id="navAluguelMobile" class="flex-1 py-1.5 rounded-lg transition-all text-center text-slate-400 hover:text-current font-bold">
           🚘 Aluguel
         </button>
       </div>
@@ -274,13 +274,4 @@
       </div>
 
       <!-- KPI HUD Compacto -->
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
-        
-        <div class="titanium-glass p-3.5 sm:p-5 relative overflow-hidden">
-          <div class="flex justify-between items-start">
-            <span class="text-[9px] sm:text-[10px] font-bold tracking-wider uppercase" style="color: var(--text-secondary)">Média Real</span>
-            <span id="kpiBadgeTanque" class="text-[8px] font-num px-1 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-bold border border-emerald-500/20">50L</span>
-          </div>
-          <div class="mt-2 sm:mt-3 flex items-baseline space-x-1">
-            <h2 id="kpiKmL" class="text-2xl sm:text-3xl font-extrabold tracking-tight font-num text-emerald-400">0.0</h2>
-            <span class="text-[11px] font-semibold" style="
+      
