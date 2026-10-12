@@ -751,7 +751,7 @@
         return;
       }
 
-      bBadge.innerText = `${contratoAluguel.carroNome}${contratoAluguel.carroPlaca ? '• ' + contratoAluguel.carroPlaca : ''}`;
+      bBadge.innerText = `${contratoAluguel.carroNome} ${contratoAluguel.carroPlaca ? '• ' + contratoAluguel.carroPlaca : ''}`;
       bNome.innerText = `Aluguel Ativo: ${contratoAluguel.carroNome} (${contratoAluguel.carroPlaca || 'Sem placa'})`;
 
       const odoAtual = telemetria.length > 0 ? Number(telemetria[0].Odometro) : contratoAluguel.odoInicial;
@@ -776,14 +776,18 @@
       const projecaoTotalKm = Math.round(kmRodadosNoContrato + (ritmoReal * diasRestantes));
 
       // Atualiza Banner Superior
-      bKmPorDia.innerText = `${cotaDisponivelPorDia} km/dia`;       bFranquia.innerText = `${saldoFranquia.toLocaleString('pt-BR')} km`;
+      bKmPorDia.innerText = `${cotaDisponivelPorDia} km/dia`;
+      bFranquia.innerText = `${saldoFranquia.toLocaleString('pt-BR')} km`;
       bFranquia.className = saldoFranquia >= 0 ? "font-black text-emerald-400 text-sm sm:text-base" : "font-black text-rose-500 text-sm sm:text-base";
-      bDias.innerText = `${diasRestantes} dias`;       bSub.innerText = `Retirada: ${contratoAluguel.odoInicial} km • Rodados: ${kmRodadosNoContrato} km • Saldo: ${saldoFranquia} km`;
+      bDias.innerText = `${diasRestantes} dias`;
+      bSub.innerText = `Retirada: ${contratoAluguel.odoInicial} km • Rodados: ${kmRodadosNoContrato} km • Saldo: ${saldoFranquia} km`;
 
       // Atualiza HUD da Aba de Aluguel
       document.getElementById('hudMetaDiaria').innerText = cotaDisponivelPorDia;
       document.getElementById('hudFranquiaRestante').innerText = saldoFranquia.toLocaleString('pt-BR');
-      document.getElementById('hudFranquiaTotal').innerText = `${contratoAluguel.franquiaKm.toLocaleString('pt-BR')} km`;       document.getElementById('hudRitmoReal').innerText = ritmoReal.toLocaleString('pt-BR');       document.getElementById('hudProjecaoTotal').innerText = `${projecaoTotalKm.toLocaleString('pt-BR')} km`;
+      document.getElementById('hudFranquiaTotal').innerText = `${contratoAluguel.franquiaKm.toLocaleString('pt-BR')} km`;
+      document.getElementById('hudRitmoReal').innerText = ritmoReal.toLocaleString('pt-BR');
+      document.getElementById('hudProjecaoTotal').innerText = `${projecaoTotalKm.toLocaleString('pt-BR')} km`;
       document.getElementById('hudDiasRestantes').innerText = diasRestantes;
       document.getElementById('hudDataFim').innerText = dataFim.toLocaleDateString('pt-BR');
 
@@ -801,11 +805,15 @@
 
       // Barra de Progresso
       const pctUso = Math.min(100, Math.round((kmRodadosNoContrato / contratoAluguel.franquiaKm) * 100));
-      document.getElementById('lblPercentualFranquia').innerText = `${pctUso}\% consumido`;       const bar = document.getElementById('barFranquiaProgress');       bar.style.width = `${pctUso}%`;
+      document.getElementById('lblPercentualFranquia').innerText = `${pctUso}% consumido`;
+      const bar = document.getElementById('barFranquiaProgress');
+      bar.style.width = `${pctUso}%`;
       bar.className = pctUso > 90 ? "h-full rounded-full transition-all bg-rose-500" : (pctUso > 75 ? "h-full rounded-full transition-all bg-amber-500" : "h-full rounded-full transition-all bg-emerald-500");
 
-      document.getElementById('lblOdoInicial').innerText = `${contratoAluguel.odoInicial} km`;       document.getElementById('lblOdoAtual').innerText = `${odoAtual} km`;
-      document.getElementById('lblOdoLimite').innerText = `${contratoAluguel.odoInicial + contratoAluguel.franquiaKm} km`;       document.getElementById('kpiKmContrato').innerText = `${kmRodadosNoContrato} km`;
+      document.getElementById('lblOdoInicial').innerText = `${contratoAluguel.odoInicial} km`;
+      document.getElementById('lblOdoAtual').innerText = `${odoAtual} km`;
+      document.getElementById('lblOdoLimite').innerText = `${contratoAluguel.odoInicial + contratoAluguel.franquiaKm} km`;
+      document.getElementById('kpiKmContrato').innerText = `${kmRodadosNoContrato} km`;
     }
 
     // --- FORM MODES ---
@@ -879,7 +887,13 @@
 
       const ultOdoGeral = telemetria.length > 0 ? Number(telemetria[0].Odometro) : (contratoAluguel.odoInicial || odo);
       const deltaDiario = odo > ultOdoGeral ? odo - ultOdoGeral : 0;
-      document.getElementById('prevDeltaKmCheckin').innerText = deltaDiario > 0 ? `+${deltaDiario} km` : '0 km';        // Distância no tanque: Calculada a partir do ÚLTIMO ABASTECIMENTO (mesmo havendo check-ins diários intermediários!)       const ultOdoAbast = getOdometroUltimoAbastecimento();       const deltaTanque = (odo > ultOdoAbast && ultOdoAbast > 0) ? (odo - ultOdoAbast) : 0;        document.getElementById('prevDeltaKm').innerText = isPrimeiroAbast ? "Início (Ponto Zero)" : (deltaTanque > 0 ? `+${deltaTanque} km` : '0 km');
+      document.getElementById('prevDeltaKmCheckin').innerText = deltaDiario > 0 ? `+${deltaDiario} km` : '0 km';
+
+      // Distância no tanque: Calculada a partir do ÚLTIMO ABASTECIMENTO (mesmo havendo check-ins diários intermediários!)
+      const ultOdoAbast = getOdometroUltimoAbastecimento();
+      const deltaTanque = (odo > ultOdoAbast && ultOdoAbast > 0) ? (odo - ultOdoAbast) : 0;
+
+      document.getElementById('prevDeltaKm').innerText = isPrimeiroAbast ? "Início (Ponto Zero)" : (deltaTanque > 0 ? `+${deltaTanque} km` : '0 km');
       
       const pReal = (lit > 0 && val > 0) ? (val / lit) : 0;
       document.getElementById('prevPrecoReal').innerText = `R$ ${pReal.toFixed(2)}`;
@@ -889,7 +903,22 @@
       } else if (deltaTanque > 0 && lit > 0) {
         // Consumo exato dos litros repostos!
         const mediaCiclo = (deltaTanque / lit).toFixed(2);
-        document.getElementById('prevKmL').innerText = `${mediaCiclo} km/l`;       } else {         document.getElementById('prevKmL').innerText = `0.0 km/l`;       }     }      // --- LEITURA & CÁLCULO PRECISO DO CONSUMO ACUMULADO ---     async function carregarDadosDaNuvem() {       if(!API_ENDPOINT) return;       const dot = document.getElementById('syncDot');       const text = document.getElementById('syncText');       dot.className = "w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping";       text.innerText = "Sync";        try {         const res = await fetch(`${API_ENDPOINT}?action=read`);
+        document.getElementById('prevKmL').innerText = `${mediaCiclo} km/l`;
+      } else {
+        document.getElementById('prevKmL').innerText = `0.0 km/l`;
+      }
+    }
+
+    // --- LEITURA & CÁLCULO PRECISO DO CONSUMO ACUMULADO ---
+    async function carregarDadosDaNuvem() {
+      if(!API_ENDPOINT) return;
+      const dot = document.getElementById('syncDot');
+      const text = document.getElementById('syncText');
+      dot.className = "w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping";
+      text.innerText = "Sync";
+
+      try {
+        const res = await fetch(`${API_ENDPOINT}?action=read`);
         const json = await res.json();
         telemetria = json.reverse(); // Mais recente primeiro
         renderDashboard();
@@ -909,4 +938,261 @@
       tbody.innerHTML = '';
 
       if (telemetria.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="9
+        tbody.innerHTML = `<tr><td colspan="9" class="text-center py-6 text-slate-500">Nenhum registro encontrado.</td></tr>`;
+        return;
+      }
+
+      const ultOdo = Number(telemetria[0].Odometro);
+      const ultOdoAbast = getOdometroUltimoAbastecimento();
+      document.getElementById('lastOdoBadge').innerText = `Último Abastecimento: ${ultOdoAbast.toLocaleString('pt-BR')} km`;
+      document.getElementById('kpiOdometroTotal').innerText = ultOdo.toLocaleString('pt-BR');
+
+      let tGasto = 0, gGas = 0, gEta = 0, gMes = 0, gSem = 0;
+      const hoje = new Date();
+
+      // ========================================================
+      // ALGORITMO DO TANQUE CHEIO (FULL-TO-FULL FUEL TRACKING)
+      // ========================================================
+      let kmValidosConsumo = 0;
+      let litrosValidosConsumo = 0;
+
+      // Percorre cronologicamente (do mais antigo ao mais novo) para calcular médias reais ciclo a ciclo
+      const cronologico = telemetria.slice().reverse();
+      let odoUltimoPontoAbastecimento = null;
+
+      cronologico.forEach((item) => {
+        const lit = Number(item.Litros) || 0;
+        const odo = Number(item.Odometro) || 0;
+
+        if (lit > 0) {
+          if (odoUltimoPontoAbastecimento !== null && odo > odoUltimoPontoAbastecimento) {
+            const deltaRealCiclo = odo - odoUltimoPontoAbastecimento;
+            kmValidosConsumo += deltaRealCiclo;
+            litrosValidosConsumo += lit; // Estes litros foram exatamente os queimados naquele trecho!
+          }
+          odoUltimoPontoAbastecimento = odo;
+        }
+      });
+
+      // Preenchimento da Tabela
+      telemetria.forEach((item, index) => {
+        const v = Number(item.Valor) || 0, l = Number(item.Litros) || 0, k = Number(item.KmRodado) || 0;
+        const d = new Date(item.Data);
+
+        tGasto += v;
+        if (l > 0) {
+          if (item.Combustivel === 'Etanol') gEta += v; else gGas += v;
+        }
+
+        if (d.getMonth() === hoje.getMonth() && d.getFullYear() === hoje.getFullYear()) gMes += v;
+        if ((hoje - d)/(1000*60*60*24) <= 7) gSem += v;
+
+        const isCheck = l === 0;
+        const colorClass = isCheck ? 'bg-slate-500/10 text-slate-400' : (item.Combustivel==='Etanol'?'bg-amber-500/10 text-amber-500':'bg-blue-500/10 text-blue-500');
+        
+        tbody.innerHTML += `
+          <tr style="border-bottom: 1px solid var(--kpi-border)">
+            <td class="py-3 px-4" style="color:var(--text-secondary)">${d.toLocaleDateString('pt-BR')}</td>
+            <td class="py-3 px-4 font-bold">${Number(item.Odometro).toLocaleString('pt-BR')}</td>
+            <td class="py-3 px-4 text-emerald-500 font-bold">+${k}</td>
+            <td class="py-3 px-4"><span class="px-2 py-0.5 rounded text-[8px] font-bold ${colorClass}">${isCheck ? 'KM Dia' : item.Combustivel}</span></td>
+            <td class="py-3 px-4">${isCheck ? '--' : l.toFixed(2)}</td>
+            <td class="py-3 px-4 font-bold">${isCheck ? '--' : 'R$ '+v.toFixed(2)}</td>
+            <td class="py-3 px-4 text-emerald-500 font-bold">${isCheck || Number(item.KmPorLitro) === 0 ? '--' : Number(item.KmPorLitro).toFixed(2)}</td>
+            <td class="py-3 px-4" style="color:var(--text-secondary)">${isCheck || Number(item.Litros100km) === 0 ? '--' : Number(item.Litros100km).toFixed(2)}</td>
+            <td class="py-3 px-4 text-center">
+              <div class="flex items-center justify-center space-x-1">
+                <button onclick="abrirModalEditar(${index})" title="Editar" class="p-1 rounded hover:bg-white/10 text-slate-400 hover:text-white transition-colors">✏️</button>
+                <button onclick="handleExcluirRegistro(${item._rowIndex})" title="Excluir" class="p-1 rounded hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 transition-colors">🗑️</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+
+      // MÉDIA REAL CONSOLIDADA (Sem a contaminação do tanque cheio inicial!)
+      const mKmL = litrosValidosConsumo > 0 ? (kmValidosConsumo / litrosValidosConsumo) : 0;
+      document.getElementById('kpiKmL').innerText = mKmL > 0 ? mKmL.toFixed(2) : "0.0";
+      document.getElementById('kpiL100').innerText = mKmL > 0 ? `${(100/mKmL).toFixed(2)} L` : '0.0 L';
+      
+      const custoKm = kmValidosConsumo > 0 ? (tGasto / kmValidosConsumo) : 0;
+      document.getElementById('kpiCustoKm').innerText = custoKm > 0 ? custoKm.toFixed(2) : "0,00";
+      document.getElementById('kpiAutonomia').innerText = mKmL > 0 ? `~${(mKmL*50).toFixed(0)} km` : "~0 km";
+      document.getElementById('kpiGastoMes').innerText = gMes.toFixed(2);
+      document.getElementById('kpiGastoSemana').innerText = `R$ ${gSem.toFixed(2)}`;
+
+      atualizarDadosGraficos(cronologico, gGas, gEta);
+    }
+
+    // --- SALVAR NOVO REGISTRO ---
+    async function handleSalvarRegistro(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnSalvar');
+      const bTxt = document.getElementById('btnSalvarTexto');
+      bTxt.innerText = "Gravando..."; btn.disabled = true;
+
+      const odo = Number(document.getElementById('inOdo').value);
+      const isPrimeiroAbast = document.getElementById('chkPrimeiroAbastecimento').checked;
+      
+      let lit = 0, val = 0, comb = "Check-in Diário", pL = 0, kL = 0, l100 = 0, cK = 0, kR = 0;
+
+      if (formModoAtual === 'abastecer') {
+        lit = Number(document.getElementById('inLitros').value) || 0;
+        val = Number(document.getElementById('inValor').value) || 0;
+        comb = document.getElementById('inCombustivel').value;
+        pL = lit > 0 ? (val / lit) : 0;
+
+        // Se for o 1º abastecimento (encher para iniciar monitoramento), o delta é 0
+        if (!isPrimeiroAbast) {
+          const ultOdoAbast = getOdometroUltimoAbastecimento();
+          kR = (odo > ultOdoAbast && ultOdoAbast > 0) ? (odo - ultOdoAbast) : 0;
+          kL = (kR > 0 && lit > 0) ? (kR / lit) : 0;
+          l100 = kL > 0 ? (100 / kL) : 0;
+          cK = kR > 0 ? (val / kR) : 0;
+        }
+      } else {
+        // Modo KM Diário
+        const ultOdoGeral = telemetria.length > 0 ? Number(telemetria[0].Odometro) : (contratoAluguel.odoInicial || odo);
+        kR = odo > ultOdoGeral ? odo - ultOdoGeral : 0;
+      }
+
+      const params = new URLSearchParams({
+        action: "create", data: new Date().toISOString(), odometro: odo, kmRodado: kR,
+        litros: lit, valor: val, combustivel: comb, kmPorLitro: kL.toFixed(2),
+        litros100km: l100.toFixed(2), custoPorKm: cK.toFixed(2), precoLitro: pL.toFixed(2)
+      });
+
+      try {
+        await fetch(`${API_ENDPOINT}?${params.toString()}`);
+        document.getElementById('registroForm').reset();
+        document.getElementById('chkPrimeiroAbastecimento').checked = false;
+        valorEditadoManualmente = false;
+        await carregarDadosDaNuvem();
+      } catch (err) { alert("Erro ao salvar."); }
+      finally { bTxt.innerText = formModoAtual === 'abastecer' ? "Salvar Abastecimento" : "Salvar KM Diário"; btn.disabled = false; }
+    }
+
+    // --- MODAL DE EDIÇÃO DIRETA ---
+    function abrirModalEditar(index) {
+      const item = telemetria[index];
+      if (!item) return;
+
+      document.getElementById('editRowIndex').value = item._rowIndex;
+      document.getElementById('editDataOriginal').value = item.Data;
+      document.getElementById('editOdo').value = item.Odometro;
+      document.getElementById('editComb').value = item.Combustivel || "Gasolina";
+      document.getElementById('editLitros').value = item.Litros || "";
+      document.getElementById('editValor').value = item.Valor || "";
+
+      document.getElementById('modalEditar').classList.remove('hidden');
+    }
+
+    function fecharModalEditar() {
+      document.getElementById('modalEditar').classList.add('hidden');
+    }
+
+    async function handleSalvarEdicao(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnSalvarEdit');
+      btn.innerText = "Salvando..."; btn.disabled = true;
+
+      const rowIndex = document.getElementById('editRowIndex').value;
+      const dataOriginal = document.getElementById('editDataOriginal').value;
+      const odo = Number(document.getElementById('editOdo').value);
+      const lit = Number(document.getElementById('editLitros').value) || 0;
+      const val = Number(document.getElementById('editValor').value) || 0;
+      const comb = document.getElementById('editComb').value;
+      const pL = lit > 0 ? (val / lit) : 0;
+
+      const params = new URLSearchParams({
+        action: "update",
+        rowIndex: rowIndex,
+        data: dataOriginal,
+        odometro: odo,
+        kmRodado: 0,
+        litros: lit,
+        valor: val,
+        combustivel: comb,
+        kmPorLitro: 0,
+        litros100km: 0,
+        custoPorKm: 0,
+        precoLitro: pL.toFixed(2)
+      });
+
+      try {
+        await fetch(`${API_ENDPOINT}?${params.toString()}`);
+        fecharModalEditar();
+        await carregarDadosDaNuvem();
+      } catch (err) {
+        alert("Erro ao editar o lançamento.");
+      } finally {
+        btn.innerText = "Salvar Correção";
+        btn.disabled = false;
+      }
+    }
+
+    async function handleExcluirRegistro(rowIndex) {
+      if (!confirm("Tem certeza que deseja apagar este lançamento?")) return;
+      try {
+        await fetch(`${API_ENDPOINT}?action=delete&rowIndex=${rowIndex}`);
+        await carregarDadosDaNuvem();
+      } catch (e) {
+        alert("Erro ao excluir.");
+      }
+    }
+
+    // --- DECISOR FLEX ---
+    function runFlexEngine() {
+      const g = Number(document.getElementById('calcGas').value), e = Number(document.getElementById('calcEta').value);
+      const bx = document.getElementById('flexVerdictBox'), vd = document.getElementById('flexVerdict'), rt = document.getElementById('flexRatio');
+      if (!g || !e) return;
+      const p = (e / g) * 100;
+      rt.innerText = `Paridade: ${p.toFixed(1)}%`;
+      if (p <= 70) {
+        bx.style.borderColor = 'rgba(16, 185, 129, 0.4)'; bx.style.background = 'rgba(16, 185, 129, 0.05)';
+        vd.className = "text-xl font-extrabold font-num tracking-tight text-emerald-500"; vd.innerText = "ETANOL";
+      } else {
+        bx.style.borderColor = 'rgba(59, 130, 246, 0.4)'; bx.style.background = 'rgba(59, 130, 246, 0.05)';
+        vd.className = "text-xl font-extrabold font-num tracking-tight text-blue-500"; vd.innerText = "GASOLINA";
+      }
+    }
+
+    // --- GRÁFICOS ---
+    function initCharts() {
+      Chart.defaults.font.family = 'JetBrains Mono'; Chart.defaults.font.size = 9;
+      const c1 = document.getElementById('chartEvolucao').getContext('2d');
+      chart1Instance = new Chart(c1, { type: 'line', data: {labels:[],datasets:[]}, options: { responsive:true, maintainAspectRatio:false, scales: { x:{grid:{display:false}}, y:{grid:{borderDash:[4,4]}} } } });
+      const c2 = document.getElementById('chartMix').getContext('2d');
+      chart2Instance = new Chart(c2, { type: 'doughnut', data: {labels:['Gasolina','Etanol'],datasets:[]}, options: { responsive:true, maintainAspectRatio:false, cutout:'75%' } });
+      atualizarCoresGraficosParaTema(document.documentElement.classList.contains('theme-dark'));
+    }
+
+    function atualizarCoresGraficosParaTema(isDark) {
+      const tc = isDark ? '#94A3B8' : '#64748B', gc = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+      [chart1Instance, chart2Instance].forEach(c => {
+        if (!c) return; c.options.plugins.legend.labels.color = tc;
+        if (c.options.scales?.x) { c.options.scales.x.ticks.color = tc; c.options.scales.y.ticks.color = tc; c.options.scales.y.grid.color = gc; }
+        c.update();
+      });
+    }
+
+    function atualizarDadosGraficos(dados, gGas, gEta) {
+      const lbls = dados.map(i => new Date(i.Data).toLocaleDateString('pt-BR'));
+      chart1Instance.data = { labels: lbls, datasets: [
+        { label: 'R$', data: dados.map(i=>Number(i.Valor)), borderColor: '#10B981', backgroundColor: 'rgba(16, 185, 129, 0.1)', fill: true, tension: 0.3 },
+        { label: 'KM', data: dados.map(i=>Number(i.KmRodado)), borderColor: '#64748B', borderDash: [4,4], tension: 0.3 }
+      ]}; chart1Instance.update();
+      chart2Instance.data = { labels: ['Gas','Eta'], datasets: [{ data: [gGas, gEta], backgroundColor: ['#3B82F6', '#F59E0B'], borderWidth: 0 }]}; chart2Instance.update();
+    }
+
+    // Inicialização Geral
+    window.addEventListener('DOMContentLoaded', () => { 
+      initTheme(); 
+      initCharts(); 
+      initFormEvents(); 
+      carregarFormularioAluguel();
+      carregarDadosDaNuvem(); 
+    });
+  </script>
+</body>
+</html>
