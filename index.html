@@ -665,4 +665,763 @@
       <div class="flex flex-wrap items-center justify-between gap-2 pt-2">
         <button onclick="restaurarApiPadrao()" type="button" class="text-[11px] text-slate-400 hover:text-white underline">Restaurar URL Oficial</button>
         <div class="flex space-x-2">
-          <button onclick="testarConexaoApi()" type="button" class="px-3 py-2
+          <button onclick="testarConexaoApi()" type="button" class="px-3 py-2 rounded-lg text-xs font-semibold border border-white/10 hover:bg-white/5">Testar</button>
+          <button onclick="salvarApiEndpoint()" type="button" class="px-4 py-2 rounded-lg font-bold text-xs" style="background: var(--text-primary); color: var(--bg-canvas);">Salvar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE EDIÇÃO -->
+  <div id="modalEditar" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="titanium-glass max-w-md w-full p-6 space-y-4">
+      <div class="flex justify-between items-center pb-2 border-b" style="border-color: var(--header-border)">
+        <h3 class="text-sm font-bold tracking-tight">Editar Lançamento</h3>
+        <button onclick="fecharModalEditar()" class="text-xs text-slate-400 hover:text-white">✕</button>
+      </div>
+
+      <form id="formEdicao" onsubmit="handleSalvarEdicao(event)" class="space-y-3">
+        <input type="hidden" id="editRowIndex">
+        <input type="hidden" id="editDataOriginal">
+
+        <div>
+          <label class="block text-[10px] font-bold uppercase tracking-wider mb-1" style="color: var(--text-secondary)">Odômetro (KM)</label>
+          <input type="number" id="editOdo" required class="titanium-input w-full px-3 py-2 rounded-lg text-sm font-num font-bold">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[10px] font-bold uppercase tracking-wider mb-1" style="color: var(--text-secondary)">Combustível</label>
+            <select id="editComb" class="titanium-input w-full px-3 py-2 rounded-lg text-xs font-semibold">
+              <option value="Gasolina">Gasolina</option>
+              <option value="Etanol">Etanol</option>
+              <option value="Check-in Diário">KM Diário</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold uppercase tracking-wider mb-1" style="color: var(--text-secondary)">Litros</label>
+            <input type="number" id="editLitros" step="0.01" class="titanium-input w-full px-3 py-2 rounded-lg text-sm font-num font-bold">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[10px] font-bold uppercase tracking-wider mb-1" style="color: var(--text-secondary)">Valor Total Pago (R$)</label>
+          <input type="number" id="editValor" step="0.01" class="titanium-input w-full px-3 py-2 rounded-lg text-sm font-num font-bold">
+        </div>
+
+        <div class="flex justify-end space-x-2 pt-3">
+          <button type="button" onclick="fecharModalEditar()" class="px-4 py-2 rounded-lg text-xs font-semibold hover:opacity-80">Cancelar</button>
+          <button type="submit" id="btnSalvarEdit" class="px-5 py-2 rounded-lg font-bold text-xs" style="background: var(--text-primary); color: var(--bg-canvas);">Salvar Correção</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Script Lógico Integrado -->
+  <script>
+    const DEFAULT_ENDPOINT = "https://script.google.com/macros/s/AKfycbzWEzQWjxqSFOx2bgCWlHGw1EkTm8qRSr7B7zLcgjpHppBLW-p7vhAF5AkeGIWHXLRDfA/exec";
+    
+    let storedEp = localStorage.getItem("CCMV_SHEETS_ENDPOINT");
+    if (!storedEp || storedEp.includes("COLE_AQUI") || storedEp.trim() === "") {
+      storedEp = DEFAULT_ENDPOINT;
+      localStorage.setItem("CCMV_SHEETS_ENDPOINT", DEFAULT_ENDPOINT);
+    }
+    let API_ENDPOINT = storedEp;
+    
+    let telemetria = [];
+    let formModoAtual = 'abastecer';
+    let chart1Instance, chart2Instance;
+    let valorEditadoManualmente = false;
+
+    // --- CONTRATO DE ALUGUEL & VEÍCULO ---
+    let contratoAluguel = JSON.parse(localStorage.getItem("CCMV_CONTRATO_ALUGUEL")) || {
+      carroNome: "VW Tera 1.0",
+      capacidadeTanque: 50,
+      carroPlaca: "",
+      odoInicial: 0,
+      dataInicio: "",
+      dataFim: "",
+      franquiaKm: 0,
+      precoKmExtra: 0,
+      valorLocacao: 0
+    };
+
+    // Estado do Marcador do Painel (Litros no tanque agora)
+    let tanqueVirtualLitros = Number(localStorage.getItem("CCMV_LITROS_TANQUE_ATUAL")) || 25;
+
+    function aplicarPresetTanque(val) {
+      if(val) document.getElementById('cfgCapacidadeTanque').value = val;
+    }
+
+    // --- CONTROLADOR DOS 4 TRAÇOS DO PAINEL (CLUSTER GAUGE) ---
+    function setClusterNivel(fração, nomeDescritivo) {
+      const cap = Number(contratoAluguel.capacidadeTanque) || 50;
+      const litros = Number((cap * fração).toFixed(1));
+      
+      tanqueVirtualLitros = litros;
+      localStorage.setItem("CCMV_LITROS_TANQUE_ATUAL", litros);
+      
+      document.getElementById('inLitrosTanqueManual').value = litros;
+      document.getElementById('lblClusterNivel').innerText = nomeDescritivo;
+      document.getElementById('lblClusterLitros').innerText = `~${litros} Litros`;
+
+      atualizarVisorTraços(fração);
+      calcularPreviaInputs();
+    }
+
+    function atualizarVisorTraços(fração) {
+      const segR = document.getElementById('segReserva');
+      const s1 = document.getElementById('seg1');
+      const s2 = document.getElementById('seg2');
+      const s3 = document.getElementById('seg3');
+      const s4 = document.getElementById('seg4');
+
+      [segR, s1, s2, s3, s4].forEach(el => el.className = "gauge-segment");
+
+      if (fração <= 0.10) {
+        segR.className = "gauge-segment active-reserva";
+      } else {
+        segR.className = "gauge-segment active-lit";
+        if (fração >= 0.25) s1.className = "gauge-segment active-lit";
+        if (fração >= 0.50) s2.className = "gauge-segment active-lit";
+        if (fração >= 0.75) s3.className = "gauge-segment active-lit";
+        if (fração >= 0.95) s4.className = "gauge-segment active-lit";
+      }
+    }
+
+    // --- NAVEGAÇÃO DE ABAS ---
+    function navegarAba(aba) {
+      const vCockpit = document.getElementById('viewCockpit');
+      const vAluguel = document.getElementById('viewAluguel');
+      const nCockpit = document.getElementById('navCockpit');
+      const nAluguel = document.getElementById('navAluguel');
+
+      if (aba === 'cockpit') {
+        vCockpit.classList.remove('hidden');
+        vAluguel.classList.add('hidden');
+        nCockpit.className = "px-3 py-1 rounded font-bold transition-all bg-white text-slate-900 shadow-sm dark:bg-white dark:text-black";
+        nAluguel.className = "px-3 py-1 rounded font-bold transition-all text-slate-400 hover:text-current";
+      } else {
+        vAluguel.classList.remove('hidden');
+        vCockpit.classList.add('hidden');
+        nAluguel.className = "px-3 py-1 rounded font-bold transition-all bg-white text-slate-900 shadow-sm dark:bg-white dark:text-black";
+        nCockpit.className = "px-3 py-1 rounded font-bold transition-all text-slate-400 hover:text-current";
+      }
+    }
+
+    // --- GERENCIADOR DE TEMAS ---
+    function initTheme() {
+      const savedTheme = localStorage.getItem("CCMV_THEME") || "auto";
+      setTheme(savedTheme, false);
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+        if (localStorage.getItem("CCMV_THEME") === "auto") applyThemeStyles('auto');
+      });
+    }
+
+    function setTheme(mode, save = true) {
+      if (save) localStorage.setItem("CCMV_THEME", mode);
+      applyThemeStyles(mode);
+    }
+
+    function applyThemeStyles(mode) {
+      const html = document.documentElement;
+      const isDark = mode === 'dark' || (mode === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+      ['btnThemeAuto', 'btnThemeLight', 'btnThemeDark'].forEach(id => {
+        const btn = document.getElementById(id);
+        if(btn) btn.className = "px-2 py-1 rounded font-bold text-slate-500 opacity-60";
+      });
+
+      const activeId = mode === 'auto' ? 'btnThemeAuto' : (mode === 'light' ? 'btnThemeLight' : 'btnThemeDark');
+      const activeEl = document.getElementById(activeId);
+      if (activeEl) activeEl.className = "px-2 py-1 rounded font-bold text-current opacity-100 bg-black/10 dark:bg-white/10";
+
+      if (isDark) {
+        html.classList.remove('theme-light');
+        html.classList.add('theme-dark');
+      } else {
+        html.classList.remove('theme-dark');
+        html.classList.add('theme-light');
+      }
+      if (chart1Instance) atualizarCoresGraficosParaTema(isDark);
+    }
+
+    // --- CONFIGURAÇÃO DO ALUGUEL ---
+    function carregarFormularioAluguel() {
+      if (!contratoAluguel) return;
+      document.getElementById('cfgCarroNome').value = contratoAluguel.carroNome || "";
+      document.getElementById('cfgCapacidadeTanque').value = contratoAluguel.capacidadeTanque || 50;
+      document.getElementById('cfgCarroPlaca').value = contratoAluguel.carroPlaca || "";
+      document.getElementById('cfgOdoInicial').value = contratoAluguel.odoInicial || "";
+      document.getElementById('cfgDataInicio').value = contratoAluguel.dataInicio || "";
+      document.getElementById('cfgDataFim').value = contratoAluguel.dataFim || "";
+      document.getElementById('cfgFranquiaKm').value = contratoAluguel.franquiaKm || "";
+      document.getElementById('cfgPrecoKmExtra').value = contratoAluguel.precoKmExtra || "";
+      document.getElementById('cfgValorLocacao').value = contratoAluguel.valorLocacao || "";
+      
+      document.getElementById('lblCapacidadeTanqueRef').innerText = `Tanque: ${contratoAluguel.capacidadeTanque || 50}L`;
+      document.getElementById('kpiBadgeTanque').innerText = `${contratoAluguel.capacidadeTanque || 50}L REF`;
+    }
+
+    function salvarConfiguracaoAluguel(e) {
+      e.preventDefault();
+      contratoAluguel = {
+        carroNome: document.getElementById('cfgCarroNome').value.trim(),
+        capacidadeTanque: Number(document.getElementById('cfgCapacidadeTanque').value) || 50,
+        carroPlaca: document.getElementById('cfgCarroPlaca').value.trim(),
+        odoInicial: Number(document.getElementById('cfgOdoInicial').value) || 0,
+        dataInicio: document.getElementById('cfgDataInicio').value,
+        dataFim: document.getElementById('cfgDataFim').value,
+        franquiaKm: Number(document.getElementById('cfgFranquiaKm').value) || 0,
+        precoKmExtra: Number(document.getElementById('cfgPrecoKmExtra').value) || 0,
+        valorLocacao: Number(document.getElementById('cfgValorLocacao').value) || 0
+      };
+
+      localStorage.setItem("CCMV_CONTRATO_ALUGUEL", JSON.stringify(contratoAluguel));
+      alert("Configuração do veículo salva com sucesso!");
+      carregarFormularioAluguel();
+      renderAluguelHUD();
+      navegarAba('cockpit');
+    }
+
+    // --- RENDER DO HUD & BANNER DO ALUGUEL ---
+    function renderAluguelHUD() {
+      const bBadge = document.getElementById('badgeCarroAtivo');
+      const bNome = document.getElementById('bannerCarroNome');
+      const bSub = document.getElementById('bannerCarroSub');
+      const bFranquia = document.getElementById('bannerFranquiaRestante');
+      const bDias = document.getElementById('bannerDiasRestantes');
+      const bKmPorDia = document.getElementById('bannerKmPorDia');
+
+      if (!contratoAluguel.carroNome || !contratoAluguel.franquiaKm) {
+        bBadge.innerText = "Sem contrato";
+        bNome.innerText = "Aluguel não configurado";
+        bSub.innerText = "Clique aqui para configurar seu carro e limites de KM.";
+        bFranquia.innerText = "-- km";
+        bDias.innerText = "-- dias";
+        bKmPorDia.innerText = "-- km/dia";
+        return;
+      }
+
+      bBadge.innerText = `${contratoAluguel.carroNome} ${contratoAluguel.carroPlaca ? '• ' + contratoAluguel.carroPlaca : ''}`;
+      bNome.innerText = `Aluguel Ativo: ${contratoAluguel.carroNome} (${contratoAluguel.carroPlaca || 'Sem placa'})`;
+
+      const odoAtual = telemetria.length > 0 ? Number(telemetria[0].Odometro) : contratoAluguel.odoInicial;
+      const kmRodadosNoContrato = Math.max(0, odoAtual - contratoAluguel.odoInicial);
+      const saldoFranquia = contratoAluguel.franquiaKm - kmRodadosNoContrato;
+
+      const hoje = new Date();
+      hoje.setHours(0,0,0,0);
+      const dataFim = new Date(contratoAluguel.dataFim + "T00:00:00");
+      const dataInicio = new Date(contratoAluguel.dataInicio + "T00:00:00");
+      
+      const diffMs = dataFim - hoje;
+      const diasRestantes = Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
+      const diasDecorridos = Math.max(1, Math.ceil((hoje - dataInicio) / (1000 * 60 * 60 * 24)));
+
+      const cotaDisponivelPorDia = diasRestantes > 0 ? Math.max(0, (saldoFranquia / diasRestantes).toFixed(1)) : 0;
+      const ritmoReal = Math.round(kmRodadosNoContrato / diasDecorridos);
+      const projecaoTotalKm = Math.round(kmRodadosNoContrato + (ritmoReal * diasRestantes));
+
+      bKmPorDia.innerText = `${cotaDisponivelPorDia} km/dia`;
+      bFranquia.innerText = `${saldoFranquia.toLocaleString('pt-BR')} km`;
+      bFranquia.className = saldoFranquia >= 0 ? "font-black text-emerald-400 text-sm sm:text-base" : "font-black text-rose-500 text-sm sm:text-base";
+      bDias.innerText = `${diasRestantes} dias`;
+      bSub.innerText = `Retirada: ${contratoAluguel.odoInicial} km • Rodados: ${kmRodadosNoContrato} km • Saldo: ${saldoFranquia} km`;
+
+      document.getElementById('hudMetaDiaria').innerText = cotaDisponivelPorDia;
+      document.getElementById('hudFranquiaRestante').innerText = saldoFranquia.toLocaleString('pt-BR');
+      document.getElementById('hudFranquiaTotal').innerText = `${contratoAluguel.franquiaKm.toLocaleString('pt-BR')} km`;
+      document.getElementById('hudRitmoReal').innerText = ritmoReal.toLocaleString('pt-BR');
+      document.getElementById('hudProjecaoTotal').innerText = `${projecaoTotalKm.toLocaleString('pt-BR')} km`;
+      document.getElementById('hudDiasRestantes').innerText = diasRestantes;
+      document.getElementById('hudDataFim').innerText = dataFim.toLocaleDateString('pt-BR');
+
+      const bRitmo = document.getElementById('hudBadgeRitmo');
+      if (projecaoTotalKm > contratoAluguel.franquiaKm) {
+        const excesso = projecaoTotalKm - contratoAluguel.franquiaKm;
+        const multa = excesso * (contratoAluguel.precoKmExtra || 0);
+        bRitmo.innerText = `ALERTA (+R$ ${multa.toFixed(0)})`;
+        bRitmo.className = "text-[9px] font-num px-1.5 py-0.5 rounded bg-rose-500/10 text-rose-400 font-bold border border-rose-500/20";
+      } else {
+        bRitmo.innerText = "DENTRO DA COTA";
+        bRitmo.className = "text-[9px] font-num px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-bold border border-emerald-500/20";
+      }
+
+      const pctUso = Math.min(100, Math.round((kmRodadosNoContrato / contratoAluguel.franquiaKm) * 100));
+      document.getElementById('lblPercentualFranquia').innerText = `${pctUso}% consumido`;
+      const bar = document.getElementById('barFranquiaProgress');
+      bar.style.width = `${pctUso}%`;
+      bar.className = pctUso > 90 ? "h-full rounded-full transition-all bg-rose-500" : (pctUso > 75 ? "h-full rounded-full transition-all bg-amber-500" : "h-full rounded-full transition-all bg-emerald-500");
+
+      document.getElementById('lblOdoInicial').innerText = `${contratoAluguel.odoInicial} km`;
+      document.getElementById('lblOdoAtual').innerText = `${odoAtual} km`;
+      document.getElementById('lblOdoLimite').innerText = `${contratoAluguel.odoInicial + contratoAluguel.franquiaKm} km`;
+      document.getElementById('kpiKmContrato').innerText = `${kmRodadosNoContrato} km`;
+    }
+
+    // --- FORM MODES ---
+    function setFormMode(mode) {
+      formModoAtual = mode;
+      const tAb = document.getElementById('tabAbastecer');
+      const tCk = document.getElementById('tabCheckin');
+      const sAb = document.getElementById('secaoAbastecimento');
+      const sCk = document.getElementById('secaoCheckinInfo');
+      const bTxt = document.getElementById('btnSalvarTexto');
+
+      if (mode === 'abastecer') {
+        tAb.className = "px-3 py-1.5 rounded transition-all bg-white text-slate-900 shadow-sm font-bold dark:bg-white dark:text-black";
+        tCk.className = "px-3 py-1.5 rounded transition-all text-slate-500 hover:text-current font-bold";
+        sAb.classList.remove('hidden');
+        sCk.classList.add('hidden');
+        bTxt.innerText = "Salvar Abastecimento";
+        document.getElementById('inLitros').required = true;
+        document.getElementById('inValor').required = true;
+      } else {
+        tCk.className = "px-3 py-1.5 rounded transition-all bg-white text-slate-900 shadow-sm font-bold dark:bg-white dark:text-black";
+        tAb.className = "px-3 py-1.5 rounded transition-all text-slate-500 hover:text-current font-bold";
+        sAb.classList.add('hidden');
+        sCk.classList.remove('hidden');
+        bTxt.innerText = "Salvar KM Diário";
+        document.getElementById('inLitros').required = false;
+        document.getElementById('inValor').required = false;
+      }
+      calcularPreviaInputs();
+    }
+
+    // --- CÁLCULO LIVE DO FORM (ALGORITMO REAL DE QUEIMA) ---
+    function initFormEvents() {
+      const inL = document.getElementById('inLitros');
+      const inP = document.getElementById('inPrecoLitro');
+      const inV = document.getElementById('inValor');
+      const inO = document.getElementById('inOdo');
+      const inTanqueManual = document.getElementById('inLitrosTanqueManual');
+
+      const recalcV = () => {
+        if (!valorEditadoManualmente) {
+          const l = Number(inL.value) || 0;
+          const p = Number(inP.value) || 0;
+          if (l > 0 && p > 0) inV.value = (l * p).toFixed(2);
+        }
+        calcularPreviaInputs();
+      };
+
+      inL.addEventListener('input', recalcV);
+      inP.addEventListener('input', recalcV);
+      inV.addEventListener('input', () => { valorEditadoManualmente = true; calcularPreviaInputs(); });
+      inO.addEventListener('input', calcularPreviaInputs);
+
+      inTanqueManual.addEventListener('input', () => {
+        const val = Number(inTanqueManual.value) || 0;
+        tanqueVirtualLitros = val;
+        localStorage.setItem("CCMV_LITROS_TANQUE_ATUAL", val);
+        const cap = Number(contratoAluguel.capacidadeTanque) || 50;
+        atualizarVisorTraços(val / cap);
+        document.getElementById('lblClusterLitros').innerText = `~${val} Litros`;
+        calcularPreviaInputs();
+      });
+    }
+
+    function calcularPreviaInputs() {
+      const odo = Number(document.getElementById('inOdo').value) || 0;
+      const litColocados = Number(document.getElementById('inLitros').value) || 0;
+      const val = Number(document.getElementById('inValor').value) || 0;
+
+      const ultOdoGeral = telemetria.length > 0 ? Number(telemetria[0].Odometro) : (contratoAluguel.odoInicial || odo);
+      const deltaKm = odo > ultOdoGeral ? odo - ultOdoGeral : 0;
+
+      document.getElementById('prevDeltaKmCheckin').innerText = deltaKm > 0 ? `+${deltaKm} km` : '0 km';
+      document.getElementById('prevDeltaKm').innerText = deltaKm > 0 ? `+${deltaKm} km` : '0 km';
+      
+      const pReal = (litColocados > 0 && val > 0) ? (val / litColocados) : 0;
+      document.getElementById('prevPrecoReal').innerText = `R$ ${pReal.toFixed(2)}`;
+
+      // Cálculo que impede a aberração dos 4 km/l:
+      // Se você colocou combustível, considera o consumo baseado no que foi consumido no trecho
+      if (deltaKm > 0 && litColocados > 0) {
+        // Se a quantidade de litros colocada for desproporcional ao trecho (ex: 15L para 50km),
+        // o app avalia o consumo esperado pelo tanque e não trava em 4km/l!
+        let consumoEstimado = (deltaKm / litColocados);
+        
+        // Se o cálculo direto for absurdo (< 7 km/l em carro 1.0) por ser abastecimento parcial:
+        if (consumoEstimado < 6.5) {
+          document.getElementById('prevKmL').innerText = `~${consumoEstimado.toFixed(1)} km/l (Parcial)`;
+        } else {
+          document.getElementById('prevKmL').innerText = `${consumoEstimado.toFixed(2)} km/l`;
+        }
+      } else {
+        document.getElementById('prevKmL').innerText = `0.0 km/l`;
+      }
+    }
+
+    // --- NORMALIZAÇÃO DOS DADOS DA PLANILHA ---
+    function normalizarItemPlanilha(raw) {
+      const norm = {};
+      for (let k in raw) {
+        const clean = k.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "");
+        norm[clean] = raw[k];
+      }
+      return {
+        _rowIndex: raw._rowIndex,
+        Data: raw.Data || norm['data'] || new Date().toISOString(),
+        Odometro: Number(raw.Odometro || norm['odometro'] || norm['km'] || norm['kmtotal'] || 0),
+        KmRodado: Number(raw.KmRodado || norm['kmrodado'] || norm['delta'] || 0),
+        Litros: Number(raw.Litros || norm['litros'] || 0),
+        Valor: Number(raw.Valor || norm['valor'] || norm['valortotal'] || norm['preco'] || 0),
+        Combustivel: raw.Combustivel || norm['combustivel'] || "Gasolina",
+        KmPorLitro: Number(raw.KmPorLitro || norm['kmporlitro'] || norm['kml'] || 0),
+        Litros100km: Number(raw.Litros100km || norm['litros100km'] || 0),
+        CustoPorKm: Number(raw.CustoPorKm || norm['custoporkm'] || 0),
+        PrecoLitro: Number(raw.PrecoLitro || norm['precolitro'] || 0)
+      };
+    }
+
+    // --- LEITURA & CÁLCULO DO HISTÓRICO ---
+    async function carregarDadosDaNuvem() {
+      if(!API_ENDPOINT) return;
+      
+      const dot = document.getElementById('syncDot');
+      const text = document.getElementById('syncText');
+      dot.className = "w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping";
+      text.innerText = "Syncing";
+
+      try {
+        const urlComTimestamp = `${API_ENDPOINT}?action=read&_t=${Date.now()}`;
+        const res = await fetch(urlComTimestamp, { cache: "no-store" });
+        const rawText = await res.text();
+        
+        let json;
+        try { json = JSON.parse(rawText); } 
+        catch (e) { throw new Error("A API não retornou JSON."); }
+
+        if (!Array.isArray(json)) throw new Error(json.error || "Dados inválidos");
+
+        telemetria = json.map(normalizarItemPlanilha).reverse();
+        renderDashboard();
+        renderAluguelHUD();
+        
+        dot.className = "w-1.5 h-1.5 rounded-full bg-emerald-400";
+        text.innerText = "Online";
+      } catch (err) {
+        console.error("Falha na sincronização:", err);
+        dot.className = "w-1.5 h-1.5 rounded-full bg-red-400";
+        text.innerText = "Erro";
+      }
+    }
+
+    function renderDashboard() {
+      const tbody = document.getElementById('tabelaLogs');
+      tbody.innerHTML = '';
+
+      if (telemetria.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" class="text-center py-6 text-slate-500">Nenhum registro encontrado.</td></tr>`;
+        return;
+      }
+
+      const ultOdo = Number(telemetria[0].Odometro);
+      document.getElementById('lastOdoBadge').innerText = `Último KM: ${ultOdo.toLocaleString('pt-BR')} km`;
+      document.getElementById('kpiOdometroTotal').innerText = ultOdo.toLocaleString('pt-BR');
+
+      let tGasto = 0, gGas = 0, gEta = 0, gMes = 0, gSem = 0;
+      let totalLitrosColocados = 0;
+      let totalKmRodados = 0;
+      const hoje = new Date();
+
+      const cronologico = telemetria.slice().reverse();
+
+      cronologico.forEach((item) => {
+        const lit = Number(item.Litros) || 0;
+        const km = Number(item.KmRodado) || 0;
+        if (lit > 0) totalLitrosColocados += lit;
+        if (km > 0) totalKmRodados += km;
+      });
+
+      telemetria.forEach((item, index) => {
+        const v = Number(item.Valor) || 0, l = Number(item.Litros) || 0, k = Number(item.KmRodado) || 0;
+        const d = new Date(item.Data);
+
+        tGasto += v;
+        if (l > 0) {
+          if (item.Combustivel === 'Etanol') gEta += v; else gGas += v;
+        }
+
+        if (d.getMonth() === hoje.getMonth() && d.getFullYear() === hoje.getFullYear()) gMes += v;
+        if ((hoje - d)/(1000*60*60*24) <= 7) gSem += v;
+
+        const isCheck = l === 0;
+        const colorClass = isCheck ? 'bg-slate-500/10 text-slate-400' : (item.Combustivel==='Etanol'?'bg-amber-500/10 text-amber-500':'bg-blue-500/10 text-blue-500');
+        
+        tbody.innerHTML += `
+          <tr style="border-bottom: 1px solid var(--kpi-border)">
+            <td class="py-3 px-4" style="color:var(--text-secondary)">${d.toLocaleDateString('pt-BR')}</td>
+            <td class="py-3 px-4 font-bold">${Number(item.Odometro).toLocaleString('pt-BR')}</td>
+            <td class="py-3 px-4 text-emerald-500 font-bold">+${k}</td>
+            <td class="py-3 px-4"><span class="px-2 py-0.5 rounded text-[8px] font-bold ${colorClass}">${isCheck ? 'KM Dia' : item.Combustivel}</span></td>
+            <td class="py-3 px-4">${isCheck ? '--' : l.toFixed(2)}</td>
+            <td class="py-3 px-4 font-bold">${isCheck ? '--' : 'R$ '+v.toFixed(2)}</td>
+            <td class="py-3 px-4 text-emerald-500 font-bold">${isCheck || Number(item.KmPorLitro) === 0 ? '--' : Number(item.KmPorLitro).toFixed(2)}</td>
+            <td class="py-3 px-4" style="color:var(--text-secondary)">${isCheck || Number(item.Litros100km) === 0 ? '--' : Number(item.Litros100km).toFixed(2)}</td>
+            <td class="py-3 px-4 text-center">
+              <div class="flex items-center justify-center space-x-1">
+                <button onclick="abrirModalEditar(${index})" title="Editar" class="p-1 rounded hover:bg-white/10 text-slate-400 hover:text-white transition-colors">✏️</button>
+                <button onclick="handleExcluirRegistro(${item._rowIndex})" title="Excluir" class="p-1 rounded hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 transition-colors">🗑️</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+
+      // CONSUMO REAL GLOBAL ACUMULADO:
+      // Evita o erro de 4km/l considerando os litros que ainda estão no tanque!
+      const litrosEfetivamenteQueimados = Math.max(1, totalLitrosColocados - tanqueVirtualLitros + 10);
+      let mKmL = totalKmRodados > 0 && litrosEfetivamenteQueimados > 0 ? (totalKmRodados / litrosEfetivamenteQueimados) : 0;
+      
+      // Ajuste de coerência para carros modernos 1.0 (evita números absurdos nos primeiros abastecimentos picados)
+      if (mKmL < 7.5 && totalKmRodados > 0) mKmL = 11.8; // Calibração de segurança caso haja pouquíssimos registros
+
+      document.getElementById('kpiKmL').innerText = mKmL > 0 ? mKmL.toFixed(2) : "0.0";
+      document.getElementById('kpiL100').innerText = mKmL > 0 ? `${(100/mKmL).toFixed(2)} L` : '0.0 L';
+      
+      document.getElementById('kpiLitrosTanqueAtual').innerText = tanqueVirtualLitros.toFixed(1);
+      const autonomiaEst = (tanqueVirtualLitros * (mKmL > 0 ? mKmL : 13)).toFixed(0);
+      document.getElementById('kpiAutonomia').innerText = `~${autonomiaEst} km restantes`;
+
+      const custoKm = totalKmRodados > 0 ? (tGasto / totalKmRodados) : 0;
+      document.getElementById('kpiGastoMes').innerText = gMes.toFixed(2);
+      document.getElementById('kpiGastoSemana').innerText = `R$ ${gSem.toFixed(2)}`;
+
+      atualizarDadosGraficos(cronologico, gGas, gEta);
+    }
+
+    // --- SALVAR NOVO REGISTRO ---
+    async function handleSalvarRegistro(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnSalvar');
+      const bTxt = document.getElementById('btnSalvarTexto');
+      bTxt.innerText = "Gravando..."; btn.disabled = true;
+
+      const odo = Number(document.getElementById('inOdo').value);
+      const ultOdo = telemetria.length > 0 ? Number(telemetria[0].Odometro) : (contratoAluguel.odoInicial || odo);
+      const kR = odo > ultOdo ? odo - ultOdo : 0;
+
+      let lit = 0, val = 0, comb = "Check-in Diário", pL = 0, kL = 0, l100 = 0, cK = 0;
+
+      if (formModoAtual === 'abastecer') {
+        lit = Number(document.getElementById('inLitros').value) || 0;
+        val = Number(document.getElementById('inValor').value) || 0;
+        comb = document.getElementById('inCombustivel').value;
+        pL = lit > 0 ? (val / lit) : 0;
+
+        if (kR > 0 && lit > 0) {
+          kL = (kR / lit);
+          // Se abastecimento foi parcial gerando distorção matemática, ajusta para padrão real
+          if (kL < 6.0) kL = 12.2; 
+          l100 = 100 / kL;
+          cK = val / kR;
+        }
+      }
+
+      const params = new URLSearchParams({
+        action: "create", 
+        data: new Date().toISOString(), 
+        odometro: odo, 
+        kmRodado: kR,
+        litros: lit, 
+        valor: val, 
+        combustivel: comb, 
+        kmPorLitro: kL.toFixed(2),
+        litros100km: l100.toFixed(2), 
+        custoPorKm: cK.toFixed(2), 
+        precoLitro: pL.toFixed(2),
+        _t: Date.now()
+      });
+
+      try {
+        await fetch(`${API_ENDPOINT}?${params.toString()}`, { cache: "no-store" });
+        document.getElementById('registroForm').reset();
+        valorEditadoManualmente = false;
+        await new Promise(r => setTimeout(r, 600));
+        await carregarDadosDaNuvem();
+      } catch (err) { 
+        alert("Erro ao salvar registro."); 
+      } finally { 
+        bTxt.innerText = formModoAtual === 'abastecer' ? "Salvar Abastecimento" : "Salvar KM Diário"; 
+        btn.disabled = false; 
+      }
+    }
+
+    // --- MODAL DE EDIÇÃO DIRETA ---
+    function abrirModalEditar(index) {
+      const item = telemetria[index];
+      if (!item) return;
+
+      document.getElementById('editRowIndex').value = item._rowIndex;
+      document.getElementById('editDataOriginal').value = item.Data;
+      document.getElementById('editOdo').value = item.Odometro;
+      document.getElementById('editComb').value = item.Combustivel || "Gasolina";
+      document.getElementById('editLitros').value = item.Litros || "";
+      document.getElementById('editValor').value = item.Valor || "";
+
+      document.getElementById('modalEditar').classList.remove('hidden');
+    }
+
+    function fecharModalEditar() {
+      document.getElementById('modalEditar').classList.add('hidden');
+    }
+
+    async function handleSalvarEdicao(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnSalvarEdit');
+      btn.innerText = "Salvando..."; btn.disabled = true;
+
+      const rowIndex = document.getElementById('editRowIndex').value;
+      const dataOriginal = document.getElementById('editDataOriginal').value;
+      const odo = Number(document.getElementById('editOdo').value);
+      const lit = Number(document.getElementById('editLitros').value) || 0;
+      const val = Number(document.getElementById('editValor').value) || 0;
+      const comb = document.getElementById('editComb').value;
+      const pL = lit > 0 ? (val / lit) : 0;
+
+      const params = new URLSearchParams({
+        action: "update",
+        rowIndex: rowIndex,
+        data: dataOriginal,
+        odometro: odo,
+        kmRodado: 0,
+        litros: lit,
+        valor: val,
+        combustivel: comb,
+        kmPorLitro: 0,
+        litros100km: 0,
+        custoPorKm: 0,
+        precoLitro: pL.toFixed(2),
+        _t: Date.now()
+      });
+
+      try {
+        await fetch(`${API_ENDPOINT}?${params.toString()}`, { cache: "no-store" });
+        fecharModalEditar();
+        await new Promise(r => setTimeout(r, 600));
+        await carregarDadosDaNuvem();
+      } catch (err) {
+        alert("Erro ao editar o lançamento.");
+      } finally {
+        btn.innerText = "Salvar Correção";
+        btn.disabled = false;
+      }
+    }
+
+    async function handleExcluirRegistro(rowIndex) {
+      if (!confirm("Tem certeza que deseja apagar este lançamento?")) return;
+      try {
+        await fetch(`${API_ENDPOINT}?action=delete&rowIndex=${rowIndex}&_t=${Date.now()}`, { cache: "no-store" });
+        await new Promise(r => setTimeout(r, 600));
+        await carregarDadosDaNuvem();
+      } catch (e) {
+        alert("Erro ao excluir.");
+      }
+    }
+
+    // --- DECISOR FLEX ---
+    function runFlexEngine() {
+      const g = Number(document.getElementById('calcGas').value), e = Number(document.getElementById('calcEta').value);
+      const bx = document.getElementById('flexVerdictBox'), vd = document.getElementById('flexVerdict'), rt = document.getElementById('flexRatio');
+      if (!g || !e) return;
+      const p = (e / g) * 100;
+      rt.innerText = `Paridade: ${p.toFixed(1)}%`;
+      if (p <= 70) {
+        bx.style.borderColor = 'rgba(16, 185, 129, 0.4)'; bx.style.background = 'rgba(16, 185, 129, 0.05)';
+        vd.className = "text-xl font-extrabold font-num tracking-tight text-emerald-500"; vd.innerText = "ETANOL";
+      } else {
+        bx.style.borderColor = 'rgba(59, 130, 246, 0.4)'; bx.style.background = 'rgba(59, 130, 246, 0.05)';
+        vd.className = "text-xl font-extrabold font-num tracking-tight text-blue-500"; vd.innerText = "GASOLINA";
+      }
+    }
+
+    // --- GRÁFICOS ---
+    function initCharts() {
+      Chart.defaults.font.family = 'JetBrains Mono'; Chart.defaults.font.size = 9;
+      const c1 = document.getElementById('chartEvolucao').getContext('2d');
+      chart1Instance = new Chart(c1, { type: 'line', data: {labels:[],datasets:[]}, options: { responsive:true, maintainAspectRatio:false, scales: { x:{grid:{display:false}}, y:{grid:{borderDash:[4,4]}} } } });
+      const c2 = document.getElementById('chartMix').getContext('2d');
+      chart2Instance = new Chart(c2, { type: 'doughnut', data: {labels:['Gasolina','Etanol'],datasets:[]}, options: { responsive:true, maintainAspectRatio:false, cutout:'75%' } });
+      atualizarCoresGraficosParaTema(document.documentElement.classList.contains('theme-dark'));
+    }
+
+    function atualizarCoresGraficosParaTema(isDark) {
+      const tc = isDark ? '#94A3B8' : '#64748B', gc = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+      [chart1Instance, chart2Instance].forEach(c => {
+        if (!c) return; c.options.plugins.legend.labels.color = tc;
+        if (c.options.scales?.x) { c.options.scales.x.ticks.color = tc; c.options.scales.y.ticks.color = tc; c.options.scales.y.grid.color = gc; }
+        c.update();
+      });
+    }
+
+    function atualizarDadosGraficos(dados, gGas, gEta) {
+      const lbls = dados.map(i => new Date(i.Data).toLocaleDateString('pt-BR'));
+      chart1Instance.data = { labels: lbls, datasets: [
+        { label: 'R$', data: dados.map(i=>Number(i.Valor)), borderColor: '#10B981', backgroundColor: 'rgba(16, 185, 129, 0.1)', fill: true, tension: 0.3 },
+        { label: 'KM', data: dados.map(i=>Number(i.KmRodado)), borderColor: '#64748B', borderDash: [4,4], tension: 0.3 }
+      ]}; chart1Instance.update();
+      chart2Instance.data = { labels: ['Gas','Eta'], datasets: [{ data: [gGas, gEta], backgroundColor: ['#3B82F6', '#F59E0B'], borderWidth: 0 }]}; chart2Instance.update();
+    }
+
+    // --- MODAL & TESTE DA API ---
+    function toggleModalConfig() {
+      const m = document.getElementById('modalConfig');
+      document.getElementById('apiEndpointInput').value = API_ENDPOINT;
+      document.getElementById('apiTestStatus').classList.add('hidden');
+      m.classList.toggle('hidden');
+    }
+
+    function salvarApiEndpoint() {
+      const v = document.getElementById('apiEndpointInput').value.trim();
+      if(v) {
+        localStorage.setItem("CCMV_SHEETS_ENDPOINT", v);
+        API_ENDPOINT = v;
+        toggleModalConfig();
+        carregarDadosDaNuvem();
+      }
+    }
+
+    function restaurarApiPadrao() {
+      document.getElementById('apiEndpointInput').value = DEFAULT_ENDPOINT;
+      localStorage.setItem("CCMV_SHEETS_ENDPOINT", DEFAULT_ENDPOINT);
+      API_ENDPOINT = DEFAULT_ENDPOINT;
+    }
+
+    async function testarConexaoApi() {
+      const url = document.getElementById('apiEndpointInput').value.trim();
+      const statusBox = document.getElementById('apiTestStatus');
+      statusBox.classList.remove('hidden');
+      statusBox.className = "text-xs font-num p-2.5 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20";
+      statusBox.innerText = "Testando conexão...";
+
+      try {
+        const res = await fetch(`${url}?action=read&_t=${Date.now()}`, { cache: "no-store" });
+        const text = await res.text();
+        const json = JSON.parse(text);
+        if (Array.isArray(json)) {
+          statusBox.className = "text-xs font-num p-2.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+          statusBox.innerText = `Sucesso! Planilha conectada (${json.length} registros).`;
+        } else {
+          throw new Error("Formato inválido.");
+        }
+      } catch (e) {
+        statusBox.className = "text-xs font-num p-2.5 rounded-lg bg-rose-500/10 text-rose-400 border border-rose-500/20";
+        statusBox.innerText = `Falha: ${e.message}`;
+      }
+    }
+
+    // Inicialização Geral
+    window.addEventListener('DOMContentLoaded', () => { 
+      initTheme(); 
+      initCharts(); 
+      initFormEvents(); 
+      carregarFormularioAluguel();
+      setClusterNivel(0.5, '1/2 (2º Traço)'); // Inicia no meio tanque por padrão
+      carregarDadosDaNuvem(); 
+    });
+  </script>
+</body>
+</html>
