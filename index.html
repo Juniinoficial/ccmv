@@ -54,7 +54,7 @@
     }
     .c-input:focus { outline: none; border-color: #38BDF8; }
     
-    /* Cluster VW (8 Segmentos Fiéis ao Painel) */
+    /* Cluster VW */
     .vw-cluster {
       background: radial-gradient(circle at 50% 0%, #172138 0%, #080B12 85%);
       border: 1px solid rgba(255, 255, 255, 0.12);
@@ -92,16 +92,14 @@
         <div>
           <div class="flex items-center space-x-2">
             <h1 class="text-base font-extrabold tracking-tight">CCMV</h1>
-            <span id="badgeCarro" class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 truncate max-w-[140px] sm:max-w-none">
-              Carregando...
-            </span>
+            <span id="badgeCarro" class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">VW Tera 1.0</span>
           </div>
           <p class="text-[9px] text-slate-400 hidden sm:block">Calculadora de Consumo Médio Veicular</p>
         </div>
       </div>
 
       <div class="flex items-center space-x-2">
-        <button id="btnSync" onclick="carregarNuvem()" class="h-8 px-3 rounded-lg glass flex items-center space-x-1.5 text-xs font-num font-bold">
+        <button id="btnSync" onclick="carregarNuvem()" class="h-8 px-3 rounded-lg glass flex items-center space-x-1.5 text-xs font-num font-bold transition-all">
           <span id="dotSync" class="w-2 h-2 rounded-full bg-emerald-400"></span>
           <span id="txtSync">Online</span>
         </button>
@@ -112,7 +110,7 @@
       </div>
     </div>
 
-    <!-- Navegação Mobile/Desktop -->
+    <!-- Navegação -->
     <div class="max-w-5xl mx-auto mt-2">
       <div class="glass p-1 flex rounded-xl text-xs font-bold">
         <button onclick="trocarAba('cockpit')" id="tabCockpit" class="flex-1 py-1.5 rounded-lg bg-white text-slate-900 shadow-sm font-bold">
@@ -132,45 +130,40 @@
     <!-- ============================== -->
     <div id="viewCockpit" class="space-y-4">
       
-      <!-- Banner do Aluguel com Botão de Edição Rápida -->
-      <div class="glass p-3.5 border-emerald-500/20 bg-emerald-500/[0.02]">
+      <!-- Banner do Aluguel -->
+      <div onclick="trocarAba('aluguel')" class="glass p-3.5 border-emerald-500/20 bg-emerald-500/[0.02] cursor-pointer">
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5">
-          <div class="flex items-center justify-between w-full sm:w-auto">
-            <div>
-              <div class="flex items-center space-x-2">
-                <h2 id="bannerCarro" class="text-xs sm:text-sm font-bold text-white">Veículo: --</h2>
-                <button onclick="trocarAba('aluguel')" class="px-2 py-0.5 rounded bg-white/10 hover:bg-white/20 text-[10px] font-bold text-cyan-300 border border-white/10">
-                  ✏️ Editar Carro
-                </button>
-              </div>
-              <p id="bannerSub" class="text-[10px] text-slate-400 font-num mt-0.5">Franquia contratada • Controle em tempo real</p>
+          <div>
+            <div class="flex items-center space-x-2">
+              <h2 id="bannerCarro" class="text-xs sm:text-sm font-bold text-white">Veículo: VW Tera 1.0 TSI</h2>
+              <span class="px-2 py-0.5 rounded bg-white/10 text-[9px] font-bold text-cyan-300">✏️ Editar</span>
             </div>
+            <p id="bannerSub" class="text-[10px] text-slate-400 font-num">Franquia de 2.000 km • Controle em tempo real</p>
           </div>
-
           <div class="grid grid-cols-3 gap-2 w-full sm:w-auto text-right font-num">
             <div class="p-1.5 rounded bg-black/20 border border-white/5">
               <span class="text-[8px] uppercase block text-cyan-400 font-bold">Cota/Dia</span>
-              <span id="bannerCotaDia" class="text-xs font-bold text-cyan-400">-- km</span>
+              <span id="bannerCotaDia" class="text-xs font-bold text-cyan-400">66.7 km</span>
             </div>
             <div class="p-1.5 rounded bg-black/20 border border-white/5">
               <span class="text-[8px] uppercase block text-slate-400 font-bold">Saldo</span>
-              <span id="bannerSaldo" class="text-xs font-bold text-emerald-400">-- km</span>
+              <span id="bannerSaldo" class="text-xs font-bold text-emerald-400">2.000 km</span>
             </div>
             <div class="p-1.5 rounded bg-black/20 border border-white/5">
               <span class="text-[8px] uppercase block text-slate-400 font-bold">Prazo</span>
-              <span id="bannerPrazo" class="text-xs font-bold text-white">-- d</span>
+              <span id="bannerPrazo" class="text-xs font-bold text-white">30 dias</span>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Cluster Digital VW (8 Segmentos) -->
+      <!-- Cluster VW (8 Segmentos) -->
       <div class="vw-cluster p-4 sm:p-5 text-white">
         <div class="flex items-center justify-between pb-3 border-b border-white/10">
           <div>
             <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Marcador de Combustível</span>
             <p class="text-xs text-slate-300 font-num mt-0.5">
-              Tanque: <b id="clusterLitros" class="text-white text-sm">-- L</b> (<span id="clusterPct" class="text-cyan-400">--%</span>) • Autonomia: <b id="clusterAuto" class="text-emerald-400 text-sm">~-- km</b>
+              Tanque: <b id="clusterLitros" class="text-white text-sm">31.2 L</b> (<span id="clusterPct" class="text-cyan-400">63%</span>) • Autonomia: <b id="clusterAuto" class="text-emerald-400 text-sm">~421 km</b>
             </p>
           </div>
           <button onclick="toggleModal('modalCalibrar', true)" class="px-2.5 py-1 rounded bg-white/10 hover:bg-white/20 text-[10px] font-bold font-num border border-white/15">
@@ -196,31 +189,28 @@
             <span class="w-6 text-center">1/2</span>
             <span class="w-3 text-center text-slate-400 font-light">|</span>
             <div class="flex items-center space-x-1">
-              <svg class="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M19 5h-1V4a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1v16H4v2h16v-2h-1V7a2 2 0 0 1 2-2V4a1 1 0 0 0-2-1zm-4 4H9V5h6v4zm4 0h-2V7h2v2z"/>
-              </svg>
+              <svg class="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M19 5h-1V4a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1v16H4v2h16v-2h-1V7a2 2 0 0 1 2-2V4a1 1 0 0 0-2-1zm-4 4H9V5h6v4zm4 0h-2V7h2v2z"/></svg>
               <span class="text-[8px] text-white">▶</span>
               <span>1</span>
             </div>
           </div>
-          <p class="text-center text-[9px] text-slate-400 font-num mt-2.5">*Clique na barra correspondente para igualar ao painel do carro.</p>
         </div>
       </div>
 
-      <!-- 4 Cards de Métricas (KPIs) -->
+      <!-- Métricas KPIs -->
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
         <div class="glass p-3.5">
           <div class="flex justify-between items-center text-[9px] uppercase font-bold text-slate-400">
             <span>Média Real</span>
             <span class="text-emerald-400 font-num">KM/L</span>
           </div>
-          <h3 id="kpiKmL" class="text-2xl font-extrabold font-num text-emerald-400 mt-1">--</h3>
-          <p id="kpiL100" class="text-[10px] text-slate-400 font-num">-- L/100km</p>
+          <h3 id="kpiKmL" class="text-2xl font-extrabold font-num text-emerald-400 mt-1">13.5</h3>
+          <p id="kpiL100" class="text-[10px] text-slate-400 font-num">7.4 L/100km</p>
         </div>
 
         <div class="glass p-3.5">
           <span class="text-[9px] uppercase font-bold text-slate-400 block">Odômetro Atual</span>
-          <h3 id="kpiOdometro" class="text-2xl font-extrabold font-num text-white mt-1">--</h3>
+          <h3 id="kpiOdometro" class="text-2xl font-extrabold font-num text-white mt-1">48.350</h3>
           <p id="kpiKmContrato" class="text-[10px] text-emerald-400 font-num font-bold">0 km no contrato</p>
         </div>
 
@@ -230,20 +220,20 @@
             <span class="text-xs text-slate-400 font-light">R$</span>
             <h3 id="kpiGastoTotal" class="text-2xl font-extrabold font-num text-white">0,00</h3>
           </div>
-          <p class="text-[10px] text-slate-400 font-num">Total registrado</p>
+          <p id="kpiGastoSemana" class="text-[10px] text-slate-400 font-num">Semana: R$ 0,00</p>
         </div>
 
         <div class="glass p-3.5">
           <span class="text-[9px] uppercase font-bold text-slate-400 block">Custo por KM</span>
           <div class="flex items-baseline space-x-1 mt-1">
             <span class="text-xs text-slate-400 font-light">R$</span>
-            <h3 id="kpiCustoKm" class="text-2xl font-extrabold font-num text-white">0,00</h3>
+            <h3 id="kpiCustoKm" class="text-2xl font-extrabold font-num text-white">0,43</h3>
           </div>
           <p class="text-[10px] text-cyan-400 font-num font-bold">Por km rodado</p>
         </div>
       </div>
 
-      <!-- Formulário de Registro -->
+      <!-- Lançamento & Flex -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
         
         <div class="lg:col-span-7 glass p-4 sm:p-5">
@@ -256,7 +246,7 @@
                 📍 KM Diário
               </button>
             </div>
-            <span id="hintUltimoKm" class="text-[9px] font-num text-slate-400">Último: -- km</span>
+            <span id="hintUltimoKm" class="text-[9px] font-num text-slate-400">Último: 48.350 km</span>
           </div>
 
           <form id="formRegistro" onsubmit="salvarRegistro(event)" class="mt-3.5 space-y-3">
@@ -291,37 +281,26 @@
                 </div>
               </div>
 
-              <!-- Prévia em Tempo Real -->
+              <!-- Prévia -->
               <div class="grid grid-cols-3 gap-1.5 p-2 rounded-lg bg-black/30 border border-white/5 text-center font-num text-[10px]">
-                <div>
-                  <span class="text-[8px] text-slate-400 block uppercase">Distância</span>
-                  <b id="prevKm" class="text-white">0 km</b>
-                </div>
-                <div>
-                  <span class="text-[8px] text-slate-400 block uppercase">Custo/L</span>
-                  <b id="prevPrecoL" class="text-white">R$ 0,00</b>
-                </div>
-                <div>
-                  <span class="text-[8px] text-slate-400 block uppercase">Consumo</span>
-                  <b id="prevKmL" class="text-emerald-400">0.0 km/l</b>
-                </div>
+                <div><span class="text-[8px] text-slate-400 block uppercase">Distância</span><b id="prevKm" class="text-white">0 km</b></div>
+                <div><span class="text-[8px] text-slate-400 block uppercase">Custo/L</span><b id="prevPrecoL" class="text-white">R$ 0,00</b></div>
+                <div><span class="text-[8px] text-slate-400 block uppercase">Consumo</span><b id="prevKmL" class="text-emerald-400">0.0 km/l</b></div>
               </div>
             </div>
 
-            <button type="submit" id="btnSalvarReg" class="w-full py-2.5 rounded-lg bg-white text-slate-900 font-extrabold text-xs shadow transition-all hover:bg-slate-200">
+            <button type="submit" id="btnSalvarReg" class="w-full py-2.5 rounded-lg bg-white text-slate-900 font-extrabold text-xs shadow hover:bg-slate-200 transition-all">
               Salvar Registro
             </button>
           </form>
         </div>
 
-        <!-- Calculadora Flex na Bomba -->
         <div class="lg:col-span-5 glass p-4 sm:p-5 flex flex-col justify-between">
           <div>
             <div class="flex items-center justify-between pb-3 border-b border-white/10">
               <h2 class="text-xs sm:text-sm font-bold">Decisor Flex (Bomba)</h2>
               <span class="text-[8px] font-num font-bold px-1.5 py-0.5 rounded bg-white/10">70% RATIO</span>
             </div>
-
             <div class="grid grid-cols-2 gap-2 mt-3">
               <div>
                 <label class="block text-[9px] font-bold uppercase text-slate-400 mb-1">Gasolina (R$)</label>
@@ -332,25 +311,23 @@
                 <input type="number" id="flexEta" step="0.01" placeholder="3.89" oninput="calcularFlex()" class="c-input w-full px-2.5 py-2 text-xs font-num font-bold">
               </div>
             </div>
-
             <div id="boxFlex" class="mt-3 p-3 rounded-xl border border-white/10 bg-black/20 text-center">
               <span class="text-[8px] uppercase tracking-wider text-slate-400 block">Veredito</span>
               <h3 id="txtFlexVeredito" class="text-base font-extrabold font-num text-slate-300">Digite os Preços</h3>
               <p id="txtFlexRatio" class="text-[9px] font-num text-slate-400 mt-0.5">Paridade: --</p>
             </div>
           </div>
-          <p class="text-[8px] text-slate-400 text-center mt-3">*Relação estequiométrica padrão de 70%.</p>
+          <p class="text-[8px] text-slate-400 text-center mt-3">*Relação de paridade de 70%.</p>
         </div>
-
       </div>
 
-      <!-- Gráfico Simples de Desembolso -->
+      <!-- Gráfico -->
       <div class="glass p-4 sm:p-5">
-        <h2 class="text-xs sm:text-sm font-bold mb-3">Evolução Financeira (R$) & Quilometragem</h2>
-        <div class="h-44 sm:h-56"><canvas id="graficoEvolucao"></canvas></div>
+        <h2 class="text-xs sm:text-sm font-bold mb-3">Evolução Financeira</h2>
+        <div class="h-44"><canvas id="graficoEvolucao"></canvas></div>
       </div>
 
-      <!-- Histórico (Cards no Mobile / Tabela no Desktop) -->
+      <!-- Histórico -->
       <div class="glass overflow-hidden">
         <div class="p-3.5 border-b border-white/10 flex items-center justify-between">
           <h2 class="text-xs sm:text-sm font-bold">Histórico de Lançamentos</h2>
@@ -360,7 +337,7 @@
         </div>
 
         <div id="listaMobile" class="divide-y divide-white/5 sm:hidden font-num text-xs">
-          <div class="text-center py-6 text-slate-400 text-[11px]">Nenhum lançamento registrado.</div>
+          <div class="text-center py-6 text-slate-400 text-[11px]">Nenhum registro.</div>
         </div>
 
         <div class="hidden sm:block overflow-x-auto">
@@ -378,30 +355,28 @@
               </tr>
             </thead>
             <tbody id="tabelaDesktop" class="divide-y divide-white/5">
-              <tr><td colspan="8" class="text-center py-6 text-slate-400">Nenhum lançamento registrado.</td></tr>
+              <tr><td colspan="8" class="text-center py-6 text-slate-400">Nenhum registro.</td></tr>
             </tbody>
           </table>
         </div>
       </div>
-
     </div>
 
-    <!-- ============================================== -->
-    <!-- ABA 2: ALUGUEL (EDIÇÃO DO CARRO + TROCA)       -->
-    <!-- ============================================== -->
+    <!-- ============================== -->
+    <!-- ABA 2: ALUGUEL & FRANQUIA      -->
+    <!-- ============================== -->
     <div id="viewAluguel" class="space-y-4 hidden">
       
-      <!-- KPIs do Contrato -->
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
         <div class="glass p-3.5">
           <span class="text-[9px] font-bold uppercase text-cyan-400 block">Cota/Dia</span>
-          <h3 id="hudCotaDia" class="text-2xl font-extrabold font-num text-cyan-400 mt-1">--</h3>
+          <h3 id="hudCotaDia" class="text-2xl font-extrabold font-num text-cyan-400 mt-1">66.7</h3>
           <p class="text-[9px] text-slate-400">km por dia permitidos</p>
         </div>
         <div class="glass p-3.5">
           <span class="text-[9px] font-bold uppercase text-emerald-400 block">Saldo Franquia</span>
-          <h3 id="hudSaldo" class="text-2xl font-extrabold font-num text-emerald-400 mt-1">--</h3>
-          <p id="hudTotalFranquia" class="text-[9px] font-bold text-slate-400">Total: -- km</p>
+          <h3 id="hudSaldo" class="text-2xl font-extrabold font-num text-emerald-400 mt-1">2.000</h3>
+          <p id="hudTotalFranquia" class="text-[9px] font-bold text-slate-400">Total: 2.000 km</p>
         </div>
         <div class="glass p-3.5">
           <span class="text-[9px] font-bold uppercase text-slate-400 block">Ritmo Médio</span>
@@ -410,64 +385,109 @@
         </div>
         <div class="glass p-3.5">
           <span class="text-[9px] font-bold uppercase text-slate-400 block">Dias Restantes</span>
-          <h3 id="hudDias" class="text-2xl font-extrabold font-num text-white mt-1">--</h3>
-          <p id="hudDataFim" class="text-[9px] text-slate-400">Devolução: --/--/----</p>
+          <h3 id="hudDias" class="text-2xl font-extrabold font-num text-white mt-1">30</h3>
+          <p id="hudDataFim" class="text-[9px] text-slate-400">Devolução: 31/10</p>
         </div>
       </div>
 
-      <!-- Formulário: Editar o Carro Atual e Contrato -->
-      <div class="glass p-4 sm:p-5">
-        <div class="flex items-center justify-between pb-3 border-b border-white/10 mb-3">
-          <div>
-            <h3 class="text-sm font-bold text-white">✏️ Editar Veículo Atual & Contrato</h3>
-            <p class="text-[10px] text-slate-400">Altere o carro, tanque, odômetro de entrada ou datas sem precisar criar uma troca.</p>
-          </div>
-          <span class="text-[9px] font-num text-emerald-400 font-bold px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20">Ativo</span>
+      <div class="glass p-4 border-cyan-500/20 bg-cyan-500/[0.02] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div>
+          <h3 class="text-xs sm:text-sm font-bold text-white flex items-center gap-1.5"><span>🔄</span> Trocou de Carro na Locadora?</h3>
+          <p class="text-[10px] text-slate-400">Transfira o contrato sem perder os KM rodados.</p>
         </div>
+        <button onclick="toggleModal('modalTroca', true)" class="w-full sm:w-auto px-4 py-2 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-extrabold text-xs font-num">
+          Registrar Troca
+        </button>
+      </div>
 
+      <div class="glass p-4 sm:p-5">
+        <h3 class="text-xs sm:text-sm font-bold mb-3">Editar Veículo Atual & Contrato</h3>
         <form onsubmit="salvarConfigAluguel(event)" class="space-y-3">
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
-            <div>
-              <label class="block text-[9px] font-bold uppercase text-slate-400 mb-1">Modelo do Carro Atual</label>
-              <input type="text" id="cfgCarro" required class="c-input w-full px-2.5 py-1.5 text-xs font-bold">
-            </div>
-            <div>
-              <label class="block text-[9px] font-bold uppercase text-slate-400 mb-1">Capacidade do Tanque (Litros)</label>
-              <input type="number" id="cfgTanque" required class="c-input w-full px-2.5 py-1.5 text-xs font-num font-bold">
-            </div>
-            <div>
-              <label class="block text-[9px] font-bold uppercase text-slate-400 mb-1">Placa</label>
-              <input type="text" id="cfgPlaca" placeholder="Ex: BRA2E19" class="c-input w-full px-2.5 py-1.5 text-xs font-num">
-            </div>
-            <div>
-              <label class="block text-[9px] font-bold uppercase text-slate-400 mb-1">Odômetro Inicial de Retirada (deste carro)</label>
-              <input type="number" id="cfgOdoIni" required class="c-input w-full px-2.5 py-1.5 text-xs font-num font-bold">
-            </div>
-            <div>
-              <label class="block text-[9px] font-bold uppercase text-slate-400 mb-1">Data Início do Contrato</label>
-              <input type="date" id="cfgDataIni" required class="c-input w-full px-2.5 py-1.5 text-xs font-num">
-            </div>
-            <div>
-              <label class="block text-[9px] font-bold uppercase text-slate-400 mb-1">Data Devolução do Contrato</label>
-              <input type="date" id="cfgDataFim" required class="c-input w-full px-2.5 py-1.5 text-xs font-num">
-            </div>
-            <div>
-              <label class="block text-[9px] font-bold uppercase text-slate-400 mb-1">Franquia Total de KM (Contrato)</label>
-              <input type="number" id="cfgFranquia" required class="c-input w-full px-2.5 py-1.5 text-xs font-num font-bold">
-            </div>
-            <div>
-              <label class="block text-[9px] font-bold uppercase text-slate-400 mb-1">KM Rodados em Carros Anteriores</label>
-              <input type="number" id="cfgKmAnt" class="c-input w-full px-2.5 py-1.5 text-xs font-num font-bold">
-            </div>
+            <div><label class="block text-[9px] font-bold uppercase text-slate-400 mb-1">Carro</label><input type="text" id="cfgCarro" required class="c-input w-full px-2.5 py-1.5 text-xs font-bold"></div>
+            <div><label class="block text-[9px] font-bold uppercase text-slate-400 mb-1">Tanque (L)</label><input type="number" id="cfgTanque" required class="c-input w-full px-2.5 py-1.5 text-xs font-num font-bold"></div>
+            <div><label class="block text-[9px] font-bold uppercase text-slate-400 mb-1">Placa</label><input type="text" id="cfgPlaca" class="c-input w-full px-2.5 py-1.5 text-xs font-num"></div>
+            <div><label class="block text-[9px] font-bold uppercase text-slate-400 mb-1">Odo Retirada</label><input type="number" id="cfgOdoIni" required class="c-input w-full px-2.5 py-1.5 text-xs font-num font-bold"></div>
+            <div><label class="block text-[9px] font-bold uppercase text-slate-400 mb-1">Data Início</label><input type="date" id="cfgDataIni" required class="c-input w-full px-2.5 py-1.5 text-xs font-num"></div>
+            <div><label class="block text-[9px] font-bold uppercase text-slate-400 mb-1">Data Devolução</label><input type="date" id="cfgDataFim" required class="c-input w-full px-2.5 py-1.5 text-xs font-num"></div>
+            <div><label class="block text-[9px] font-bold uppercase text-slate-400 mb-1">Franquia (KM)</label><input type="number" id="cfgFranquia" required class="c-input w-full px-2.5 py-1.5 text-xs font-num font-bold"></div>
+            <div><label class="block text-[9px] font-bold uppercase text-slate-400 mb-1">KM Carros Anteriores</label><input type="number" id="cfgKmAnt" class="c-input w-full px-2.5 py-1.5 text-xs font-num font-bold"></div>
           </div>
-
           <div class="flex justify-end pt-2">
             <button type="submit" class="w-full sm:w-auto px-5 py-2 rounded-lg bg-white text-slate-900 font-bold text-xs shadow hover:bg-slate-200">
-              Salvar Dados do Carro Atual
+              Salvar Modificações
             </button>
           </div>
         </form>
       </div>
 
-      <!-- Troca de Carro na Locadora (Substituição) -->
-      <div class="glass p-4 border-cyan-500/20 bg-cyan-500/[0.02] flex
+    </div>
+  </main>
+
+  <!-- ============================== -->
+  <!-- MODALS                         -->
+  <!-- ============================== -->
+  
+  <!-- Config/API -->
+  <div id="modalConfig" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 items-center justify-center p-4" style="display: none;">
+    <div class="glass max-w-sm w-full p-5 space-y-4 shadow-2xl">
+      <div class="flex justify-between items-center pb-2 border-b border-white/10">
+        <h3 class="text-sm font-bold">Ajustes & Conexão</h3>
+        <button onclick="toggleModal('modalConfig', false)" class="text-slate-400 hover:text-white p-1">✕</button>
+      </div>
+      <div>
+        <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Tema</label>
+        <div class="glass p-1 flex rounded-lg text-xs font-bold">
+          <button onclick="setTheme('dark')" class="flex-1 py-1 rounded hover:bg-white/10">🌙 Escuro</button>
+          <button onclick="setTheme('light')" class="flex-1 py-1 rounded text-slate-400 hover:text-white">☀️ Claro</button>
+        </div>
+      </div>
+      <div>
+        <div class="flex justify-between mb-1">
+          <label class="text-[10px] font-bold uppercase text-slate-400">Endpoint Planilha</label>
+          <button onclick="restaurarApi()" class="text-[9px] text-cyan-400 underline">Restaurar Original</button>
+        </div>
+        <input type="text" id="cfgApiUrl" class="c-input w-full px-2.5 py-2 text-[10px] font-num">
+        <div id="statusTesteApi" class="text-[10px] font-num p-2 rounded mt-2 hidden"></div>
+      </div>
+      <div class="flex justify-between pt-2">
+        <button onclick="testarApi()" class="px-3 py-1.5 rounded border border-white/15 text-xs font-bold">Testar</button>
+        <button onclick="salvarApi()" class="px-4 py-1.5 rounded bg-white text-slate-900 font-bold text-xs">Salvar & Sincronizar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Calibrar Tanque -->
+  <div id="modalCalibrar" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 items-center justify-center p-4" style="display: none;">
+    <div class="glass max-w-sm w-full p-5 space-y-3 shadow-2xl">
+      <div class="flex justify-between items-center pb-2 border-b border-white/10">
+        <h3 class="text-xs sm:text-sm font-bold">Calibrar Combustível</h3>
+        <button onclick="toggleModal('modalCalibrar', false)" class="text-slate-400 hover:text-white p-1">✕</button>
+      </div>
+      <div class="flex items-center space-x-2">
+        <input type="number" id="inCalibrarLitros" step="0.5" class="c-input w-full px-3 py-2 text-sm font-num font-bold">
+        <span class="text-xs font-bold font-num text-slate-400" id="calibrarCapRef">/ 50L</span>
+      </div>
+      <div class="grid grid-cols-4 gap-1.5 pt-1 text-[10px] font-num text-center">
+        <button onclick="setCalibrarLitros(0.125)" class="p-1.5 rounded bg-white/5 border border-white/10 font-bold">1/8</button>
+        <button onclick="setCalibrarLitros(0.25)" class="p-1.5 rounded bg-white/5 border border-white/10 font-bold">1/4</button>
+        <button onclick="setCalibrarLitros(0.50)" class="p-1.5 rounded bg-white/5 border border-white/10 font-bold">1/2</button>
+        <button onclick="setCalibrarLitros(1.00)" class="p-1.5 rounded bg-white/5 border border-white/10 font-bold">Cheio</button>
+      </div>
+      <div class="flex justify-end space-x-2 pt-2">
+        <button onclick="toggleModal('modalCalibrar', false)" class="px-3 py-1.5 rounded text-xs">Cancelar</button>
+        <button onclick="confirmarCalibrar()" class="px-4 py-1.5 rounded bg-white text-slate-900 font-bold text-xs">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Troca de Carro -->
+  <div id="modalTroca" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 items-center justify-center p-4" style="display: none;">
+    <div class="glass max-w-sm w-full p-5 space-y-3 shadow-2xl">
+      <div class="flex justify-between items-center pb-2 border-b border-white/10">
+        <h3 class="text-xs sm:text-sm font-bold flex items-center gap-1.5"><span>🔄</span> Substituição de Veículo</h3>
+        <button onclick="toggleModal('modalTroca', false)" class="text-slate-400 hover:text-white p-1">✕</button>
+      </div>
+      <form onsubmit="confirmarTrocaCarro(event)" class="space-y-3">
+        <div>
+          <label class="block text-[9px] uppercase font-bold text-amber-4
