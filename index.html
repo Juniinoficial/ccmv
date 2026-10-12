@@ -5,258 +5,182 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>CCMV | Cockpit & Gestão de Frotas</title>
   
-  <!-- Favicon: Posto de Gasolina Vetorial Minimalista -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2310B981' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 22h12'/%3E%3Cpath d='M4 9h10v13H4z'/%3E%3Cpath d='M6 5h6v4H6z'/%3E%3Cpath d='M14 12h2a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2'/%3E%3Cpath d='M18 10c0-2.5 1-4 3-4'/%3E%3Cpath d='M21 6v3'/%3E%3C/svg%3E">
   
-  <!-- Fontes de Alta Precisão -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   
-  <!-- Tailwind CSS & Chart.js -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
     :root {
-      --bg-canvas: #07090E;
-      --card-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
-      --card-border: rgba(255, 255, 255, 0.08);
-      --card-shadow: 0 15px 35px -15px rgba(0, 0, 0, 0.8);
-      --card-specular: rgba(255, 255, 255, 0.10);
-      --input-bg: rgba(255, 255, 255, 0.03); 
-      --input-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #FFFFFF;
-      --text-secondary: #94A3B8;
-      --header-bg: rgba(7, 9, 14, 0.88);
-      --header-border: rgba(255, 255, 255, 0.08);
-      --kpi-border: rgba(255, 255, 255, 0.06);
+      --bg: #07090E;
+      --card: rgba(255, 255, 255, 0.03);
+      --border: rgba(255, 255, 255, 0.08);
+      --text: #FFFFFF;
+      --sub: #94A3B8;
+      --input: rgba(255, 255, 255, 0.04);
     }
-
     html.theme-light {
-      --bg-canvas: #F8FAFC;
-      --card-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.8) 100%);
-      --card-border: rgba(0, 0, 0, 0.08);
-      --card-shadow: 0 10px 25px -10px rgba(0, 0, 0, 0.05);
-      --card-specular: rgba(255, 255, 255, 0.8);
-      --input-bg: #FFFFFF;
-      --input-border: rgba(0, 0, 0, 0.12);
-      --text-primary: #0F172A;
-      --text-secondary: #64748B;
-      --header-bg: rgba(248, 250, 252, 0.92);
-      --header-border: rgba(0, 0, 0, 0.08);
-      --kpi-border: rgba(0, 0, 0, 0.06);
+      --bg: #F8FAFC;
+      --card: #FFFFFF;
+      --border: rgba(0, 0, 0, 0.08);
+      --text: #0F172A;
+      --sub: #64748B;
+      --input: #F1F5F9;
     }
-
     body {
-      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
-      background-color: var(--bg-canvas);
-      color: var(--text-primary);
-      transition: background-color 0.3s ease, color 0.3s ease;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
       -webkit-font-smoothing: antialiased;
-      overflow-x: hidden;
     }
-
-    .font-num {
-      font-family: 'JetBrains Mono', monospace;
-      font-feature-settings: "tnum" 1, "zero" 1;
-    }
-
-    .titanium-glass {
-      background: var(--card-bg);
-      backdrop-filter: blur(20px) saturate(160%);
-      -webkit-backdrop-filter: blur(20px) saturate(160%);
-      border: 1px solid var(--card-border);
-      box-shadow: inset 0 1px 1px 0 var(--card-specular), var(--card-shadow);
+    .font-num { font-family: 'JetBrains Mono', monospace; }
+    .glass {
+      background: var(--card);
+      border: 1px solid var(--border);
       border-radius: 16px;
-      transition: all 0.3s ease;
+      backdrop-filter: blur(16px);
     }
-
-    .titanium-input {
-      background: var(--input-bg);
-      border: 1px solid var(--input-border);
-      color: var(--text-primary);
-      transition: all 0.2s ease;
-      font-size: 16px; /* Evita zoom automático no iOS */
+    .c-input {
+      background: var(--input);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 10px;
+      font-size: 15px;
     }
-    .titanium-input:focus {
-      outline: none;
-      border-color: rgba(255, 255, 255, 0.35);
-      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.05);
-    }
-
-    /* CLUSTER DIGITAL VW (8 BARRAS) */
-    .vw-cluster-container {
-      background: radial-gradient(circle at 50% 0%, #151d2f 0%, #080b12 85%);
+    .c-input:focus { outline: none; border-color: #38BDF8; }
+    
+    /* Cluster VW (8 Segmentos Fiéis à Foto) */
+    .vw-cluster {
+      background: radial-gradient(circle at 50% 0%, #172138 0%, #080B12 85%);
       border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 16px;
-      box-shadow: inset 0 2px 10px rgba(0,0,0,0.8), 0 10px 25px rgba(0,0,0,0.5);
       position: relative;
-      overflow: hidden;
     }
-    .vw-cluster-container::before {
+    .vw-cluster::before {
       content: '';
       position: absolute;
-      top: 0;
-      left: 10%;
-      right: 10%;
-      height: 2px;
+      top: 0; left: 15%; right: 15%; height: 2px;
       background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.6), transparent);
     }
-
-    .vw-dash-segment {
-      flex: 1;
-      height: 8px;
-      border-radius: 2px;
+    .vw-seg {
+      flex: 1; height: 8px; border-radius: 2px;
       background: rgba(255, 255, 255, 0.12);
-      transition: all 0.2s ease;
-      cursor: pointer;
+      cursor: pointer; transition: all 0.2s;
     }
-    .vw-dash-segment:hover {
-      background: rgba(255, 255, 255, 0.4);
-    }
-    .vw-dash-segment.lit-white {
+    .vw-seg.lit {
       background: #FFFFFF;
-      box-shadow: 0 0 8px rgba(255, 255, 255, 0.9), 0 0 14px rgba(255, 255, 255, 0.4);
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.9);
     }
-    .vw-dash-segment.lit-red {
+    .vw-seg.reserva {
       background: #EF4444;
-      box-shadow: 0 0 8px rgba(239, 68, 68, 0.9), 0 0 14px rgba(239, 68, 68, 0.4);
+      box-shadow: 0 0 8px rgba(239, 68, 68, 0.9);
     }
   </style>
 </head>
-<body class="min-h-screen relative selection:bg-slate-500/20">
+<body class="min-h-screen pb-12">
 
-  <!-- Header Mobile-First Fluido -->
-  <header style="background: var(--header-bg); border-bottom: 1px solid var(--header-border);" class="sticky top-0 z-30 backdrop-blur-xl transition-colors duration-300">
-    <div class="max-w-7xl mx-auto px-3 sm:px-6 h-14 sm:h-16 flex items-center justify-between">
-      
-      <!-- Logo + Título -->
-      <div class="flex items-center space-x-2.5">
-        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl titanium-glass flex items-center justify-center border-white/20 shadow-inner">
-          <svg class="w-4 h-4 sm:w-5 sm:h-5 text-current" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9C2.1 11.1 2 11.5 2 12v4c0 .6.4 1 1 1h2"/>
-            <circle cx="7" cy="17" r="2"/>
-            <path d="M9 17h6"/>
-            <circle cx="17" cy="17" r="2"/>
-          </svg>
-        </div>
-        <div>
-          <div class="flex items-center gap-1.5">
-            <h1 class="text-base sm:text-lg font-extrabold tracking-tight leading-none">CCMV</h1>
-            <span id="badgeCarroAtivo" class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 truncate max-w-[120px] sm:max-w-none">
-              Carregando...
-            </span>
-          </div>
-          <p class="text-[9px] font-medium uppercase tracking-wider hidden sm:block mt-0.5" style="color: var(--text-secondary)">
-            Telemetria & Gestão de Frotas
-          </p>
-        </div>
-      </div>
-
-      <!-- Navegação Desktop -->
-      <div class="hidden sm:flex items-center space-x-1 titanium-glass p-1 rounded-xl text-xs font-bold">
-        <button onclick="navegarAba('cockpit')" id="navCockpitDesktop" class="px-4 py-1.5 rounded-lg transition-all bg-white text-slate-900 shadow-sm dark:bg-white dark:text-black">
-          📊 Cockpit
-        </button>
-        <button onclick="navegarAba('aluguel')" id="navAluguelDesktop" class="px-4 py-1.5 rounded-lg transition-all text-slate-400 hover:text-current">
-          🚘 Aluguel
-        </button>
-      </div>
-
-      <!-- Ações do Topo: Sync & Ajustes -->
+  <!-- Header -->
+  <header class="sticky top-0 z-30 bg-[#07090E]/90 backdrop-blur-md border-b border-white/10 px-3 sm:px-6 py-2.5">
+    <div class="max-w-5xl mx-auto flex items-center justify-between">
       <div class="flex items-center space-x-2">
-        <button id="syncBadge" onclick="carregarDadosDaNuvem()" title="Sincronizar com Planilha" class="h-9 px-3 rounded-xl titanium-glass hover:border-emerald-500/40 flex items-center space-x-2 text-xs font-num cursor-pointer transition-all">
-          <span class="w-2 h-2 rounded-full bg-slate-400 animate-pulse" id="syncDot"></span>
-          <span id="syncText" class="font-bold text-[11px]">Sync</span>
-        </button>
+        <span class="text-xl">🚗</span>
+        <div>
+          <div class="flex items-center space-x-2">
+            <h1 class="text-base font-extrabold tracking-tight">CCMV</h1>
+            <span id="badgeCarro" class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">VW Tera 1.0</span>
+          </div>
+          <p class="text-[9px] text-slate-400 hidden sm:block">Calculadora de Consumo Médio Veicular</p>
+        </div>
+      </div>
 
-        <button onclick="abrirModalConfig()" title="Preferências e Ajustes da API" class="h-9 px-3 rounded-xl titanium-glass hover:opacity-80 flex items-center space-x-1.5 text-xs font-bold cursor-pointer">
+      <div class="flex items-center space-x-2">
+        <button id="btnSync" onclick="carregarNuvem()" class="h-8 px-3 rounded-lg glass flex items-center space-x-1.5 text-xs font-num font-bold">
+          <span id="dotSync" class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span id="txtSync">Online</span>
+        </button>
+        <button onclick="toggleModal('modalConfig', true)" class="h-8 px-2.5 rounded-lg glass text-xs font-bold flex items-center space-x-1">
           <span>⚙️</span>
-          <span class="text-[11px] font-medium">Ajustes</span>
+          <span class="hidden sm:inline">Ajustes</span>
         </button>
       </div>
     </div>
 
-    <!-- Navegação Segmentada Mobile (Sem rolagem horizontal) -->
-    <div class="px-3 pb-2.5 sm:hidden">
-      <div class="titanium-glass p-1 rounded-xl flex items-center text-xs font-bold w-full">
-        <button onclick="navegarAba('cockpit')" id="navCockpitMobile" class="flex-1 py-1.5 rounded-lg transition-all text-center bg-white text-slate-900 shadow-sm dark:bg-white dark:text-black font-bold">
+    <!-- Navegação Mobile/Desktop -->
+    <div class="max-w-5xl mx-auto mt-2">
+      <div class="glass p-1 flex rounded-xl text-xs font-bold">
+        <button onclick="trocarAba('cockpit')" id="tabCockpit" class="flex-1 py-1.5 rounded-lg bg-white text-slate-900 shadow-sm font-bold">
           📊 Cockpit
         </button>
-        <button onclick="navegarAba('aluguel')" id="navAluguelMobile" class="flex-1 py-1.5 rounded-lg transition-all text-center text-slate-400 hover:text-current font-bold">
-          🚘 Aluguel
+        <button onclick="trocarAba('aluguel')" id="tabAluguel" class="flex-1 py-1.5 rounded-lg text-slate-400 font-bold">
+          🚘 Aluguel & Franquia
         </button>
       </div>
     </div>
   </header>
 
-  <main class="max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
+  <main class="max-w-5xl mx-auto px-3 sm:px-6 mt-4 space-y-4">
 
-    <!-- ========================================== -->
-    <!-- VIEW 1: COCKPIT DE CONSUMO & TELEMETRIA   -->
-    <!-- ========================================== -->
-    <div id="viewCockpit" class="space-y-4 sm:space-y-6">
+    <!-- ============================== -->
+    <!-- ABA 1: COCKPIT                 -->
+    <!-- ============================== -->
+    <div id="viewCockpit" class="space-y-4">
       
-      <!-- Banner Resumo do Aluguel -->
-      <div id="bannerAluguelResumo" onclick="navegarAba('aluguel')" class="titanium-glass p-3.5 sm:p-4 cursor-pointer hover:border-emerald-500/40 transition-all border-emerald-500/20 bg-emerald-500/[0.02]">
-        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          <div class="flex items-center space-x-2.5">
-            <span class="text-xl sm:text-2xl">🚗</span>
-            <div>
-              <h4 id="bannerCarroNome" class="text-xs sm:text-sm font-bold tracking-tight">Carro: Não configurado</h4>
-              <p id="bannerCarroSub" class="text-[10px] font-num" style="color: var(--text-secondary)">Toque aqui para configurar franquia e datas.</p>
-            </div>
+      <!-- Banner do Aluguel -->
+      <div onclick="trocarAba('aluguel')" class="glass p-3.5 border-emerald-500/20 bg-emerald-500/[0.02] cursor-pointer">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5">
+          <div>
+            <h2 id="bannerCarro" class="text-xs sm:text-sm font-bold text-white">Veículo: VW Tera 1.0 TSI</h2>
+            <p id="bannerSub" class="text-[10px] text-slate-400 font-num">Franquia de 2.000 km • Clique para gerenciar</p>
           </div>
-          
           <div class="grid grid-cols-3 gap-2 w-full sm:w-auto text-right font-num">
-            <div class="px-2 py-1 rounded-lg bg-black/10 dark:bg-white/5 border border-white/5">
-              <span class="text-[8px] uppercase tracking-wider block font-bold text-cyan-400">Cota/Dia</span>
-              <span id="bannerKmPorDia" class="font-black text-cyan-400 text-xs sm:text-sm">-- km</span>
+            <div class="p-1.5 rounded bg-black/20 border border-white/5">
+              <span class="text-[8px] uppercase block text-cyan-400 font-bold">Cota/Dia</span>
+              <span id="bannerCotaDia" class="text-xs font-bold text-cyan-400">66.7 km</span>
             </div>
-            <div class="px-2 py-1 rounded-lg bg-black/10 dark:bg-white/5 border border-white/5">
-              <span class="text-[8px] uppercase tracking-wider block font-bold" style="color: var(--text-secondary)">Saldo</span>
-              <span id="bannerFranquiaRestante" class="font-black text-emerald-400 text-xs sm:text-sm">-- km</span>
+            <div class="p-1.5 rounded bg-black/20 border border-white/5">
+              <span class="text-[8px] uppercase block text-slate-400 font-bold">Saldo</span>
+              <span id="bannerSaldo" class="text-xs font-bold text-emerald-400">2.000 km</span>
             </div>
-            <div class="px-2 py-1 rounded-lg bg-black/10 dark:bg-white/5 border border-white/5">
-              <span class="text-[8px] uppercase tracking-wider block font-bold" style="color: var(--text-secondary)">Prazo</span>
-              <span id="bannerDiasRestantes" class="font-black text-white text-xs sm:text-sm">-- dias</span>
+            <div class="p-1.5 rounded bg-black/20 border border-white/5">
+              <span class="text-[8px] uppercase block text-slate-400 font-bold">Prazo</span>
+              <span id="bannerPrazo" class="text-xs font-bold text-white">30 dias</span>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- RÉPLICA DO PAINEL DIGITAL VW (8 BARRAS) -->
-      <div class="vw-cluster-container p-4 sm:p-5 text-white">
+      <!-- Cluster Digital VW (8 Segmentos) -->
+      <div class="vw-cluster p-4 sm:p-5 text-white">
         <div class="flex items-center justify-between pb-3 border-b border-white/10">
           <div>
-            <div class="flex items-center space-x-2">
-              <span class="text-[10px] sm:text-xs uppercase font-extrabold tracking-widest text-slate-400">Nível do Tanque</span>
-              <span class="text-[8px] sm:text-[9px] px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 font-num font-bold">VW Cluster</span>
-            </div>
-            <p class="text-[11px] sm:text-xs text-slate-300 font-num mt-0.5">
-              Volume: <b id="clusterLitrosTexto" class="text-white">-- L</b> (<span id="clusterPercentualTexto" class="text-cyan-400">--%</span>) • Autonomia: <b id="clusterAutonomiaTexto" class="text-emerald-400">~-- km</b>
+            <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Marcador de Combustível</span>
+            <p class="text-xs text-slate-300 font-num mt-0.5">
+              Tanque: <b id="clusterLitros" class="text-white text-sm">31.2 L</b> (<span id="clusterPct" class="text-cyan-400">63%</span>) • Autonomia: <b id="clusterAuto" class="text-emerald-400 text-sm">~421 km</b>
             </p>
           </div>
-          
-          <button onclick="abrirAjusteRapidoTanque()" class="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-[10px] font-bold font-num border border-white/15 transition-all">
+          <button onclick="toggleModal('modalCalibrar', true)" class="px-2.5 py-1 rounded bg-white/10 hover:bg-white/20 text-[10px] font-bold font-num border border-white/15">
             Calibrar
           </button>
         </div>
 
-        <!-- 8 Traços da Foto -->
         <div class="max-w-md mx-auto pt-4 pb-1">
+          <!-- 8 Barras da Foto -->
           <div class="flex items-center gap-1 sm:gap-1.5 px-1">
-            <div class="vw-dash-segment" id="seg1" onclick="definirBarraTanque(1)" title="1/8 (Reserva)"></div>
-            <div class="vw-dash-segment" id="seg2" onclick="definirBarraTanque(2)" title="2/8"></div>
-            <div class="vw-dash-segment" id="seg3" onclick="definirBarraTanque(3)" title="3/8"></div>
-            <div class="vw-dash-segment" id="seg4" onclick="definirBarraTanque(4)" title="4/8 (Meio tanque)"></div>
-            <div class="vw-dash-segment" id="seg5" onclick="definirBarraTanque(5)" title="5/8"></div>
-            <div class="vw-dash-segment" id="seg6" onclick="definirBarraTanque(6)" title="6/8"></div>
-            <div class="vw-dash-segment" id="seg7" onclick="definirBarraTanque(7)" title="7/8"></div>
-            <div class="vw-dash-segment" id="seg8" onclick="definirBarraTanque(8)" title="8/8 (Cheio)"></div>
+            <div class="vw-seg" id="b1" onclick="cliqueSegmento(1)"></div>
+            <div class="vw-seg" id="b2" onclick="cliqueSegmento(2)"></div>
+            <div class="vw-seg" id="b3" onclick="cliqueSegmento(3)"></div>
+            <div class="vw-seg" id="b4" onclick="cliqueSegmento(4)"></div>
+            <div class="vw-seg" id="b5" onclick="cliqueSegmento(5)"></div>
+            <div class="vw-seg" id="b6" onclick="cliqueSegmento(6)"></div>
+            <div class="vw-seg" id="b7" onclick="cliqueSegmento(7)"></div>
+            <div class="vw-seg" id="b8" onclick="cliqueSegmento(8)"></div>
           </div>
 
+          <!-- Escala Idêntica à Foto: 0, |, 1/2, |, 1 + Bomba -->
           <div class="flex items-center justify-between text-[11px] sm:text-xs font-num font-extrabold text-white px-1 mt-2">
             <span class="w-3 text-center">0</span>
             <span class="w-3 text-center text-slate-400 font-light">|</span>
@@ -270,8 +194,835 @@
               <span>1</span>
             </div>
           </div>
+          <p class="text-center text-[9px] text-slate-400 font-num mt-2.5">*Clique na barra correspondente para igualar ao painel do carro.</p>
         </div>
       </div>
 
-      <!-- KPI HUD Compacto -->
+      <!-- 4 Cards de Métricas (KPIs) -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
+        <div class="glass p-3.5">
+          <div class="flex justify-between items-center text-[9px] uppercase font-bold text-slate-400">
+            <span>Média Real</span>
+            <span class="text-emerald-400 font-num">KM/L</span>
+          </div>
+          <h3 id="kpiKmL" class="text-2xl font-extrabold font-num text-emerald-400 mt-1">13.5</h3>
+          <p id="kpiL100" class="text-[10px] text-slate-400 font-num">7.4 L/100km</p>
+        </div>
+
+        <div class="glass p-3.5">
+          <span class="text-[9px] uppercase font-bold text-slate-400 block">Odômetro Atual</span>
+          <h3 id="kpiOdometro" class="text-2xl font-extrabold font-num text-white mt-1">48.350</h3>
+          <p id="kpiKmContrato" class="text-[10px] text-emerald-400 font-num font-bold">0 km no contrato</p>
+        </div>
+
+        <div class="glass p-3.5">
+          <span class="text-[9px] uppercase font-bold text-slate-400 block">Gasto Combustível</span>
+          <div class="flex items-baseline space-x-1 mt-1">
+            <span class="text-xs text-slate-400 font-light">R$</span>
+            <h3 id="kpiGastoTotal" class="text-2xl font-extrabold font-num text-white">0,00</h3>
+          </div>
+          <p id="kpiGastoSemana" class="text-[10px] text-slate-400 font-num">Semana: R$ 0,00</p>
+        </div>
+
+        <div class="glass p-3.5">
+          <span class="text-[9px] uppercase font-bold text-slate-400 block">Custo por KM</span>
+          <div class="flex items-baseline space-x-1 mt-1">
+            <span class="text-xs text-slate-400 font-light">R$</span>
+            <h3 id="kpiCustoKm" class="text-2xl font-extrabold font-num text-white">0,43</h3>
+          </div>
+          <p class="text-[10px] text-cyan-400 font-num font-bold">Por km rodado</p>
+        </div>
+      </div>
+
+      <!-- Formulário de Registro (Abastecimento ou KM Diário) -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        
+        <div class="lg:col-span-7 glass p-4 sm:p-5">
+          <div class="flex items-center justify-between pb-3 border-b border-white/10">
+            <div class="flex p-0.5 rounded-lg bg-black/30 border border-white/5 text-[11px] font-bold">
+              <button type="button" id="btnModoAbastecer" onclick="setModoForm('abastecer')" class="px-3 py-1 rounded bg-white text-slate-900 shadow">
+                ⛽ Abastecer
+              </button>
+              <button type="button" id="btnModoCheckin" onclick="setModoForm('checkin')" class="px-3 py-1 rounded text-slate-400">
+                📍 KM Diário
+              </button>
+            </div>
+            <span id="hintUltimoKm" class="text-[9px] font-num text-slate-400">Último: 48.350 km</span>
+          </div>
+
+          <form id="formRegistro" onsubmit="salvarRegistro(event)" class="mt-3.5 space-y-3">
+            <div>
+              <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Odômetro Atual (KM Total)</label>
+              <input type="number" id="inOdo" required step="1" placeholder="Ex: 48500" class="c-input w-full px-3 py-2 font-num font-bold">
+            </div>
+
+            <div id="secaoCamposAbastecimento" class="space-y-3">
+              <div class="grid grid-cols-2 gap-2.5">
+                <div>
+                  <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Combustível</label>
+                  <select id="inComb" class="c-input w-full px-2.5 py-2 text-xs font-bold">
+                    <option value="Gasolina">Gasolina</option>
+                    <option value="Etanol">Etanol</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Preço/Litro (R$)</label>
+                  <input type="number" id="inPreco" step="0.001" placeholder="Ex: 5.89" class="c-input w-full px-2.5 py-2 text-xs font-num font-bold">
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Litros Colocados</label>
+                  <input type="number" id="inLitros" step="0.01" placeholder="Ex: 20.00" class="c-input w-full px-2.5 py-2 text-xs font-num font-bold">
+                </div>
+                <div>
+                  <div class="flex justify-between items-center mb-1">
+                    <label class="text-[10px] font-bold uppercase text-slate-400">Total (R$)</label>
+                    <span class="text-[8px] text-emerald-400 font-bold font-num">Auto</span>
+                  </div>
+                  <input type="number" id="inValor" step="0.01" placeholder="Ex: 117.80" class="c-input w-full px-2.5 py-2 text-xs font-num font-bold">
+                </div>
+              </div>
+
+              <!-- Prévia em Tempo Real -->
+              <div class="grid grid-cols-3 gap-1.5 p-2 rounded-lg bg-black/30 border border-white/5 text-center font-num text-[10px]">
+                <div>
+                  <span class="text-[8px] text-slate-400 block uppercase">Distância</span>
+                  <b id="prevKm" class="text-white">0 km</b>
+                </div>
+                <div>
+                  <span class="text-[8px] text-slate-400 block uppercase">Custo/L</span>
+                  <b id="prevPrecoL" class="text-white">R$ 0,00</b>
+                </div>
+                <div>
+                  <span class="text-[8px] text-slate-400 block uppercase">Consumo</span>
+                  <b id="prevKmL" class="text-emerald-400">0.0 km/l</b>
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" id="btnSalvarReg" class="w-full py-2.5 rounded-lg bg-white text-slate-900 font-extrabold text-xs shadow transition-all hover:bg-slate-200">
+              Salvar Registro
+            </button>
+          </form>
+        </div>
+
+        <!-- Calculadora Flex na Bomba -->
+        <div class="lg:col-span-5 glass p-4 sm:p-5 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between pb-3 border-b border-white/10">
+              <h2 class="text-xs sm:text-sm font-bold">Decisor Flex (Bomba)</h2>
+              <span class="text-[8px] font-num font-bold px-1.5 py-0.5 rounded bg-white/10">70% RATIO</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 mt-3">
+              <div>
+                <label class="block text-[9px] font-bold uppercase text-slate-400 mb-1">Gasolina (R$)</label>
+                <input type="number" id="flexGas" step="0.01" placeholder="5.89" oninput="calcularFlex()" class="c-input w-full px-2.5 py-2 text-xs font-num font-bold">
+              </div>
+              <div>
+                <label class="block text-[9px] font-bold uppercase text-slate-400 mb-1">Etanol (R$)</label>
+                <input type="number" id="flexEta" step="0.01" placeholder="3.89" oninput="calcularFlex()" class="c-input w-full px-2.5 py-2 text-xs font-num font-bold">
+              </div>
+            </div>
+
+            <div id="boxFlex" class="mt-3 p-3 rounded-xl border border-white/10 bg-black/20 text-center">
+              <span class="text-[8px] uppercase tracking-wider text-slate-400 block">Veredito</span>
+              <h3 id="txtFlexVeredito" class="text-base font-extrabold font-num text-slate-300">Digite os Preços</h3>
+              <p id="txtFlexRatio" class="text-[9px] font-num text-slate-400 mt-0.5">Paridade: --</p>
+            </div>
+          </div>
+          <p class="text-[8px] text-slate-400 text-center mt-3">*Relação estequiométrica padrão de 70%.</p>
+        </div>
+
+      </div>
+
+      <!-- Gráfico Simples de Desembolso -->
+      <div class="glass p-4 sm:p-5">
+        <h2 class="text-xs sm:text-sm font-bold mb-3">Evolução Financeira (R$) & Quilometragem</h2>
+        <div class="h-44 sm:h-56"><canvas id="graficoEvolucao"></canvas></div>
+      </div>
+
+      <!-- Histórico (Cards no Mobile / Tabela no Desktop) -->
+      <div class="glass overflow-hidden">
+        <div class="p-3.5 border-b border-white/10 flex items-center justify-between">
+          <h2 class="text-xs sm:text-sm font-bold">Histórico de Lançamentos</h2>
+          <button onclick="carregarNuvem()" class="px-2.5 py-1 rounded border border-white/10 text-[9px] font-bold font-num bg-white/5">
+            Atualizar
+          </button>
+        </div>
+
+        <!-- Lista Mobile -->
+        <div id="listaMobile" class="divide-y divide-white/5 sm:hidden font-num text-xs">
+          <div class="text-center py-6 text-slate-400 text-[11px]">Nenhum lançamento registrado.</div>
+        </div>
+
+        <!-- Tabela Desktop -->
+        <div class="hidden sm:block overflow-x-auto">
+          <table class="w-full text-left text-[11px] font-num">
+            <thead>
+              <tr class="bg-black/30 text-slate-400 uppercase text-[9px] border-b border-white/10">
+                <th class="py-2.5 px-3">Data</th>
+                <th class="py-2.5 px-3">Odômetro</th>
+                <th class="py-2.5 px-3">Delta</th>
+                <th class="py-2.5 px-3">Tipo</th>
+                <th class="py-2.5 px-3">Litros</th>
+                <th class="py-2.5 px-3">Valor</th>
+                <th class="py-2.5 px-3">KM/L</th>
+                <th class="py-2.5 px-3 text-center">Ação</th>
+              </tr>
+            </thead>
+            <tbody id="tabelaDesktop" class="divide-y divide-white/5">
+              <tr><td colspan="8" class="text-center py-6 text-slate-400">Nenhum lançamento registrado.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ============================== -->
+    <!-- ABA 2: ALUGUEL & FRANQUIA      -->
+    <!-- ============================== -->
+    <div id="viewAluguel" class="space-y-4 hidden">
       
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
+        <div class="glass p-3.5">
+          <span class="text-[9px] font-bold uppercase text-cyan-400 block">Cota/Dia</span>
+          <h3 id="hudCotaDia" class="text-2xl font-extrabold font-num text-cyan-400 mt-1">66.7</h3>
+          <p class="text-[9px] text-slate-400">km por dia permitidos</p>
+        </div>
+        <div class="glass p-3.5">
+          <span class="text-[9px] font-bold uppercase text-emerald-400 block">Saldo Franquia</span>
+          <h3 id="hudSaldo" class="text-2xl font-extrabold font-num text-emerald-400 mt-1">2.000</h3>
+          <p id="hudTotalFranquia" class="text-[9px] font-bold text-slate-400">Total: 2.000 km</p>
+        </div>
+        <div class="glass p-3.5">
+          <span class="text-[9px] font-bold uppercase text-slate-400 block">Ritmo Médio</span>
+          <h3 id="hudRitmo" class="text-2xl font-extrabold font-num text-white mt-1">0</h3>
+          <p class="text-[9px] text-slate-400">km/dia rodados</p>
+        </div>
+        <div class="glass p-3.5">
+          <span class="text-[9px] font-bold uppercase text-slate-400 block">Dias Restantes</span>
+          <h3 id="hudDias" class="text-2xl font-extrabold font-num text-white mt-1">30</h3>
+          <p id="hudDataFim" class="text-[9px] text-slate-400">Devolução: 31/10</p>
+        </div>
+      </div>
+
+      <!-- Troca de Carro na Locadora -->
+      <div class="glass p-4 border-cyan-500/20 bg-cyan-500/[0.02] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div>
+          <h3 class="text-xs sm:text-sm font-bold text-white flex items-center gap-1.5">
+            <span>🔄</span> Trocou de Carro na Locadora?
+          </h3>
+          <p class="text-[10px] text-slate-400">Transfira o contrato para o novo veículo sem perder os KM já rodados.</p>
+        </div>
+        <button onclick="toggleModal('modalTroca', true)" class="w-full sm:w-auto px-4 py-2 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-extrabold text-xs font-num">
+          Registrar Troca de Veículo
+        </button>
+      </div>
+
+      <!-- Configurações do Contrato -->
+      <div class="glass p-4 sm:p-5">
+        <h3 class="text-xs sm:text-sm font-bold mb-3">Configurações do Veículo Atual</h3>
+        <form onsubmit="salvarConfigAluguel(event)" class="space-y-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+            <div>
+              <label class="block text-[9px] font-bold uppercase text-slate-400 mb-1">Modelo do Carro</label>
+              <input type="text" id="cfgCarro" required value="VW Tera 1.0 TSI" class="c-input w-full px-2.5 py-1.5 text-xs font-bold">
+            </div>
+            <div>
+              <label class="block text-[9px] font-bold uppercase text-slate-400 mb-1">Capacidade do Tanque (Litros)</label>
+              <input type="number" id="cfgTanque" required value="50" class="c-input w-full px-2.5 py-1.5 text-xs font-num font-bold">
+            </div>
+            <div>
+              <label class="block text-[9px] font-bold uppercase text-slate-400 mb-1">Placa</label>
+              <input type="text" id="cfgPlaca" placeholder="Ex: BRA2E19" class="c-input w-full px-2.5 py-1.5 text-xs font-num">
+            </div>
+            <div>
+              <label class="block text-[9px] font-bold uppercase text-slate-400 mb-1">Odômetro Inicial ao Retirar</label>
+              <input type="number" id="cfgOdoIni" required value="48350" class="c-input w-full px-2.5 py-1.5 text-xs font-num font-bold">
+            </div>
+            <div>
+              <label class="block text-[9px] font-bold uppercase text-slate-400 mb-1">Data Início</label>
+              <input type="date" id="cfgDataIni" required value="2026-10-01" class="c-input w-full px-2.5 py-1.5 text-xs font-num">
+            </div>
+            <div>
+              <label class="block text-[9px] font-bold uppercase text-slate-400 mb-1">Data Devolução</label>
+              <input type="date" id="cfgDataFim" required value="2026-10-31" class="c-input w-full px-2.5 py-1.5 text-xs font-num">
+            </div>
+            <div>
+              <label class="block text-[9px] font-bold uppercase text-slate-400 mb-1">Franquia Total de KM (Contrato)</label>
+              <input type="number" id="cfgFranquia" required value="2000" class="c-input w-full px-2.5 py-1.5 text-xs font-num font-bold">
+            </div>
+            <div>
+              <label class="block text-[9px] font-bold uppercase text-slate-400 mb-1">KM Rodados em Carros Anteriores</label>
+              <input type="number" id="cfgKmAnt" value="0" class="c-input w-full px-2.5 py-1.5 text-xs font-num font-bold">
+            </div>
+          </div>
+          <div class="flex justify-end pt-2">
+            <button type="submit" class="px-5 py-2 rounded-lg bg-white text-slate-900 font-bold text-xs shadow hover:bg-slate-200">
+              Salvar Contrato
+            </button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ============================== -->
+  <!-- MODAL: AJUSTES DA API & TEMA   -->
+  <!-- ============================== -->
+  <div id="modalConfig" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 items-center justify-center p-4" style="display: none;">
+    <div class="glass max-w-sm w-full p-5 space-y-4">
+      <div class="flex justify-between items-center pb-2 border-b border-white/10">
+        <h3 class="text-sm font-bold">Ajustes & Conexão</h3>
+        <button onclick="toggleModal('modalConfig', false)" class="text-slate-400 hover:text-white p-1">✕</button>
+      </div>
+
+      <div>
+        <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Aparência</label>
+        <div class="glass p-1 flex rounded-lg text-xs font-bold">
+          <button onclick="setTheme('dark')" id="themeDark" class="flex-1 py-1 rounded bg-white/10">🌙 Escuro</button>
+          <button onclick="setTheme('light')" id="themeLight" class="flex-1 py-1 rounded text-slate-400">☀️ Claro</button>
+        </div>
+      </div>
+
+      <div>
+        <div class="flex justify-between items-center mb-1">
+          <label class="text-[10px] font-bold uppercase text-slate-400">Endpoint da Planilha</label>
+          <button onclick="restaurarApi()" class="text-[9px] text-cyan-400 underline">Restaurar Oficial</button>
+        </div>
+        <input type="text" id="cfgApiUrl" class="c-input w-full px-2.5 py-2 text-[10px] font-num">
+        <div id="statusTesteApi" class="text-[10px] font-num p-2 rounded mt-2 hidden leading-relaxed"></div>
+      </div>
+
+      <div class="flex justify-between items-center pt-2 border-t border-white/10">
+        <button onclick="testarApi()" type="button" class="px-3 py-1.5 rounded border border-white/15 text-xs font-bold hover:bg-white/5">
+          Testar
+        </button>
+        <button onclick="salvarApi()" type="button" class="px-4 py-1.5 rounded bg-white text-slate-900 font-bold text-xs">
+          Salvar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CALIBRAR TANQUE -->
+  <div id="modalCalibrar" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 items-center justify-center p-4" style="display: none;">
+    <div class="glass max-w-sm w-full p-5 space-y-3">
+      <div class="flex justify-between items-center pb-2 border-b border-white/10">
+        <h3 class="text-xs sm:text-sm font-bold">Calibrar Marcador de Combustível</h3>
+        <button onclick="toggleModal('modalCalibrar', false)" class="text-slate-400 hover:text-white p-1">✕</button>
+      </div>
+      <p class="text-[11px] text-slate-300">Digite quantos litros reais estão no tanque:</p>
+      <div class="flex items-center space-x-2">
+        <input type="number" id="inCalibrarLitros" step="0.5" class="c-input w-full px-3 py-2 text-sm font-num font-bold">
+        <span class="text-xs font-bold font-num text-slate-400">/ 50L</span>
+      </div>
+      <div class="grid grid-cols-4 gap-1.5 pt-1 text-[10px] font-num text-center">
+        <button onclick="setCalibrarLitros(0.125)" class="p-1.5 rounded bg-white/5 border border-white/10 font-bold">1/8 (R)</button>
+        <button onclick="setCalibrarLitros(0.25)" class="p-1.5 rounded bg-white/5 border border-white/10 font-bold">1/4</button>
+        <button onclick="setCalibrarLitros(0.50)" class="p-1.5 rounded bg-white/5 border border-white/10 font-bold">1/2</button>
+        <button onclick="setCalibrarLitros(1.00)" class="p-1.5 rounded bg-white/5 border border-white/10 font-bold">Cheio</button>
+      </div>
+      <div class="flex justify-end space-x-2 pt-2">
+        <button onclick="toggleModal('modalCalibrar', false)" class="px-3 py-1.5 rounded text-xs">Cancelar</button>
+        <button onclick="confirmarCalibrar()" class="px-4 py-1.5 rounded bg-white text-slate-900 font-bold text-xs">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: REGISTRAR TROCA DE CARRO -->
+  <div id="modalTroca" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 items-center justify-center p-4" style="display: none;">
+    <div class="glass max-w-sm w-full p-5 space-y-3">
+      <div class="flex justify-between items-center pb-2 border-b border-white/10">
+        <h3 class="text-xs sm:text-sm font-bold">Substituição de Veículo</h3>
+        <button onclick="toggleModal('modalTroca', false)" class="text-slate-400 hover:text-white p-1">✕</button>
+      </div>
+      <form onsubmit="confirmarTrocaCarro(event)" class="space-y-3">
+        <div>
+          <label class="block text-[9px] uppercase font-bold text-amber-400 mb-1">Odômetro Final do Carro Devolvido</label>
+          <input type="number" id="trocaOdoDevolucao" required class="c-input w-full px-2.5 py-1.5 text-xs font-num font-bold">
+        </div>
+        <div class="border-t border-white/10 pt-2 space-y-2">
+          <span class="text-[9px] uppercase font-bold text-cyan-400 block">Novo Carro Entregue</span>
+          <input type="text" id="trocaNovoCarro" required placeholder="Modelo do novo carro" class="c-input w-full px-2.5 py-1.5 text-xs">
+          <input type="number" id="trocaNovoOdo" required placeholder="KM inicial ao retirar" class="c-input w-full px-2.5 py-1.5 text-xs font-num font-bold">
+          <input type="number" id="trocaNovoTanque" required value="50" placeholder="Capacidade do tanque (L)" class="c-input w-full px-2.5 py-1.5 text-xs font-num">
+        </div>
+        <div class="flex justify-end space-x-2 pt-1">
+          <button type="button" onclick="toggleModal('modalTroca', false)" class="px-3 py-1.5 rounded text-xs">Cancelar</button>
+          <button type="submit" class="px-4 py-1.5 rounded bg-cyan-500 text-slate-950 font-bold text-xs font-num">Confirmar Troca</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- SCRIPT LÓGICO COMPACTO & BLINDADO -->
+  <script>
+    const SCRIPT_URL_PADRAO = "https://script.google.com/macros/s/AKfycbzWEzQWjxqSFOx2bgCWlHGw1EkTm8qRSr7B7zLcgjpHppBLW-p7vhAF5AkeGIWHXLRDfA/exec";
+    let API_URL = localStorage.getItem("CCMV_API_URL") || SCRIPT_URL_PADRAO;
+
+    // Estado Local Inicial
+    let telemetria = JSON.parse(localStorage.getItem("CCMV_DATA")) || [];
+    let contrato = JSON.parse(localStorage.getItem("CCMV_CONTRATO")) || {
+      carro: "VW Tera 1.0 TSI", tanque: 50, placa: "", odoIni: 48350,
+      dataIni: "2026-10-01", dataFim: "2026-10-31", franquia: 2000, kmAnt: 0
+    };
+    let litrosTanque = Number(localStorage.getItem("CCMV_LITROS_TANQUE")) || 31.25; // 5/8 de 50L (exatamente como na foto)
+    let modoForm = "abastecer";
+    let chartInst = null;
+
+    function $(id) { return document.getElementById(id); }
+
+    function toggleModal(id, open) {
+      const el = $(id);
+      if (el) el.style.display = open ? 'flex' : 'none';
+    }
+
+    function trocarAba(aba) {
+      if (aba === 'cockpit') {
+        $('viewCockpit').classList.remove('hidden');
+        $('viewAluguel').classList.add('hidden');
+        $('tabCockpit').className = "flex-1 py-1.5 rounded-lg bg-white text-slate-900 shadow-sm font-bold";
+        $('tabAluguel').className = "flex-1 py-1.5 rounded-lg text-slate-400 font-bold";
+      } else {
+        $('viewAluguel').classList.remove('hidden');
+        $('viewCockpit').classList.add('hidden');
+        $('tabAluguel').className = "flex-1 py-1.5 rounded-lg bg-white text-slate-900 shadow-sm font-bold";
+        $('tabCockpit').className = "flex-1 py-1.5 rounded-lg text-slate-400 font-bold";
+      }
+    }
+
+    // Cluster VW: 8 Barras
+    function renderCluster() {
+      const cap = Number(contrato.tanque) || 50;
+      const l = Math.max(0, Math.min(cap, litrosTanque));
+      const pct = Math.round((l / cap) * 100);
+      let barras = Math.round((l / cap) * 8);
+      if (l > 0 && barras === 0) barras = 1;
+
+      for (let i = 1; i <= 8; i++) {
+        const seg = $(`b${i}`);
+        if (!seg) continue;
+        seg.className = "vw-seg";
+        if (i <= barras) {
+          seg.className = (barras === 1) ? "vw-seg reserva" : "vw-seg lit";
+        }
+      }
+
+      const kmL = Number($('kpiKmL').innerText) || 13.5;
+      const aut = Math.round(l * kmL);
+
+      $('clusterLitros').innerText = `${l.toFixed(1)} L`;
+      $('clusterPct').innerText = `${pct}%`;
+      $('clusterAuto').innerText = `~${aut} km`;
+    }
+
+    function cliqueSegmento(num) {
+      const cap = Number(contrato.tanque) || 50;
+      litrosTanque = (num / 8) * cap;
+      localStorage.setItem("CCMV_LITROS_TANQUE", litrosTanque);
+      renderCluster();
+    }
+
+    function setCalibrarLitros(f) {
+      const cap = Number(contrato.tanque) || 50;
+      $('inCalibrarLitros').value = (cap * f).toFixed(1);
+    }
+
+    function confirmarCalibrar() {
+      const v = Number($('inCalibrarLitros').value);
+      if (!isNaN(v) && v >= 0) {
+        litrosTanque = v;
+        localStorage.setItem("CCMV_LITROS_TANQUE", litrosTanque);
+        renderCluster();
+      }
+      toggleModal('modalCalibrar', false);
+    }
+
+    // Formulário: Alternar Abastecer vs KM Diário
+    function setModoForm(modo) {
+      modoForm = modo;
+      if (modo === 'abastecer') {
+        $('btnModoAbastecer').className = "px-3 py-1 rounded bg-white text-slate-900 shadow";
+        $('btnModoCheckin').className = "px-3 py-1 rounded text-slate-400";
+        $('secaoCamposAbastecimento').classList.remove('hidden');$('btnSalvarReg').innerText = "Salvar Abastecimento";
+        $('inLitros').required = true;
+        $('inValor').required = true;
+      } else {
+        $('btnModoCheckin').className = "px-3 py-1 rounded bg-white text-slate-900 shadow";
+        $('btnModoAbastecer').className = "px-3 py-1 rounded text-slate-400";
+        $('secaoCamposAbastecimento').classList.add('hidden');$('btnSalvarReg').innerText = "Salvar KM Diário";
+        $('inLitros').required = false;
+        $('inValor').required = false;
+      }
+    }
+
+    // Prévia Dinâmica do Form
+    function livePreviewForm() {
+      const odo = Number($('inOdo').value) || 0;
+      const lit = Number($('inLitros').value) || 0;
+      const preco = Number($('inPreco').value) || 0;
+      let val = Number($('inValor').value) || 0;
+
+      if (lit > 0 && preco > 0 && !$('inValor').dataset.manual) {
+        val = lit * preco;
+        $('inValor').value = val.toFixed(2);
+      }
+
+      const ultOdo = telemetria.length > 0 ? Number(telemetria[0].Odometro) : contrato.odoIni;
+      const dKm = odo > ultOdo ? odo - ultOdo : 0;
+      
+      $('prevKm').innerText = `${dKm} km`;
+      $('prevPrecoL').innerText = (lit > 0 && val > 0) ? `R$ ${(val/lit).toFixed(2)}` : "R$ 0,00";
+      
+      if (dKm > 0 && lit > 0) {
+        const c = dKm / lit;
+        $('prevKmL').innerText = c < 6.5 ? `~${c.toFixed(1)} (Parcial)` : `${c.toFixed(2)} km/l`;
+      } else {
+        $('prevKmL').innerText = "0.0 km/l";
+      }
+    }
+
+    $('inValor').addEventListener('input', () => {$('inValor').dataset.manual = "1"; });
+    ['inOdo', 'inLitros', 'inPreco'].forEach(id => $(id).addEventListener('input', livePreviewForm));
+
+    // Salvar Novo Registro
+    async function salvarRegistro(e) {
+      e.preventDefault();
+      const btn = $('btnSalvarReg');
+      btn.innerText = "Gravando..."; btn.disabled = true;
+
+      const odo = Number($('inOdo').value);
+      const ultOdo = telemetria.length > 0 ? Number(telemetria[0].Odometro) : contrato.odoIni;
+      const dKm = odo > ultOdo ? odo - ultOdo : 0;
+
+      let lit = 0, val = 0, comb = "Check-in Diário", pL = 0, kmL = 0;
+
+      if (modoForm === 'abastecer') {
+        lit = Number($('inLitros').value) || 0;
+        val = Number($('inValor').value) || 0;
+        comb = $('inComb').value;
+        pL = lit > 0 ? (val / lit) : 0;
+        litrosTanque = Math.min(contrato.tanque, litrosTanque + lit);
+        kmL = (dKm > 0 && lit > 0) ? (dKm / lit) : 0;
+      } else {
+        const consumoEst = Number($('kpiKmL').innerText) || 13.5;
+        litrosTanque = Math.max(0, litrosTanque - (dKm / consumoEst));
+      }
+
+      localStorage.setItem("CCMV_LITROS_TANQUE", litrosTanque);
+
+      const params = new URLSearchParams({
+        action: "create",
+        data: new Date().toISOString(),
+        odometro: odo,
+        kmRodado: dKm,
+        litros: lit,
+        valor: val,
+        combustivel: comb,
+        kmPorLitro: kmL.toFixed(2),
+        litros100km: kmL > 0 ? (100 / kmL).toFixed(2) : "0",
+        custoPorKm: dKm > 0 ? (val / dKm).toFixed(2) : "0",
+        precoLitro: pL.toFixed(2),
+        _t: Date.now()
+      });
+
+      try {
+        await fetch(`${API_URL}?${params.toString()}`);
+        $('formRegistro').reset();
+        delete $('inValor').dataset.manual;
+        await carregarNuvem();
+      } catch (err) {
+        alert("Erro ao gravar. Verifique sua conexão.");
+      } finally {
+        btn.innerText = modoForm === 'abastecer' ? "Salvar Abastecimento" : "Salvar KM Diário";
+        btn.disabled = false;
+      }
+    }
+
+    // Leitura e Sincronização com o Google Sheets
+    async function carregarNuvem() {
+      const dot = $('dotSync');
+      const txt = $('txtSync');
+      dot.className = "w-2 h-2 rounded-full bg-amber-400 animate-ping";
+      txt.innerText = "Sync";
+
+      try {
+        const res = await fetch(`${API_URL}?action=read&_t=${Date.now()}`);
+        const json = await res.json();
+
+        if (Array.isArray(json)) {
+          // Normaliza cabeçalhos independente de maiúsculas/minúsculas
+          telemetria = json.map(r => ({
+            _rowIndex: r._rowIndex,
+            Data: r.Data || r.data || new Date().toISOString(),
+            Odometro: Number(r.Odometro || r.odometro || 0),
+            KmRodado: Number(r.KmRodado || r.kmrodado || 0),
+            Litros: Number(r.Litros || r.litros || 0),
+            Valor: Number(r.Valor || r.valor || 0),
+            Combustivel: r.Combustivel || r.combustivel || "Gasolina",
+            KmPorLitro: Number(r.KmPorLitro || r.kmporlitro || 0)
+          })).reverse();
+
+          localStorage.setItem("CCMV_DATA", JSON.stringify(telemetria));
+          dot.className = "w-2 h-2 rounded-full bg-emerald-400";
+          txt.innerText = "Online";
+        }
+      } catch (e) {
+        dot.className = "w-2 h-2 rounded-full bg-red-400";
+        txt.innerText = "Offline";
+      }
+
+      renderUI();
+    }
+
+    // Renderização Completa do Painel
+    function renderUI() {
+      const ultOdo = telemetria.length > 0 ? Number(telemetria[0].Odometro) : contrato.odoIni;
+      $('hintUltimoKm').innerText = `Último: ${ultOdo.toLocaleString('pt-BR')} km`;
+      $('kpiOdometro').innerText = ultOdo.toLocaleString('pt-BR');
+
+      // Cálculos da Franquia de Aluguel
+      const kmAtualCarro = Math.max(0, ultOdo - contrato.odoIni);
+      const kmTotalContrato = (contrato.kmAnt || 0) + kmAtualCarro;
+      const saldoFranquia = contrato.franquia - kmTotalContrato;
+
+      const hoje = new Date(); hoje.setHours(0,0,0,0);
+      const dFim = new Date(contrato.dataFim + "T00:00:00");
+      const dIni = new Date(contrato.dataIni + "T00:00:00");
+      const diasRest = Math.max(1, Math.ceil((dFim - hoje) / 86400000));
+      const diasPass = Math.max(1, Math.ceil((hoje - dIni) / 86400000));
+
+      const cotaDia = Math.max(0, (saldoFranquia / diasRest).toFixed(1));
+      const ritmoMedio = Math.round(kmTotalContrato / diasPass);
+
+      $('bannerCotaDia').innerText = `${cotaDia} km`;
+      $('bannerSaldo').innerText = `${saldoFranquia.toLocaleString('pt-BR')} km`;
+      $('bannerPrazo').innerText = `${diasRest} d`;
+      $('badgeCarro').innerText = contrato.carro;
+      $('bannerCarro').innerText = `Veículo: ${contrato.carro} ${contrato.placa ? '• ' + contrato.placa : ''}`;
+      $('kpiKmContrato').innerText = `${kmTotalContrato} km no contrato`;
+
+      $('hudCotaDia').innerText = cotaDia;
+      $('hudSaldo').innerText = saldoFranquia.toLocaleString('pt-BR');$('hudTotalFranquia').innerText = `Total: ${contrato.franquia.toLocaleString('pt-BR')} km`;
+      $('hudRitmo').innerText = ritmoMedio;
+      $('hudDias').innerText = diasRest;
+      $('hudDataFim').innerText = `Devolução: ${dFim.toLocaleDateString('pt-BR')}`;
+
+      // Consumo Real e Gastos
+      let tGasto = 0, tLitros = 0, tKm = 0;
+      telemetria.forEach(r => {
+        tGasto += r.Valor;
+        if (r.Litros > 0) { tLitros += r.Litros; tKm += r.KmRodado; }
+      });
+
+      const mediaConsumo = (tKm > 0 && tLitros > 0) ? (tKm / tLitros) : 13.5;
+      $('kpiKmL').innerText = mediaConsumo.toFixed(1);$('kpiL100').innerText = `${(100 / mediaConsumo).toFixed(1)} L/100km`;
+      $('kpiGastoTotal').innerText = tGasto.toFixed(2);$('kpiCustoKm').innerText = tKm > 0 ? (tGasto / tKm).toFixed(2) : "0,43";
+
+      renderTabelaELista();
+      renderCluster();
+      renderGrafico();
+    }
+
+    function renderTabelaELista() {
+      const mob = $('listaMobile');
+      const dsk = $('tabelaDesktop');
+      mob.innerHTML = ''; dsk.innerHTML = '';
+
+      if (telemetria.length === 0) {
+        mob.innerHTML = '<div class="text-center py-6 text-slate-400 text-[11px]">Nenhum registro encontrado.</div>';
+        dsk.innerHTML = '<tr><td colspan="8" class="text-center py-6 text-slate-400">Nenhum registro encontrado.</td></tr>';
+        return;
+      }
+
+      telemetria.forEach(r => {
+        const d = new Date(r.Data).toLocaleDateString('pt-BR');
+        const isC = r.Litros === 0;
+
+        // Mobile Card
+        mob.innerHTML += `
+          <div class="p-3 flex items-center justify-between">
+            <div>
+              <div class="flex items-center space-x-2">
+                <b class="text-white">${r.Odometro.toLocaleString('pt-BR')} km</b>
+                <span class="text-emerald-400 font-bold">+${r.KmRodado} km</span>
+                <span class="px-1.5 py-0.2 rounded text-[8px] font-bold ${isC ? 'bg-white/10 text-slate-400' : 'bg-emerald-500/10 text-emerald-400'}">${isC ? 'KM Dia' : r.Combustivel}</span>
+              </div>
+              <div class="text-[10px] text-slate-400 mt-0.5">
+                ${d} ${isC ? '' : `• ${r.Litros.toFixed(1)}L • R$ ${r.Valor.toFixed(2)} • <b class="text-emerald-400">${r.KmPorLitro > 0 ? r.KmPorLitro.toFixed(1) + ' km/l' : ''}</b>`}
+              </div>
+            </div>
+            <button onclick="apagarLinha(${r._rowIndex})" class="p-1.5 rounded bg-rose-500/10 text-rose-400 text-xs">🗑️</button>
+          </div>
+        `;
+
+        // Desktop Row
+        dsk.innerHTML += `
+          <tr class="hover:bg-white/5">
+            <td class="py-2.5 px-3 text-slate-400">${d}</td>
+            <td class="py-2.5 px-3 font-bold">${r.Odometro.toLocaleString('pt-BR')}</td>
+            <td class="py-2.5 px-3 text-emerald-400 font-bold">+${r.KmRodado}</td>
+            <td class="py-2.5 px-3">${isC ? 'KM Dia' : r.Combustivel}</td>
+            <td class="py-2.5 px-3">${isC ? '--' : r.Litros.toFixed(1)}</td>
+            <td class="py-2.5 px-3 font-bold">${isC ? '--' : 'R$ ' + r.Valor.toFixed(2)}</td>
+            <td class="py-2.5 px-3 text-emerald-400 font-bold">${isC || r.KmPorLitro === 0 ? '--' : r.KmPorLitro.toFixed(1)}</td>
+            <td class="py-2.5 px-3 text-center">
+              <button onclick="apagarLinha(${r._rowIndex})" class="text-rose-400 hover:text-rose-300">🗑️</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    async function apagarLinha(row) {
+      if (!confirm("Excluir este lançamento?")) return;
+      try {
+        await fetch(`${API_URL}?action=delete&rowIndex=${row}&_t=${Date.now()}`);
+        await carregarNuvem();
+      } catch (e) { alert("Erro ao apagar"); }
+    }
+
+    // Calculadora Flex
+    function calcularFlex() {
+      const g = Number($('flexGas').value);
+      const e = Number($('flexEta').value);
+      if (!g || !e) return;
+      const r = (e / g) * 100;
+      $('txtFlexRatio').innerText = `Paridade: ${r.toFixed(1)}%`;
+      if (r <= 70) {
+        $('boxFlex').className = "mt-3 p-3 rounded-xl border border-emerald-500/40 bg-emerald-500/10 text-center";
+        $('txtFlexVeredito').className = "text-base font-extrabold font-num text-emerald-400";
+        $('txtFlexVeredito').innerText = "ABASTEÇA COM ETANOL";
+      } else {
+        $('boxFlex').className = "mt-3 p-3 rounded-xl border border-blue-500/40 bg-blue-500/10 text-center";
+        $('txtFlexVeredito').className = "text-base font-extrabold font-num text-blue-400";
+        $('txtFlexVeredito').innerText = "ABASTEÇA COM GASOLINA";
+      }
+    }
+
+    // Gráfico Chart.js
+    function renderGrafico() {
+      const ctx = $('graficoEvolucao').getContext('2d');
+      const cron = telemetria.slice().reverse();
+      const labels = cron.map(r => new Date(r.Data).toLocaleDateString('pt-BR'));
+      const valores = cron.map(r => r.Valor);
+
+      if (chartInst) chartInst.destroy();
+      chartInst = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Gasto (R$)',
+            data: valores,
+            borderColor: '#10B981',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            fill: true, tension: 0.3
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { x: { grid: { display: false } }, y: { grid: { color: 'rgba(255,255,255,0.05)' } } }
+        }
+      });
+    }
+
+    // Troca de Carro
+    function confirmarTrocaCarro(e) {
+      e.preventDefault();
+      const odoFim = Number($('trocaOdoDevolucao').value);
+      const kmRodadosCarro = Math.max(0, odoFim - contrato.odoIni);
+
+      contrato.kmAnt = (contrato.kmAnt || 0) + kmRodadosCarro;
+      contrato.carro = $('trocaNovoCarro').value.trim();
+      contrato.odoIni = Number($('trocaNovoOdo').value);
+      contrato.tanque = Number($('trocaNovoTanque').value) || 50;
+
+      localStorage.setItem("CCMV_CONTRATO", JSON.stringify(contrato));
+      alert(`Troca confirmada!\n${kmRodadosCarro} km do veículo anterior foram preservados na franquia.`);
+      toggleModal('modalTroca', false);
+      renderUI();
+      trocarAba('cockpit');
+    }
+
+    // Configurações do Aluguel
+    function salvarConfigAluguel(e) {
+      e.preventDefault();
+      contrato.carro = $('cfgCarro').value.trim();
+      contrato.tanque = Number($('cfgTanque').value) || 50;
+      contrato.placa = $('cfgPlaca').value.trim();
+      contrato.odoIni = Number($('cfgOdoIni').value) || 0;
+      contrato.dataIni = $('cfgDataIni').value;
+      contrato.dataFim = $('cfgDataFim').value;
+      contrato.franquia = Number($('cfgFranquia').value) || 2000;
+      contrato.kmAnt = Number($('cfgKmAnt').value) || 0;
+
+      localStorage.setItem("CCMV_CONTRATO", JSON.stringify(contrato));
+      alert("Contrato salvo!");
+      renderUI();
+      trocarAba('cockpit');
+    }
+
+    // Ajustes da API
+    function restaurarApi() {
+      $('cfgApiUrl').value = SCRIPT_URL_PADRAO;
+      API_URL = SCRIPT_URL_PADRAO;
+      localStorage.setItem("CCMV_API_URL", SCRIPT_URL_PADRAO);
+    }
+
+    function salvarApi() {
+      const v = $('cfgApiUrl').value.trim();
+      if (v) {
+        API_URL = v;
+        localStorage.setItem("CCMV_API_URL", v);
+        toggleModal('modalConfig', false);
+        carregarNuvem();
+      }
+    }
+
+    async function testarApi() {
+      const url = $('cfgApiUrl').value.trim();
+      const box = $('statusTesteApi');
+      box.classList.remove('hidden');
+      box.className = "text-[10px] font-num p-2 rounded mt-2 bg-amber-500/10 text-amber-400";
+      box.innerText = "Consultando Google Apps Script...";
+
+      try {
+        const res = await fetch(`${url}?action=read&_t=${Date.now()}`);
+        const json = await res.json();
+        if (Array.isArray(json)) {
+          box.className = "text-[10px] font-num p-2 rounded mt-2 bg-emerald-500/10 text-emerald-400";
+          box.innerText = `✅ Sucesso! Planilha conectada (${json.length} linhas lidas).`;
+        }
+      } catch (e) {
+        box.className = "text-[10px] font-num p-2 rounded mt-2 bg-rose-500/10 text-rose-400";
+        box.innerText = `❌ Falha: Verifique se no Google Apps Script a implantação está para 'Qualquer pessoa'.`;
+      }
+    }
+
+    function setTheme(t) {
+      if (t === 'light') {
+        document.documentElement.classList.remove('theme-dark');
+        document.documentElement.classList.add('theme-light');
+      } else {
+        document.documentElement.classList.remove('theme-light');
+        document.documentElement.classList.add('theme-dark');
+      }
+    }
+
+    // Inicialização Imediata
+    window.addEventListener('DOMContentLoaded', () => {
+      $('cfgApiUrl').value = API_URL;
+      $('inOdo').value = contrato.odoIni;
+      $('trocaOdoDevolucao').value = contrato.odoIni;
+      renderUI();
+      carregarNuvem();
+    });
+  </script>
+</body>
+</html>
