@@ -6,6 +6,7 @@
   <title>CCMV | Cockpit & Gestão de Frotas</title>
   
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2310B981' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 22h12'/%3E%3Cpath d='M4 9h10v13H4z'/%3E%3Cpath d='M6 5h6v4H6z'/%3E%3Cpath d='M14 12h2a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2'/%3E%3Cpath d='M18 10c0-2.5 1-4 3-4'/%3E%3Cpath d='M21 6v3'/%3E%3C/svg%3E">
+  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -38,16 +39,12 @@
       overflow-x: hidden;
     }
     .font-num { font-family: 'JetBrains Mono', monospace; }
-    
     .glass {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 16px;
       backdrop-filter: blur(16px);
-      position: relative;
-      z-index: 10;
     }
-    
     .c-input {
       background: var(--input);
       border: 1px solid var(--border);
@@ -57,22 +54,12 @@
     }
     .c-input:focus { outline: none; border-color: #38BDF8; }
     
-    /* BLOQUEIO DO CLIQUE NOS GLOWS DE FUNDO */
-    .orb-glow {
-      position: fixed;
-      border-radius: 50%;
-      filter: blur(120px);
-      pointer-events: none !important;
-      z-index: -10 !important;
-    }
-
-    /* Cluster VW (8 Segmentos) */
+    /* Cluster VW */
     .vw-cluster {
       background: radial-gradient(circle at 50% 0%, #172138 0%, #080B12 85%);
       border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 16px;
       position: relative;
-      overflow: hidden;
     }
     .vw-cluster::before {
       content: '';
@@ -86,7 +73,7 @@
       cursor: pointer; transition: all 0.2s;
       position: relative;
     }
-    /* Hitbox expandida para facilitar toque no mobile */
+    /* Área tátil expandida para toque no telemóvel */
     .vw-seg::after {
       content: '';
       position: absolute;
@@ -100,56 +87,43 @@
       background: #EF4444;
       box-shadow: 0 0 8px rgba(239, 68, 68, 0.9);
     }
-
-    /* Prevenção de overflow nos modais em telas menores */
-    .modal-box {
-      max-height: 90vh;
-      overflow-y: auto;
-    }
   </style>
 </head>
 <body class="min-h-screen pb-12">
 
-  <!-- Glows de Ambiente Seguros -->
-  <div class="orb-glow w-[400px] h-[400px] bg-emerald-500/10 -top-20 -left-20"></div>
-  <div class="orb-glow w-[500px] h-[500px] bg-slate-500/10 top-1/2 -right-40"></div>
-
-  <!-- Header Fixo -->
-  <header class="sticky top-0 z-50 bg-[#07090E]/90 backdrop-blur-md border-b border-white/10 px-3 sm:px-6 py-2.5">
+  <!-- Header -->
+  <header class="sticky top-0 z-30 bg-[#07090E]/90 backdrop-blur-md border-b border-white/10 px-3 sm:px-6 py-2.5">
     <div class="max-w-5xl mx-auto flex items-center justify-between">
-      
-      <!-- Marca -->
       <div class="flex items-center space-x-2">
         <span class="text-xl">🚗</span>
         <div>
           <div class="flex items-center space-x-2">
             <h1 class="text-base font-extrabold tracking-tight">CCMV</h1>
-            <span id="badgeCarro" class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 whitespace-nowrap overflow-hidden text-ellipsis max-w-[100px] sm:max-w-none">--</span>
+            <span id="badgeCarro" class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">VW Tera 1.0</span>
           </div>
-          <p class="text-[9px] text-slate-400 hidden sm:block mt-0.5">Calculadora de Consumo Veicular</p>
+          <p class="text-[9px] text-slate-400 hidden sm:block">Calculadora de Consumo Médio Veicular</p>
         </div>
       </div>
 
-      <!-- Botões de Ação do Topo -->
-      <div class="flex items-center space-x-1.5 sm:space-x-2">
-        <button onclick="carregarNuvem()" class="h-8 px-2.5 sm:px-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 flex items-center space-x-1.5 text-xs font-num font-bold transition-all relative z-50 cursor-pointer">
-          <span id="dotSync" class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
-          <span id="txtSync" class="text-[10px] sm:text-xs">Sync</span>
+      <div class="flex items-center space-x-2">
+        <button id="btnSync" onclick="carregarNuvem()" class="h-8 px-3 rounded-lg glass flex items-center space-x-1.5 text-xs font-num font-bold transition-all cursor-pointer">
+          <span id="dotSync" class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span id="txtSync">Online</span>
         </button>
-        <button onclick="toggleModal('modalConfig', true)" class="h-8 px-2.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold flex items-center space-x-1 relative z-50 cursor-pointer">
+        <button onclick="toggleModal('modalConfig', true)" class="h-8 px-2.5 rounded-lg glass text-xs font-bold flex items-center space-x-1 cursor-pointer">
           <span>⚙️</span>
           <span class="hidden sm:inline">Ajustes</span>
         </button>
       </div>
     </div>
 
-    <!-- Navegação Mobile/Desktop -->
+    <!-- Navegação -->
     <div class="max-w-5xl mx-auto mt-2">
-      <div class="glass p-1 flex rounded-xl text-xs font-bold w-full relative z-50">
+      <div class="glass p-1 flex rounded-xl text-xs font-bold">
         <button onclick="trocarAba('cockpit')" id="tabCockpit" class="flex-1 py-1.5 rounded-lg bg-white text-slate-900 shadow-sm font-bold cursor-pointer">
           📊 Cockpit
         </button>
-        <button onclick="trocarAba('aluguel')" id="tabAluguel" class="flex-1 py-1.5 rounded-lg text-slate-400 font-bold hover:text-white cursor-pointer">
+        <button onclick="trocarAba('aluguel')" id="tabAluguel" class="flex-1 py-1.5 rounded-lg text-slate-400 font-bold cursor-pointer">
           🚘 Aluguel & Franquia
         </button>
       </div>
@@ -163,54 +137,48 @@
     <!-- ============================== -->
     <div id="viewCockpit" class="space-y-4">
       
-      <!-- Banner Inteligente do Aluguel -->
-      <div class="glass p-3.5 border-emerald-500/20 bg-emerald-500/[0.02]" id="bannerAluguelCard">
-        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          <div class="flex-1 w-full flex items-center justify-between sm:justify-start sm:w-auto">
-            <div>
-              <div class="flex items-center space-x-2">
-                <h2 id="bannerCarro" class="text-xs sm:text-sm font-bold text-white tracking-tight">Veículo: --</h2>
-                <button onclick="trocarAba('aluguel')" class="px-2 py-0.5 rounded bg-white/10 hover:bg-white/20 text-[9px] font-bold text-cyan-300 border border-white/10 cursor-pointer relative z-40">
-                  ✏️ Editar
-                </button>
-              </div>
-              <p id="bannerSub" class="text-[10px] text-slate-400 font-num mt-0.5">Configure seu contrato na aba Aluguel.</p>
+      <!-- Banner do Aluguel -->
+      <div onclick="trocarAba('aluguel')" class="glass p-3.5 border-emerald-500/20 bg-emerald-500/[0.02] cursor-pointer">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5">
+          <div>
+            <div class="flex items-center space-x-2">
+              <h2 id="bannerCarro" class="text-xs sm:text-sm font-bold text-white">Veículo: VW Tera 1.0 TSI</h2>
+              <span class="px-2 py-0.5 rounded bg-white/10 text-[9px] font-bold text-cyan-300">✏️ Editar</span>
             </div>
+            <p id="bannerSub" class="text-[10px] text-slate-400 font-num">Franquia de 2.000 km • Controle em tempo real</p>
           </div>
-
-          <div class="grid grid-cols-3 gap-1.5 sm:gap-2 w-full sm:w-auto text-right font-num shrink-0">
+          <div class="grid grid-cols-3 gap-2 w-full sm:w-auto text-right font-num">
             <div class="p-1.5 rounded bg-black/20 border border-white/5">
               <span class="text-[8px] uppercase block text-cyan-400 font-bold">Cota/Dia</span>
-              <span id="bannerCotaDia" class="text-xs font-bold text-cyan-400">-- km</span>
+              <span id="bannerCotaDia" class="text-xs font-bold text-cyan-400">66.7 km</span>
             </div>
             <div class="p-1.5 rounded bg-black/20 border border-white/5">
               <span class="text-[8px] uppercase block text-slate-400 font-bold">Saldo</span>
-              <span id="bannerSaldo" class="text-xs font-bold text-emerald-400">-- km</span>
+              <span id="bannerSaldo" class="text-xs font-bold text-emerald-400">2.000 km</span>
             </div>
             <div class="p-1.5 rounded bg-black/20 border border-white/5">
               <span class="text-[8px] uppercase block text-slate-400 font-bold">Prazo</span>
-              <span id="bannerPrazo" class="text-xs font-bold text-white">-- d</span>
+              <span id="bannerPrazo" class="text-xs font-bold text-white">30 dias</span>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- PAINEL CLUSTER DIGITAL VW -->
-      <div class="vw-cluster p-4 sm:p-5 text-white" id="clusterContainer">
+      <!-- Cluster VW (8 Segmentos) -->
+      <div class="vw-cluster p-4 sm:p-5 text-white">
         <div class="flex items-center justify-between pb-3 border-b border-white/10">
           <div>
             <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Marcador de Combustível</span>
-            <p class="text-[11px] sm:text-xs text-slate-300 font-num mt-0.5">
-              Tanque: <b id="clusterLitros" class="text-white text-sm">-- L</b> (<span id="clusterPct" class="text-cyan-400">--%</span>) • Autonomia: <b id="clusterAuto" class="text-emerald-400 text-sm">~-- km</b>
+            <p class="text-xs text-slate-300 font-num mt-0.5">
+              Tanque: <b id="clusterLitros" class="text-white text-sm">31.2 L</b> (<span id="clusterPct" class="text-cyan-400">63%</span>) • Autonomia: <b id="clusterAuto" class="text-emerald-400 text-sm">~421 km</b>
             </p>
           </div>
-          <button onclick="toggleModal('modalCalibrar', true)" class="px-2.5 py-1 rounded bg-white/10 hover:bg-white/20 text-[10px] font-bold font-num border border-white/15 cursor-pointer relative z-40">
+          <button onclick="toggleModal('modalCalibrar', true)" class="px-2.5 py-1 rounded bg-white/10 hover:bg-white/20 text-[10px] font-bold font-num border border-white/15 cursor-pointer">
             Calibrar
           </button>
         </div>
 
-        <div class="max-w-md mx-auto pt-4 pb-1 relative z-40">
-          <!-- 8 Barras Idênticas ao Painel -->
+        <div class="max-w-md mx-auto pt-4 pb-1">
           <div class="flex items-center gap-1 sm:gap-1.5 px-1">
             <div class="vw-seg" id="b1" onclick="cliqueSegmento(1)"></div>
             <div class="vw-seg" id="b2" onclick="cliqueSegmento(2)"></div>
@@ -222,36 +190,70 @@
             <div class="vw-seg" id="b8" onclick="cliqueSegmento(8)"></div>
           </div>
 
-          <!-- Régua: 0, |, 1/2, |, 1 -->
           <div class="flex items-center justify-between text-[11px] sm:text-xs font-num font-extrabold text-white px-1 mt-2">
             <span class="w-3 text-center">0</span>
             <span class="w-3 text-center text-slate-400 font-light">|</span>
             <span class="w-6 text-center">1/2</span>
             <span class="w-3 text-center text-slate-400 font-light">|</span>
             <div class="flex items-center space-x-1">
-              <svg class="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M19 5h-1V4a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1v16H4v2h16v-2h-1V7a2 2 0 0 1 2-2V4a1 1 0 0 0-2-1zm-4 4H9V5h6v4zm4 0h-2V7h2v2z"/>
-              </svg>
+              <svg class="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M19 5h-1V4a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1v16H4v2h16v-2h-1V7a2 2 0 0 1 2-2V4a1 1 0 0 0-2-1zm-4 4H9V5h6v4zm4 0h-2V7h2v2z"/></svg>
               <span class="text-[8px] text-white">▶</span>
               <span>1</span>
             </div>
           </div>
-          <p class="text-center text-[9px] text-slate-400 font-num mt-2.5">*Clique nas barras para ajustar o nível visível no carro.</p>
         </div>
       </div>
 
-      <!-- 4 Cards de Métricas (KPIs) -->
+      <!-- Métricas KPIs -->
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
         <div class="glass p-3.5">
           <div class="flex justify-between items-center text-[9px] uppercase font-bold text-slate-400">
             <span>Média Real</span>
             <span class="text-emerald-400 font-num">KM/L</span>
           </div>
-          <h3 id="kpiKmL" class="text-2xl font-extrabold font-num text-emerald-400 mt-1">--</h3>
-          <p id="kpiL100" class="text-[10px] text-slate-400 font-num">-- L/100km</p>
+          <h3 id="kpiKmL" class="text-2xl font-extrabold font-num text-emerald-400 mt-1">13.5</h3>
+          <p id="kpiL100" class="text-[10px] text-slate-400 font-num">7.4 L/100km</p>
         </div>
 
         <div class="glass p-3.5">
           <span class="text-[9px] uppercase font-bold text-slate-400 block">Odômetro Atual</span>
-          <h3 id="kpiOdometro" class="text-2xl font-extrabold font-num text-white mt-1">--</h3>
-          <p id="kpiKmContrato"
+          <h3 id="kpiOdometro" class="text-2xl font-extrabold font-num text-white mt-1">48.350</h3>
+          <p id="kpiKmContrato" class="text-[10px] text-emerald-400 font-num font-bold">0 km no contrato</p>
+        </div>
+
+        <div class="glass p-3.5">
+          <span class="text-[9px] uppercase font-bold text-slate-400 block">Gasto Combustível</span>
+          <div class="flex items-baseline space-x-1 mt-1">
+            <span class="text-xs text-slate-400 font-light">R$</span>
+            <h3 id="kpiGastoTotal" class="text-2xl font-extrabold font-num text-white">0,00</h3>
+          </div>
+          <p id="kpiGastoSemana" class="text-[10px] text-slate-400 font-num">Semana: R$ 0,00</p>
+        </div>
+
+        <div class="glass p-3.5">
+          <span class="text-[9px] uppercase font-bold text-slate-400 block">Custo por KM</span>
+          <div class="flex items-baseline space-x-1 mt-1">
+            <span class="text-xs text-slate-400 font-light">R$</span>
+            <h3 id="kpiCustoKm" class="text-2xl font-extrabold font-num text-white">0,43</h3>
+          </div>
+          <p class="text-[10px] text-cyan-400 font-num font-bold">Por km rodado</p>
+        </div>
+      </div>
+
+      <!-- Lançamento & Flex -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        
+        <div class="lg:col-span-7 glass p-4 sm:p-5">
+          <div class="flex items-center justify-between pb-3 border-b border-white/10">
+            <div class="flex p-0.5 rounded-lg bg-black/30 border border-white/5 text-[11px] font-bold">
+              <button type="button" id="btnModoAbastecer" onclick="setModoForm('abastecer')" class="px-3 py-1 rounded bg-white text-slate-900 shadow cursor-pointer">
+                ⛽ Abastecer
+              </button>
+              <button type="button" id="btnModoCheckin" onclick="setModoForm('checkin')" class="px-3 py-1 rounded text-slate-400 cursor-pointer">
+                📍 KM Diário
+              </button>
+            </div>
+            <span id="hintUltimoKm" class="text-[9px] font-num text-slate-400">Último: 48.350 km</span>
+          </div>
+
+          <form id="formRegistro" on
