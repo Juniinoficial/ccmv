@@ -74,7 +74,6 @@
       cursor: pointer; transition: all 0.2s;
       position: relative;
     }
-    /* Hitbox ampla para toque preciso no mobile */
     .vw-seg::after {
       content: '';
       position: absolute;
@@ -176,7 +175,7 @@
           <div>
             <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Marcador de Combustível</span>
             <p class="text-xs text-slate-300 font-num mt-0.5">
-              Tanque: <b id="clusterLitros" class="text-white text-sm">31.2 L</b> (<span id="clusterPct" class="text-cyan-400">63%</span>) • Autonomia: <b id="clusterAuto" class="text-emerald-400 text-sm">~421 km</b>
+              Tanque: <b id="clusterLitros" class="text-white text-sm">50.0 L</b> (<span id="clusterPct" class="text-cyan-400">100%</span>) • Autonomia: <b id="clusterAuto" class="text-emerald-400 text-sm">~896 km</b>
             </p>
           </div>
           <button onclick="toggleModal('modalCalibrar', true)" class="px-2.5 py-1 rounded bg-white/10 hover:bg-white/20 text-[10px] font-bold font-num border border-white/15 cursor-pointer">
@@ -217,8 +216,8 @@
             <span>Média Real</span>
             <span class="text-emerald-400 font-num">KM/L</span>
           </div>
-          <h3 id="kpiKmL" class="text-2xl font-extrabold font-num text-emerald-400 mt-1">13.5</h3>
-          <p id="kpiL100" class="text-[10px] text-slate-400 font-num">7.4 L/100km</p>
+          <h3 id="kpiKmL" class="text-2xl font-extrabold font-num text-emerald-400 mt-1">--</h3>
+          <p id="kpiL100" class="text-[10px] text-slate-400 font-num">-- L/100km</p>
         </div>
 
         <div class="glass p-3.5">
@@ -240,7 +239,7 @@
           <span class="text-[9px] uppercase font-bold text-slate-400 block">Custo por KM</span>
           <div class="flex items-baseline space-x-1 mt-1">
             <span class="text-xs text-slate-400 font-light">R$</span>
-            <h3 id="kpiCustoKm" class="text-2xl font-extrabold font-num text-white">0,43</h3>
+            <h3 id="kpiCustoKm" class="text-2xl font-extrabold font-num text-white">0,00</h3>
           </div>
           <p class="text-[10px] text-cyan-400 font-num font-bold">Por km rodado</p>
         </div>
@@ -521,14 +520,13 @@
     </div>
   </div>
 
-  <!-- SCRIPT LOGIC (ROBUSTO & ANTI-FREEZE) -->
+  <!-- SCRIPT LOGIC -->
   <script>
     const SCRIPT_URL_PADRAO = "https://script.google.com/macros/s/AKfycbzWEzQWjxqSFOx2bgCWlHGw1EkTm8qRSr7B7zLcgjpHppBLW-p7vhAF5AkeGIWHXLRDfA/exec";
     let API_URL = localStorage.getItem("CCMV_API_URL") || SCRIPT_URL_PADRAO;
 
     function $(id) { return document.getElementById(id); }
 
-    // Parser Numérico Seguro (Aceita vírgula e ponto do Brasil)
     function parseNum(val, def = 0) {
       if (val === undefined || val === null || val === '') return def;
       if (typeof val === 'number') return isNaN(val) ? def : val;
@@ -542,7 +540,6 @@
       return isNaN(n) ? def : n;
     }
 
-    // Formatador de Data à Prova de Falhas
     function formatarDataBR(val) {
       if (!val) return "--/--/----";
       try {
@@ -565,9 +562,11 @@
       dataIni: di, dataFim: df, franquia: 2000, kmAnt: 0
     };
     
-    let litrosTanque = parseNum(localStorage.getItem("CCMV_LITROS_TANQUE"), 31.25);
+    // Inicializa tanque com a capacidade total (sempre cheio na retirada)
+    let litrosTanque = parseNum(localStorage.getItem("CCMV_LITROS_TANQUE"), parseNum(contrato.tanque, 50));
     let modoForm = "abastecer";
     let chartInst = null;
+    let mediaKmLAtual = 14.0; // Referência padrão para autonomia inicial
 
     function toggleModal(id, open) { 
       const el = $(id); 
@@ -605,8 +604,7 @@
         if (i <= barras) seg.className = (barras <= 1) ? "vw-seg reserva" : "vw-seg lit";
       }
       
-      const kmLRaw = $('kpiKmL') ?$('kpiKmL').innerText.replace(',', '.') : "13.5";
-      const kmL = parseNum(kmLRaw, 13.5);
+      const kmL = mediaKmLAtual > 0 ? mediaKmLAtual : 14.0;
       
       if ($('clusterLitros'))$('clusterLitros').innerText = `${l.toFixed(1)} L`;
       if ($('clusterPct'))$('clusterPct').innerText = `${pct}%`;
@@ -618,7 +616,7 @@
       const cap = parseNum(contrato.tanque, 50);
       litrosTanque = (num / 8) * cap;
       localStorage.setItem("CCMV_LITROS_TANQUE", litrosTanque);
-      renderCluster();
+      renderUI();
     }
 
     function setCalibrarLitros(f) { 
@@ -630,7 +628,7 @@
       if (v >= 0) {
         litrosTanque = v;
         localStorage.setItem("CCMV_LITROS_TANQUE", litrosTanque);
-        renderCluster();
+        renderUI();
       }
       toggleModal('modalCalibrar', false);
     }
@@ -674,7 +672,7 @@
           const c = dKm / lit;
           $('prevKmL').innerText = `${c.toFixed(2)} km/l`;
         } else {
-          $('prevKmL').innerText = "0.0 km/l";
+          $('prevKmL').innerText = mediaKmLAtual > 0 ? `${mediaKmLAtual.toFixed(1)} km/l` : "0.0 km/l";
         }
       }
     }
@@ -705,12 +703,12 @@
         litrosTanque = Math.min(parseNum(contrato.tanque, 50), litrosTanque + lit);
         kmL = (dKm > 0 && lit > 0) ? (dKm / lit) : 0;
       } else {
-        const cEst = parseNum($('kpiKmL').innerText.replace(',', '.'), 13.5);
+        // No KM Diário, debita proporcionalmente do tanque se não foi calibrado manualmente
+        const cEst = mediaKmLAtual > 0 ? mediaKmLAtual : 14.0;
         litrosTanque = Math.max(0, litrosTanque - (dKm / cEst));
       }
       localStorage.setItem("CCMV_LITROS_TANQUE", litrosTanque);
 
-      // Inclusão otimista local imediata
       const novoRegistro = {
         _rowIndex: Date.now(),
         Data: new Date().toISOString(),
@@ -747,7 +745,7 @@
         if ($('inOdo'))$('inOdo').value = odo;
         await carregarNuvem();
       } catch (err) { 
-        console.warn("Offline: salvo localmente no celular.");
+        console.warn("Offline: salvo localmente.");
       } finally { 
         if (btn) {
           btn.innerText = modoForm === 'abastecer' ? "Salvar Abastecimento" : "Salvar KM Diário"; 
@@ -796,7 +794,7 @@
       renderUI();
     }
 
-    // Renderiza UI Global
+    // Renderiza UI Global & Nova Matemática do Carro Atual
     function renderUI() {
       if (!contrato) return;
 
@@ -806,7 +804,7 @@
 
       // Franquia e Regras de Negócio
       const kmAtualCarro = Math.max(0, ultOdo - parseNum(contrato.odoIni));
-      const kmTotalContrato = (parseNum(contrato.kmAnt)) + kmAtualCarro;
+      const kmTotalContrato = parseNum(contrato.kmAnt) + kmAtualCarro;
       const saldoFranquia = parseNum(contrato.franquia, 2000) - kmTotalContrato;
 
       const hoje = new Date(); hoje.setHours(0,0,0,0);
@@ -815,15 +813,11 @@
 
       if (contrato.dataFim) {
         const dFim = new Date(contrato.dataFim + (contrato.dataFim.includes('T') ? '' : 'T00:00:00'));
-        if (!isNaN(dFim.getTime())) {
-          diasRest = Math.max(1, Math.ceil((dFim - hoje) / 86400000));
-        }
+        if (!isNaN(dFim.getTime())) diasRest = Math.max(1, Math.ceil((dFim - hoje) / 86400000));
       }
       if (contrato.dataIni) {
         const dIni = new Date(contrato.dataIni + (contrato.dataIni.includes('T') ? '' : 'T00:00:00'));
-        if (!isNaN(dIni.getTime())) {
-          diasPass = Math.max(1, Math.ceil((hoje - dIni) / 86400000));
-        }
+        if (!isNaN(dIni.getTime())) diasPass = Math.max(1, Math.ceil((hoje - dIni) / 86400000));
       }
 
       const cotaDia = saldoFranquia > 0 ? (saldoFranquia / diasRest).toFixed(1) : "0.0";
@@ -843,29 +837,50 @@
       if ($('hudDias'))$('hudDias').innerText = diasRest;
       if ($('hudDataFim'))$('hudDataFim').innerText = `Devolução: ${formatarDataBR(contrato.dataFim)}`;
 
-      // Consumos e Gastos Acumulados
-      let tGasto = 0, tLitros = 0, tKm = 0, gSemana = 0;
+      // -------------------------------------------------------------------
+      // MATEMÁTICA CORRETA DE CONSUMO BASEADA NO CARRO ATUAL (TANQUE CHEIO)
+      // -------------------------------------------------------------------
+      const capTanque = parseNum(contrato.tanque, 50);
+      const lAtual = Math.max(0, Math.min(capTanque, litrosTanque));
+      const odoIniCarro = parseNum(contrato.odoIni);
+
+      let litrosAbastecidosNoCarroAtual = 0;
+      let tGastoGeral = 0;
+      let gSemana = 0;
+
       telemetria.forEach(r => {
-        tGasto += parseNum(r.Valor);
+        const v = parseNum(r.Valor);
         const l = parseNum(r.Litros);
-        const k = parseNum(r.KmRodado);
-        if (l > 0) { 
-          tLitros += l; 
-          tKm += k; 
+        const odo = parseNum(r.Odometro);
+        tGastoGeral += v;
+
+        // Abastecimentos colocados especificamente neste carro
+        if (odo >= odoIniCarro && l > 0) {
+          litrosAbastecidosNoCarroAtual += l;
         }
+
         const dReg = new Date(r.Data);
         if (!isNaN(dReg.getTime()) && (hoje - dReg) / 86400000 <= 7) {
-          gSemana += parseNum(r.Valor);
+          gSemana += v;
         }
       });
-      
-      const mKmL = (tKm > 0 && tLitros > 0) ? (tKm / tLitros) : 13.5;
-      
-      if ($('kpiKmL'))$('kpiKmL').innerText = mKmL.toFixed(1);
-      if ($('kpiL100'))$('kpiL100').innerText = `${(100 / mKmL).toFixed(1)} L/100km`;
-      if ($('kpiGastoTotal'))$('kpiGastoTotal').innerText = tGasto.toFixed(2).replace('.', ',');
+
+      // Combustível efetivamente consumido:
+      // Como o carro sempre é pego CHEIO (capTanque), os litros queimados do tanque são (capTanque - lAtual)
+      // somados a qualquer abastecimento intermediário colocado no caminho.
+      const litrosConsumidosCarroAtual = (capTanque - lAtual) + litrosAbastecidosNoCarroAtual;
+
+      if (kmAtualCarro > 0 && litrosConsumidosCarroAtual > 0.1) {
+        mediaKmLAtual = kmAtualCarro / litrosConsumidosCarroAtual;
+        $('kpiKmL').innerText = mediaKmLAtual.toFixed(1);$('kpiL100').innerText = `${(100 / mediaKmLAtual).toFixed(1)} L/100km`;
+      } else {
+        $('kpiKmL').innerText = "--";
+        $('kpiL100').innerText = "-- L/100km";
+      }
+
+      if ($('kpiGastoTotal'))$('kpiGastoTotal').innerText = tGastoGeral.toFixed(2).replace('.', ',');
       if ($('kpiGastoSemana'))$('kpiGastoSemana').innerText = `Semana: R$ ${gSemana.toFixed(2).replace('.', ',')}`;
-      if ($('kpiCustoKm'))$('kpiCustoKm').innerText = kmTotalContrato > 0 && tGasto > 0 ? (tGasto / kmTotalContrato).toFixed(2).replace('.', ',') : "0,00";
+      if ($('kpiCustoKm'))$('kpiCustoKm').innerText = kmTotalContrato > 0 && tGastoGeral > 0 ? (tGastoGeral / kmTotalContrato).toFixed(2).replace('.', ',') : "0,00";
 
       renderTabela();
       renderCluster();
@@ -1024,7 +1039,8 @@
       trocarAba('cockpit');
     }
 
-    // 🔄 REGISTRO DE TROCA DE VEÍCULO (Mantém datas e franquia)
+    // 🔄 REGISTRO DE TROCA DE VEÍCULO
+    // Mantém as datas, acumula a quilometragem na franquia e reseta o novo carro para tanque cheio (8 barras)
     function confirmarTrocaCarro(e) {
       e.preventDefault();
       const odoFinal = parseNum($('trocaOdoDevolucao').value);
@@ -1041,11 +1057,12 @@
       contrato.odoIni = parseNum($('trocaNovoOdo').value);
       contrato.tanque = parseNum($('trocaNovoTanque').value, 50);
       
-      // 3. DATAS (dataIni e dataFim) e FRANQUIA (2000) PERMANECEM INTACTAS
+      // 3. O novo carro é retirado com tanque cheio
+      litrosTanque = contrato.tanque;
+      localStorage.setItem("CCMV_LITROS_TANQUE", litrosTanque);
 
       localStorage.setItem("CCMV_CONTRATO", JSON.stringify(contrato));
       
-      // Atualiza campos de entrada
       if ($('inOdo'))$('inOdo').value = contrato.odoIni;
       if ($('trocaOdoDevolucao'))$('trocaOdoDevolucao').value = contrato.odoIni;
       
