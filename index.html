@@ -111,9 +111,9 @@
       </div>
 
       <div class="flex items-center space-x-2">
-        <button id="btnSync" onclick="sincronizarSeguro()" class="h-8 px-3 rounded-lg glass flex items-center space-x-1.5 text-xs font-num font-bold transition-all cursor-pointer">
+        <button id="btnSync" onclick="carregarNuvem()" class="h-8 px-3 rounded-lg glass flex items-center space-x-1.5 text-xs font-num font-bold transition-all cursor-pointer">
           <span id="dotSync" class="w-2 h-2 rounded-full bg-emerald-400"></span>
-          <span id="txtSync">Sync</span>
+          <span id="txtSync">Online</span>
         </button>
         <button onclick="toggleModal('modalConfig', true)" class="h-8 px-2.5 rounded-lg glass text-xs font-bold flex items-center space-x-1 cursor-pointer">
           <span>⚙️</span>
@@ -136,25 +136,6 @@
   </header>
 
   <main class="max-w-5xl mx-auto px-3 sm:px-6 mt-4 space-y-4">
-
-    <!-- BARRA DE PROTEÇÃO E BACKUP DOS DADOS LOCAIS -->
-    <div class="glass p-3 border-cyan-500/30 bg-cyan-500/[0.04] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
-      <div class="flex items-center space-x-2">
-        <span class="text-base">🛡️</span>
-        <div>
-          <h3 class="text-[11px] font-bold text-white">Proteção de Dados do Aparelho</h3>
-          <p id="statusContagemLocal" class="text-[10px] text-slate-300 font-num">Carregando memória local...</p>
-        </div>
-      </div>
-      <div class="grid grid-cols-2 sm:flex gap-2">
-        <button onclick="baixarBackupLocal()" class="px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 border border-white/15 text-[10px] sm:text-xs font-bold text-white flex items-center justify-center gap-1 cursor-pointer transition-all">
-          <span>📥</span> <span>Baixar Backup Local</span>
-        </button>
-        <button id="btnForcarEnvio" onclick="forcarEnvioParaPlanilha()" class="px-3 py-2 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-[10px] sm:text-xs font-extrabold flex items-center justify-center gap-1 cursor-pointer transition-all shadow">
-          <span>☁️</span> <span>Forçar Envio p/ Planilha</span>
-        </button>
-      </div>
-    </div>
 
     <!-- ============================== -->
     <!-- ABA 1: COCKPIT                 -->
@@ -194,7 +175,7 @@
           <div>
             <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Marcador de Combustível</span>
             <p class="text-xs text-slate-300 font-num mt-0.5">
-              Tanque: <b id="clusterLitros" class="text-white text-sm">50.0 L</b> (<span id="clusterPct" class="text-cyan-400">100%</span>) • Autonomia: <b id="clusterAuto" class="text-emerald-400 text-sm">~896 km</b>
+              Tanque: <b id="clusterLitros" class="text-white text-sm">50.0 L</b> (<span id="clusterPct" class="text-cyan-400">100%</span>) • Autonomia: <b id="clusterAuto" class="text-emerald-400 text-sm">~700 km</b>
             </p>
           </div>
           <button onclick="toggleModal('modalCalibrar', true)" class="px-2.5 py-1 rounded bg-white/10 hover:bg-white/20 text-[10px] font-bold font-num border border-white/15 cursor-pointer">
@@ -241,7 +222,7 @@
 
         <div class="glass p-3.5">
           <span class="text-[9px] uppercase font-bold text-slate-400 block">Odômetro Atual</span>
-          <h3 id="kpiOdometro" class="text-2xl font-extrabold font-num text-white mt-1">48.350</h3>
+          <h3 id="kpiOdometro" class="text-2xl font-extrabold font-num text-white mt-1">15.165</h3>
           <p id="kpiKmContrato" class="text-[10px] text-emerald-400 font-num font-bold">0 km no contrato</p>
         </div>
 
@@ -277,13 +258,13 @@
                 📍 KM Diário
               </button>
             </div>
-            <span id="hintUltimoKm" class="text-[9px] font-num text-slate-400">Último: 48.350 km</span>
+            <span id="hintUltimoKm" class="text-[9px] font-num text-slate-400">Último: -- km</span>
           </div>
 
           <form id="formRegistro" onsubmit="salvarRegistro(event)" class="mt-3.5 space-y-3">
             <div>
               <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Odômetro Atual (KM Total)</label>
-              <input type="number" id="inOdo" required step="1" placeholder="Ex: 48500" class="c-input w-full px-3 py-2 font-num font-bold">
+              <input type="number" id="inOdo" required step="1" placeholder="Ex: 15200" class="c-input w-full px-3 py-2 font-num font-bold">
             </div>
 
             <div id="secaoCamposAbastecimento" class="space-y-3">
@@ -362,14 +343,9 @@
       <div class="glass overflow-hidden">
         <div class="p-3.5 border-b border-white/10 flex items-center justify-between">
           <h2 class="text-xs sm:text-sm font-bold">Histórico de Lançamentos</h2>
-          <div class="flex items-center gap-2">
-            <button onclick="forcarEnvioParaPlanilha()" class="px-2.5 py-1 rounded border border-cyan-500/30 text-cyan-400 text-[9px] font-bold font-num bg-cyan-500/10 cursor-pointer">
-              ☁️ Subir Tudo
-            </button>
-            <button onclick="sincronizarSeguro()" class="px-2.5 py-1 rounded border border-white/10 text-[9px] font-bold font-num bg-white/5 cursor-pointer">
-              Atualizar
-            </button>
-          </div>
+          <button onclick="carregarNuvem()" class="px-2.5 py-1 rounded border border-white/10 text-[9px] font-bold font-num bg-white/5 cursor-pointer">
+            Atualizar
+          </button>
         </div>
 
         <div id="listaMobile" class="divide-y divide-white/5 sm:hidden font-num text-xs">
@@ -468,7 +444,7 @@
   <div id="modalConfig" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 items-center justify-center p-4" style="display: none;">
     <div class="glass modal-scroll max-w-sm w-full p-5 space-y-4 shadow-2xl">
       <div class="flex justify-between items-center pb-2 border-b border-white/10">
-        <h3 class="text-sm font-bold">Ajustes, Backup & Conexão</h3>
+        <h3 class="text-sm font-bold">Ajustes & Sincronização</h3>
         <button onclick="toggleModal('modalConfig', false)" class="text-slate-400 hover:text-white p-1 cursor-pointer">✕</button>
       </div>
       <div>
@@ -479,14 +455,14 @@
         </div>
       </div>
 
-      <!-- Ações de Segurança no Modal -->
+      <!-- Controle de Cache Local e Backup -->
       <div class="space-y-2 pt-2 border-t border-white/10">
-        <label class="block text-[10px] font-bold uppercase text-cyan-400">Segurança de Dados (LocalStorage)</label>
-        <button onclick="baixarBackupLocal()" class="w-full py-2 rounded-lg bg-white/10 hover:bg-white/15 border border-white/15 text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer">
-          <span>📥</span> <span>Baixar Backup Local (JSON + CSV)</span>
+        <label class="block text-[10px] font-bold uppercase text-slate-400">Gerenciamento de Dados</label>
+        <button onclick="limparCacheEPuxarNuvem()" class="w-full py-2 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-300 text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer">
+          <span>🧹</span> <span>Apagar Cache Local e Puxar da Nuvem</span>
         </button>
-        <button onclick="forcarEnvioParaPlanilha()" class="w-full py-2 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-xs font-extrabold flex items-center justify-center gap-1.5 cursor-pointer">
-          <span>☁️</span> <span>Forçar Envio do Celular para a Planilha</span>
+        <button onclick="baixarBackupLocal()" class="w-full py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/15 text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer">
+          <span>📥</span> <span>Baixar Backup (JSON/CSV)</span>
         </button>
       </div>
 
@@ -556,7 +532,7 @@
     </div>
   </div>
 
-  <!-- SCRIPT LOGIC BLINDADO -->
+  <!-- SCRIPT LOGIC (CACHE INSTANTÂNEO + NUVEM SOBERANA) -->
   <script>
     const SCRIPT_URL_PADRAO = "https://script.google.com/macros/s/AKfycbzWEzQWjxqSFOx2bgCWlHGw1EkTm8qRSr7B7zLcgjpHppBLW-p7vhAF5AkeGIWHXLRDfA/exec";
     let API_URL = localStorage.getItem("CCMV_API_URL") || SCRIPT_URL_PADRAO;
@@ -587,23 +563,15 @@
       }
     }
 
-    // Assinatura única de cada registro para evitar duplicidade ou perda
-    function gerarAssinatura(r) {
-      const odo = Math.round(parseNum(r.Odometro || r.odometro));
-      const lit = parseNum(r.Litros || r.litros).toFixed(1);
-      const val = parseNum(r.Valor || r.valor).toFixed(2);
-      return `${odo}_${lit}_${val}`;
-    }
-
-    // Carrega dados locais (Prioridade Máxima)
+    // 1. Carrega Cache Local apenas para abertura imediata (0ms)
     let telemetria = JSON.parse(localStorage.getItem("CCMV_DATA")) || [];
     
     const hj = new Date();
     const di = new Date(hj.getFullYear(), hj.getMonth(), 1).toISOString().split('T')[0];
     const df = new Date(hj.getFullYear(), hj.getMonth() + 1, 0).toISOString().split('T')[0];
     let contrato = JSON.parse(localStorage.getItem("CCMV_CONTRATO")) || {
-      carro: "VW Tera 1.0 TSI", tanque: 50, placa: "", odoIni: 48350,
-      dataIni: di, dataFim: df, franquia: 2000, kmAnt: 0
+      carro: "VW Tera 1.0 TSI", tanque: 50, placa: "", odoIni: 14955,
+      dataIni: di, dataFim: df, franquia: 2000, kmAnt: 864
     };
     
     let litrosTanque = parseNum(localStorage.getItem("CCMV_LITROS_TANQUE"), parseNum(contrato.tanque, 50));
@@ -611,23 +579,108 @@
     let chartInst = null;
     let mediaKmLAtual = 14.0;
 
-    function salvarEstadoLocal() {
+    function atualizarCacheLocal() {
       localStorage.setItem("CCMV_DATA", JSON.stringify(telemetria));
       localStorage.setItem("CCMV_CONTRATO", JSON.stringify(contrato));
       localStorage.setItem("CCMV_LITROS_TANQUE", String(litrosTanque));
-      atualizarStatusLocal();
     }
 
-    function atualizarStatusLocal() {
-      const el = $('statusContagemLocal');
-      if (el) {
-        el.innerText = `${telemetria.length} lançamento(s) salvos no celular • Veículo: ${contrato.carro}`;
+    // Envio em Segundo Plano (POST text/plain sem bloqueio CORS)
+    async function enviarPostBackground(payloadObj) {
+      const d = $('dotSync'); const t = $('txtSync');
+      if (d) d.className = "w-2 h-2 rounded-full bg-amber-400 animate-ping";
+      if (t) t.innerText = "Sync";
+
+      try {
+        await fetch(API_URL, {
+          method: "POST",
+          mode: "cors",
+          redirect: "follow",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payloadObj)
+        });
+        if (d) d.className = "w-2 h-2 rounded-full bg-emerald-400";
+        if (t) t.innerText = "Online";
+      } catch (err) {
+        console.warn("Falha no envio em segundo plano:", err);
+        if (d) d.className = "w-2 h-2 rounded-full bg-rose-400";
+        if (t) t.innerText = "Offline";
       }
     }
 
     // =========================================================
-    // REGRA 2: TRAVA DE SEGURANÇA - DOWNLOAD DE BACKUP LOCAL
+    // NUVEM SOBERANA: PUXA SEMPRE O QUE ESTÁ NA PLANILHA
     // =========================================================
+    async function carregarNuvem() {
+      const d = $('dotSync'); const t = $('txtSync');
+      if (d) d.className = "w-2 h-2 rounded-full bg-amber-400 animate-ping"; 
+      if (t) t.innerText = "Sync";
+
+      try {
+        const res = await fetch(`${API_URL}?action=read&_t=${Date.now()}`, {
+          method: "GET",
+          redirect: "follow"
+        });
+        const json = await res.json();
+
+        let listaNuvem = [];
+        if (Array.isArray(json)) {
+          listaNuvem = json;
+        } else if (json && Array.isArray(json.registros)) {
+          listaNuvem = json.registros;
+          // Se a nuvem trouxe o contrato e tanque salvos na aba Config_CCMV, atualiza o aparelho!
+          if (json.config && json.config.contrato) {
+            contrato = Object.assign(contrato, json.config.contrato);
+          }
+          if (json.config && json.config.litrosTanque !== undefined) {
+            litrosTanque = parseNum(json.config.litrosTanque, contrato.tanque);
+          }
+        } else if (json && Array.isArray(json.data)) {
+          listaNuvem = json.data;
+        }
+
+        telemetria = listaNuvem.map(r => ({
+          _rowIndex: r._rowIndex, 
+          Data: r.Data || r.data || new Date().toISOString(),
+          Odometro: parseNum(r.Odometro || r.odometro), 
+          KmRodado: parseNum(r.KmRodado || r.kmrodado), 
+          Litros: parseNum(r.Litros || r.litros), 
+          Valor: parseNum(r.Valor || r.valor), 
+          Combustivel: r.Combustivel || r.combustivel || "Gasolina", 
+          KmPorLitro: parseNum(r.KmPorLitro || r.kmporlitro)
+        })).filter(r => r.Odometro > 0).sort((a, b) => b.Odometro - a.Odometro);
+
+        // Sobrescreve o cache local com a verdade da nuvem
+        atualizarCacheLocal();
+        carregarCamposAluguel();
+
+        const ultOdo = telemetria.length > 0 ? parseNum(telemetria[0].Odometro) : parseNum(contrato.odoIni);
+        if ($('inOdo'))$('inOdo').value = ultOdo;
+        if ($('trocaOdoDevolucao'))$('trocaOdoDevolucao').value = ultOdo;
+
+        if (d) d.className = "w-2 h-2 rounded-full bg-emerald-400"; 
+        if (t) t.innerText = "Online";
+      } catch (e) {
+        console.warn("Erro ao puxar da nuvem, mantendo cache rápido:", e);
+        if (d) d.className = "w-2 h-2 rounded-full bg-rose-400"; 
+        if (t) t.innerText = "Offline";
+      }
+
+      renderUI();
+    }
+
+    // Botão para apagar LocalStorage (ex: no computador) e puxar tudo da planilha
+    async function limparCacheEPuxarNuvem() {
+      if (!confirm("Isso apagará os dados salvos no navegador deste aparelho e puxará tudo atualizado da Planilha Google. Continuar?")) return;
+      const urlSalva = API_URL;
+      localStorage.clear();
+      localStorage.setItem("CCMV_API_URL", urlSalva);
+      toggleModal('modalConfig', false);
+      await carregarNuvem();
+      alert("✅ Cache local limpo! Dados recarregados diretamente da nuvem.");
+    }
+
+    // Backup sob demanda dentro de Ajustes
     function baixarBackupLocal() {
       const dataStr = new Date().toISOString().split('T')[0];
       const pacoteBackup = {
@@ -636,160 +689,14 @@
         litrosTanque: litrosTanque,
         telemetria: telemetria
       };
-
-      // 1. Baixa arquivo JSON completo (Restauração total)
       const blobJson = new Blob([JSON.stringify(pacoteBackup, null, 2)], { type: "application/json;charset=utf-8" });
       const urlJson = URL.createObjectURL(blobJson);
       const aJson = document.createElement("a");
       aJson.href = urlJson;
-      aJson.download = `CCMV_Backup_Completo_${dataStr}.json`;
+      aJson.download = `CCMV_Backup_${dataStr}.json`;
       document.body.appendChild(aJson);
       aJson.click();
       document.body.removeChild(aJson);
-
-      // 2. Se houver lançamentos, baixa também CSV para abrir direto no Excel/Sheets
-      if (telemetria.length > 0) {
-        setTimeout(() => {
-          let csv = "Data;Odometro;KmRodado;Litros;Valor;Combustivel;KmPorLitro\n";
-          telemetria.forEach(r => {
-            csv += `${r.Data};${r.Odometro};${r.KmRodado};${r.Litros};${r.Valor};${r.Combustivel};${r.KmPorLitro}\n`;
-          });
-          const blobCsv = new Blob([csv], { type: "text/csv;charset=utf-8" });
-          const urlCsv = URL.createObjectURL(blobCsv);
-          const aCsv = document.createElement("a");
-          aCsv.href = urlCsv;
-          aCsv.download = `CCMV_Planilha_Local_${dataStr}.csv`;
-          document.body.appendChild(aCsv);
-          aCsv.click();
-          document.body.removeChild(aCsv);
-        }, 400);
-      }
-    }
-
-    // =========================================================
-    // REGRA 3: ENVIO POST BLINDADO ANTI-CORS
-    // =========================================================
-    async function enviarPostPlanilha(payloadObj) {
-      const response = await fetch(API_URL, {
-        method: "POST",
-        mode: "cors",
-        redirect: "follow",
-        headers: {
-          "Content-Type": "text/plain;charset=utf-8"
-        },
-        body: JSON.stringify(payloadObj)
-      });
-      return await response.json();
-    }
-
-    // =========================================================
-    // REGRA 1: SUBIR LOCALSTORAGE PRIMEIRO (PROIBIDO SOBRESCREVER)
-    // =========================================================
-    async function sincronizarSeguro() {
-      const d = $('dotSync'); const t = $('txtSync');
-      if (d) d.className = "w-2 h-2 rounded-full bg-amber-400 animate-ping"; 
-      if (t) t.innerText = "Sync...";
-
-      try {
-        // 1. Lê o que está atualmente na planilha
-        const res = await fetch(`${API_URL}?action=read&_t=${Date.now()}`, {
-          method: "GET",
-          redirect: "follow"
-        });
-        const json = await res.json();
-
-        let nuvemLista = [];
-        if (Array.isArray(json)) {
-          nuvemLista = json;
-        } else if (json && Array.isArray(json.data)) {
-          nuvemLista = json.data;
-        } else if (json && Array.isArray(json.telemetria)) {
-          nuvemLista = json.telemetria;
-        }
-
-        const nuvemNormalizada = nuvemLista.map(r => ({
-          _rowIndex: r._rowIndex || Date.now() + Math.random(),
-          Data: r.Data || r.data || new Date().toISOString(),
-          Odometro: parseNum(r.Odometro || r.odometro),
-          KmRodado: parseNum(r.KmRodado || r.kmrodado),
-          Litros: parseNum(r.Litros || r.litros),
-          Valor: parseNum(r.Valor || r.valor),
-          Combustivel: r.Combustivel || r.combustivel || "Gasolina",
-          KmPorLitro: parseNum(r.KmPorLitro || r.kmporlitro)
-        })).filter(r => r.Odometro > 0);
-
-        // 2. Identifica tudo que existe no LocalStorage do celular e NÃO está na planilha
-        const assinaturasNuvem = new Set(nuvemNormalizada.map(gerarAssinatura));
-        const faltandoNaPlanilha = telemetria.filter(r => !assinaturasNuvem.has(gerarAssinatura(r)));
-
-        // 3. Se houver dados locais inéditos, envia (POST) para o Google Sheets PRIMEIRO!
-        if (faltandoNaPlanilha.length > 0) {
-          await enviarPostPlanilha({
-            action: "sync_up",
-            registros: faltandoNaPlanilha,
-            contrato: contrato,
-            litrosTanque: litrosTanque
-          });
-        } else if (localStorage.getItem("CCMV_CONTRATO")) {
-          // Garante que o contrato local também esteja salvo na nuvem
-          await enviarPostPlanilha({
-            action: "save_config",
-            contrato: contrato,
-            litrosTanque: litrosTanque
-          });
-        }
-
-        // 4. Mescla de forma aditiva (Local + Nuvem sem apagar nada do celular)
-        const mapaUnificado = new Map();
-        nuvemNormalizada.forEach(r => mapaUnificado.set(gerarAssinatura(r), r));
-        telemetria.forEach(r => mapaUnificado.set(gerarAssinatura(r), r)); // Local tem prioridade
-
-        telemetria = Array.from(mapaUnificado.values()).sort((a, b) => b.Odometro - a.Odometro);
-        salvarEstadoLocal();
-
-        if (d) d.className = "w-2 h-2 rounded-full bg-emerald-400"; 
-        if (t) t.innerText = "Online";
-      } catch (e) {
-        console.warn("Aviso de sincronização:", e);
-        if (d) d.className = "w-2 h-2 rounded-full bg-rose-400"; 
-        if (t) t.innerText = "Local";
-      }
-
-      renderUI();
-    }
-
-    // Botão Manual: Forçar Envio Completo do Celular para a Planilha
-    async function forcarEnvioParaPlanilha() {
-      const btn = $('btnForcarEnvio');
-      const txtOrig = btn ? btn.innerHTML : "";
-      if (btn) {
-        btn.innerHTML = "<span>⏳</span> <span>Enviando p/ Planilha...</span>";
-        btn.disabled = true;
-      }
-
-      try {
-        const resp = await enviarPostPlanilha({
-          action: "force_push",
-          registros: telemetria,
-          contrato: contrato,
-          litrosTanque: litrosTanque
-        });
-
-        if (resp && resp.success !== false) {
-          if ($('dotSync')) $('dotSync').className = "w-2 h-2 rounded-full bg-emerald-400";
-          if ($('txtSync')) $('txtSync').innerText = "Online";
-          alert(`✅ Sucesso! Todos os ${telemetria.length} lançamentos e dados do contrato foram gravados na planilha Google Sheets.`);
-        } else {
-          throw new Error((resp && resp.error) || "Resposta inválida do Apps Script");
-        }
-      } catch (err) {
-        alert("⚠️ Não foi possível confirmar a gravação via POST. Verifique se você atualizou o código no Google Apps Script (Nova Versão).\n\nSeus dados continuam 100% salvos no celular!");
-      } finally {
-        if (btn) {
-          btn.innerHTML = txtOrig;
-          btn.disabled = false;
-        }
-      }
     }
 
     function toggleModal(id, open) { 
@@ -800,14 +707,12 @@
     function trocarAba(aba) {
       if (aba === 'cockpit') {
         $('viewCockpit').classList.remove('hidden'); 
-        $('viewAluguel').classList.add('hidden');
-        $('tabCockpit').className = "flex-1 py-1.5 rounded-lg bg-white text-slate-900 shadow-sm font-bold cursor-pointer transition-colors";
+        $('viewAluguel').classList.add('hidden');$('tabCockpit').className = "flex-1 py-1.5 rounded-lg bg-white text-slate-900 shadow-sm font-bold cursor-pointer transition-colors";
         $('tabAluguel').className = "flex-1 py-1.5 rounded-lg text-slate-400 font-bold hover:text-white cursor-pointer transition-colors";
         renderGrafico();
       } else {
         $('viewAluguel').classList.remove('hidden'); 
-        $('viewCockpit').classList.add('hidden');
-        $('tabAluguel').className = "flex-1 py-1.5 rounded-lg bg-white text-slate-900 shadow-sm font-bold cursor-pointer transition-colors";
+        $('viewCockpit').classList.add('hidden');$('tabAluguel').className = "flex-1 py-1.5 rounded-lg bg-white text-slate-900 shadow-sm font-bold cursor-pointer transition-colors";
         $('tabCockpit').className = "flex-1 py-1.5 rounded-lg text-slate-400 font-bold hover:text-white cursor-pointer transition-colors";
         carregarCamposAluguel();
       }
@@ -830,18 +735,18 @@
       
       const kmL = mediaKmLAtual > 0 ? mediaKmLAtual : 14.0;
       
-      if ($('clusterLitros')) $('clusterLitros').innerText = `${l.toFixed(1)} L`;
-      if ($('clusterPct')) $('clusterPct').innerText = `${pct}%`;
-      if ($('clusterAuto')) $('clusterAuto').innerText = `~${Math.round(l * kmL)} km`;
-      if ($('calibrarCapRef')) $('calibrarCapRef').innerText = `/ ${cap}L`;
+      if ($('clusterLitros'))$('clusterLitros').innerText = `${l.toFixed(1)} L`;
+      if ($('clusterPct'))$('clusterPct').innerText = `${pct}%`;
+      if ($('clusterAuto'))$('clusterAuto').innerText = `~${Math.round(l * kmL)} km`;
+      if ($('calibrarCapRef'))$('calibrarCapRef').innerText = `/ ${cap}L`;
     }
 
     function cliqueSegmento(num) {
       const cap = parseNum(contrato.tanque, 50);
       litrosTanque = (num / 8) * cap;
-      salvarEstadoLocal();
+      atualizarCacheLocal();
       renderUI();
-      enviarPostPlanilha({ action: "save_config", contrato: contrato, litrosTanque: litrosTanque }).catch(() => {});
+      enviarPostBackground({ action: "save_config", contrato: contrato, litrosTanque: litrosTanque });
     }
 
     function setCalibrarLitros(f) { 
@@ -852,9 +757,9 @@
       const v = parseNum($('inCalibrarLitros').value, -1);
       if (v >= 0) {
         litrosTanque = v;
-        salvarEstadoLocal();
+        atualizarCacheLocal();
         renderUI();
-        enviarPostPlanilha({ action: "save_config", contrato: contrato, litrosTanque: litrosTanque }).catch(() => {});
+        enviarPostBackground({ action: "save_config", contrato: contrato, litrosTanque: litrosTanque });
       }
       toggleModal('modalCalibrar', false);
     }
@@ -865,15 +770,13 @@
       if (modo === 'abastecer') {
         $('btnModoAbastecer').className = "px-3 py-1 rounded bg-white text-slate-900 shadow font-bold cursor-pointer";
         $('btnModoCheckin').className = "px-3 py-1 rounded text-slate-400 font-bold cursor-pointer";
-        $('secaoCamposAbastecimento').classList.remove('hidden');
-        $('btnSalvarReg').innerText = "Salvar Abastecimento";
+        $('secaoCamposAbastecimento').classList.remove('hidden');$('btnSalvarReg').innerText = "Salvar Abastecimento";
         $('inLitros').required = true; 
         $('inValor').required = true;
       } else {
         $('btnModoCheckin').className = "px-3 py-1 rounded bg-white text-slate-900 shadow font-bold cursor-pointer";
         $('btnModoAbastecer').className = "px-3 py-1 rounded text-slate-400 font-bold cursor-pointer";
-        $('secaoCamposAbastecimento').classList.add('hidden');
-        $('btnSalvarReg').innerText = "Salvar KM Diário";
+        $('secaoCamposAbastecimento').classList.add('hidden');$('btnSalvarReg').innerText = "Salvar KM Diário";
         $('inLitros').required = false; 
         $('inValor').required = false;
       }
@@ -892,7 +795,7 @@
       const ultOdo = telemetria.length > 0 ? parseNum(telemetria[0].Odometro) : parseNum(contrato.odoIni);
       const dKm = odo > ultOdo ? odo - ultOdo : 0;
       
-      if ($('prevKm')) $('prevKm').innerText = `${dKm} km`;
+      if ($('prevKm'))$('prevKm').innerText = `${dKm} km`;
       if ($('prevPrecoL'))$('prevPrecoL').innerText = (lit > 0 && val > 0) ? `R$ ${(val/lit).toFixed(2)}` : "R$ 0,00";
       
       if ($('prevKmL')) {
@@ -912,7 +815,7 @@
       if ($(id))$(id).addEventListener('input', livePreviewForm);
     });
 
-    // Salvar Registro (Salva no LocalStorage + Envia POST para a Planilha)
+    // Salvar Registro (Atualiza tela na hora e envia em background p/ nuvem)
     async function salvarRegistro(e) {
       e.preventDefault();
       const btn = $('btnSalvarReg');
@@ -949,41 +852,32 @@
         PrecoLitro: Number(pL.toFixed(2))
       };
 
-      // 1. Salva imediatamente no LocalStorage
       telemetria.unshift(novoRegistro);
       telemetria.sort((a, b) => b.Odometro - a.Odometro);
-      salvarEstadoLocal();
+      atualizarCacheLocal();
       renderUI();
 
-      // 2. Envia via POST para o Google Sheets
-      try {
-        await enviarPostPlanilha({
-          action: "create",
-          registro: novoRegistro,
-          contrato: contrato,
-          litrosTanque: litrosTanque
-        });
-        if ($('dotSync'))$('dotSync').className = "w-2 h-2 rounded-full bg-emerald-400";
-        if ($('txtSync'))$('txtSync').innerText = "Online";
-      } catch (err) { 
-        console.warn("Salvo localmente, pendente na nuvem:", err);
-        if ($('dotSync'))$('dotSync').className = "w-2 h-2 rounded-full bg-amber-400";
-        if ($('txtSync'))$('txtSync').innerText = "Pendente";
-      } finally { 
-        if ($('formRegistro'))$('formRegistro').reset(); 
-        if ($('inValor')) delete$('inValor').dataset.manual;
-        if ($('inOdo'))$('inOdo').value = odo;
-        if (btn) {
-          btn.innerText = modoForm === 'abastecer' ? "Salvar Abastecimento" : "Salvar KM Diário"; 
-          btn.disabled = false; 
-        }
+      if ($('formRegistro'))$('formRegistro').reset(); 
+      if ($('inValor')) delete$('inValor').dataset.manual;
+      if ($('inOdo'))$('inOdo').value = odo;
+      if (btn) {
+        btn.innerText = modoForm === 'abastecer' ? "Salvar Abastecimento" : "Salvar KM Diário"; 
+        btn.disabled = false; 
       }
+
+      // Envia em segundo plano e depois sincroniza IDs da planilha
+      await enviarPostBackground({
+        action: "create",
+        registro: novoRegistro,
+        contrato: contrato,
+        litrosTanque: litrosTanque
+      });
+      carregarNuvem();
     }
 
     // Renderiza UI Global & Matemática Real (Tanque Cheio na Retirada)
     function renderUI() {
       if (!contrato) return;
-      atualizarStatusLocal();
 
       const ultOdo = telemetria.length > 0 ? parseNum(telemetria[0].Odometro) : parseNum(contrato.odoIni);
       if ($('hintUltimoKm'))$('hintUltimoKm').innerText = `Último: ${ultOdo.toLocaleString('pt-BR')} km`;
@@ -1038,7 +932,7 @@
         const odo = parseNum(r.Odometro);
         tGastoGeral += v;
 
-        if (odo >= odoIniCarro && l > 0) {
+        if (odo > odoIniCarro && l > 0) {
           litrosAbastecidosNoCarroAtual += l;
         }
 
@@ -1128,18 +1022,15 @@
       if (!removido) return;
 
       telemetria.splice(idx, 1);
-      salvarEstadoLocal();
+      atualizarCacheLocal();
       renderUI();
 
-      try { 
-        await enviarPostPlanilha({
-          action: "delete",
-          odometro: removido.Odometro,
-          rowIndex: removido._rowIndex
-        });
-      } catch (e) { 
-        console.warn("Excluído localmente");
-      }
+      await enviarPostBackground({
+        action: "delete",
+        odometro: removido.Odometro,
+        rowIndex: removido._rowIndex
+      });
+      carregarNuvem();
     }
 
     function calcularFlex() {
@@ -1220,9 +1111,9 @@
       contrato.franquia = parseNum($('cfgFranquia').value, 2000); 
       contrato.kmAnt = parseNum($('cfgKmAnt').value, 0);
       
-      salvarEstadoLocal();
-      enviarPostPlanilha({ action: "save_config", contrato: contrato, litrosTanque: litrosTanque }).catch(() => {});
-      alert("Configurações atualizadas!");
+      atualizarCacheLocal();
+      enviarPostBackground({ action: "save_config", contrato: contrato, litrosTanque: litrosTanque });
+      alert("Configurações salvas e enviadas para a nuvem!");
       renderUI(); 
       trocarAba('cockpit');
     }
@@ -1242,8 +1133,8 @@
       
       // Novo carro retirado com tanque cheio (8 barras)
       litrosTanque = contrato.tanque;
-      salvarEstadoLocal();
-      enviarPostPlanilha({ action: "save_config", contrato: contrato, litrosTanque: litrosTanque }).catch(() => {});
+      atualizarCacheLocal();
+      enviarPostBackground({ action: "save_config", contrato: contrato, litrosTanque: litrosTanque });
       
       if ($('inOdo'))$('inOdo').value = contrato.odoIni;
       if ($('trocaOdoDevolucao'))$('trocaOdoDevolucao').value = contrato.odoIni;
@@ -1266,7 +1157,7 @@
         API_URL = v; 
         localStorage.setItem("CCMV_API_URL", v); 
         toggleModal('modalConfig', false); 
-        sincronizarSeguro(); 
+        carregarNuvem(); 
       }
     }
     
@@ -1279,7 +1170,7 @@
         const res = await fetch(`${$('cfgApiUrl').value}?action=read&_t=${Date.now()}`);
         const json = await res.json();
         statusBox.className = "text-[10px] font-num p-2 rounded mt-2 bg-emerald-500/10 text-emerald-400"; 
-        statusBox.innerText = "✅ Conectado! Endpoint ativo."; 
+        statusBox.innerText = "✅ Conectado! Nuvem operacional."; 
       } catch (e) { 
         statusBox.className = "text-[10px] font-num p-2 rounded mt-2 bg-rose-500/10 text-rose-400"; 
         statusBox.innerText = "❌ Erro de permissão ou URL inválida."; 
@@ -1300,8 +1191,10 @@
       if ($('inOdo'))$('inOdo').value = ultOdo;
       if ($('trocaOdoDevolucao'))$('trocaOdoDevolucao').value = ultOdo;
       carregarCamposAluguel();
+      // 1. Renderiza imediato pelo cache local (0ms)
       renderUI();
-      sincronizarSeguro(); // Sobe o LocalStorage primeiro e mescla sem apagar
+      // 2. Puxa a verdade da Nuvem em seguida e atualiza o aparelho
+      carregarNuvem();
     });
   </script>
 </body>
